@@ -6,3 +6,6 @@
 !Makefile
 !README*
 !css.html
+!.github
+!.github/workflows
+!.github/workflows/*.yaml
