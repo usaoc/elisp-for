@@ -1,0 +1,49 @@
+# Copyright (C) 2022 Wing Hei Chan
+
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.  This file is offered as-is,
+# without any warranty.
+
+#+title: For
+
+For is an Emacs Lisp extension package that provides iteration and
+sequence forms inspired by Racket.  For detailed documentation, refer
+to [[https://usaoc.github.io/for/][the manual]].
+
+* Introduction
+  [[https://racket-lang.org/][Racket]], extending on the idea of [[https://srfi.schemers.org/srfi-42/srfi-42.html][SRFI 42]], provides [[https://docs.racket-lang.org/reference/sequences.html][iteration]] and
+  [[https://docs.racket-lang.org/reference/sequences.html][sequence]] forms that are both efficient and generic.  The iteration
+  forms essentially expand to calls to self-tail-recursive procedures,
+  similar to [[https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-10.html][~do~ and named ~let~ forms]].  The sequence constructors
+  serve a twofold purpose, acting both as [[https://docs.racket-lang.org/reference/Macros.html][transformers]] and normal
+  procedures.  This package aims to implement a subset of the
+  functionalities of Racket's iteration and sequence forms.  For those
+  looking for iteration forms closer to [[http://www.lispworks.com/documentation/HyperSpec/Body/06_a.htm][the Common Lisp Loop Facility]],
+  [[https://www.gnu.org/software/emacs/manual/html_node/cl/Loop-Facility.html][also available in Emacs Lisp]], [[https://github.com/okamsn/loopy][Loopy]] is a better option that provides
+  iteration forms in the same vein as [[https://iterate.common-lisp.dev/][Iterate]].
+
+* How to Use
+  This package can be installed through the user's package manager of
+  choice, such as the built-in [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html][package manager]] or [[https://github.com/radian-software/straight.el][Straight]].  A
+  [[file:Makefile][=Makefile=]] is provided for those who manually install the package,
+  where targets are available for compiling the Emacs Lisp files as
+  well as building the documentation.
+
+  If only the iteration forms and sequence expanders are used, it is
+  recommended that the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Named-Features.html][named feature]] ~for~ be available only [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Eval-During-Compile.html][at
+  compile time]], otherwise the named feature must also be available
+  at execution time.  The [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffer_002dLocal-Variables.html][buffer-local variable]] ~for-binder~ can be
+  specified [[https://www.gnu.org/software/emacs/manual/html_node/emacs/File-Variables.html][file-locally]] or [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html][directory-locally]] to alter the behavior of
+  certain ~let~-like forms.  [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Shorthands.html][Shorthands]] may be useful for those who
+  use the sequence generators.
+
+  Although it is not a must, it is recommended that [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Variable-Scoping.html][lexical binding]] be
+  enabled, as this package is designed and optimized for such usage.
+
+  This package requires minimally Emacs 28.1.
+
+* Contribute
+  [[https://github.com/usaoc/for/issues][Submit an issue]] for bug reports and general discussion.  [[https://github.com/usaoc/for/pulls][Submit a
+  pull request]] for patches.  Otherwise, [[mailto:whmunkchan@outlook.com][send an email]] with patches
+  attached if any.

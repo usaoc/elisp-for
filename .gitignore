@@ -1,0 +1,8 @@
+*
+!.gitignore
+!*.el
+!*.texi
+!COPYING
+!Makefile
+!README*
+!css.html

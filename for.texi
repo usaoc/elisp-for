@@ -1,0 +1,1498 @@
+\input texinfo
+@c %**start of header
+@settitle For
+@documentencoding UTF-8
+@c %**end of header
+
+@set title For
+@set subtitle Iteration and Sequence
+@set author Wing Hei Chan
+@set year 2022
+@set version 0.1
+
+@macro enquote{phrase}
+``\phrase\''
+@end macro
+
+@macro concept{entry, subentry}
+@cindex \entry\ @subentry \subentry\
+@end macro
+
+@macro rnrs{n}
+@acronym{R@sup{\n\}RS, @cite{Revised@sup{\n\} Report on the Algorithmic
+Language Scheme}}
+@end macro
+
+@macro is{result}
+     @result{} \result\
+@end macro
+
+@rmacro optional{form}
+[\form\]
+@end rmacro
+
+@rmacro repeated{form}
+\form\@dots{}
+@end rmacro
+
+@macro aux{name, subforms}
+{Auxiliary Operator} \name\ \subforms\
+@end macro
+
+@macro seq{name, alias, subforms}
+Function \name\ \subforms\
+@deffnx @aux{\alias\ \subforms\}
+@end macro
+
+@macro seqx{name, alias, subforms}
+@deffnx @seq{\name\, \alias\, \subforms\}
+@end macro
+
+@copying
+This manual documents @value{title} (version @value{version}).
+
+Copyright @copyright{} @value{year} @value{author}
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled @enquote{GNU
+Free Documentation License}.
+@end quotation
+@end copying
+
+@dircategory Emacs
+@direntry
+* @value{title}: (for).      Iteration and sequence.
+@end direntry
+
+@finalout
+@titlepage
+@title @value{title}
+@subtitle @value{subtitle}
+@author @value{author}
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+@contents
+
+@node Top
+@top @value{title}
+This package provides iteration and sequence forms inspired by Racket.
+Two major facilities are provided:
+
+@enumerate
+@item
+Generic iteration forms equivalent to @code{named-let} forms;
+
+@item
+Generic sequence constructors that are both expanders and generators.
+@end enumerate
+
+@insertcopying
+
+@menu
+* Introduction::                Who put @code{for} loops in my Lisp?
+* Basic Concepts::              You ought to well understand them.
+* Buffer-Local Variables::      Look, this package has variables!
+* Definers::                    Are definitions expressions?
+* Iteration Forms::             When @code{for} loops meet @code{let} forms.
+* Sequence Constructors::       Let's construct the construction.
+* Concept Index::               All your concept are belong to us.
+* Function Index::              Otherwise what are you looking for?
+* Variable Index::              Variables can programmatically vary.
+* GNU Free Documentation License::  Embrace the computing freedom.
+
+@detailmenu
+ --- The Detailed Node Listing ---
+
+Basic Concepts
+
+* For Clauses::                 The heart of an iteration form.
+* Sequence Forms::              Is it an expander or a generator?
+* Multiple Values::             Because a single value is not enough.
+
+Iteration Forms
+
+* Iteration Macros::            They head the iteration forms.
+* Special-Clause Operators::    How special are they, anyway?
+
+@end detailmenu
+@end menu
+
+@node Introduction
+@chapter Introduction
+@concept{comparison to @code{cl-loop}, Lispy}
+@concept{comparison to @code{cl-loop}, functional}
+@concept{terminology, expression}
+@concept{terminology, form}
+@concept{terminology, subexpression}
+@concept{terminology, subform}
+
+Despite the same name as the imperative iteration construct in
+@url{https://doi.org/10.1093/comjnl/5.4.349, Algol}, this package is
+inspired by the @url{https://docs.racket-lang.org/reference/for.html,
+iteration} and
+@url{https://docs.racket-lang.org/reference/sequences.html, sequence}
+forms@footnote{Following
+@url{https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-7.html,
+Scheme} as opposed to
+@url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_e.htm,
+Common Lisp} and Emacs Lisp (@pxref{Forms,,,elisp}), this manual refers
+to an arbitrary Lisp object (@pxref{Lisp Data Types,,,elisp}) as a
+@dfn{form} and a form intended to be evaluated
+(@pxref{Evaluation,,,elisp}) as an @dfn{expression}.  This means
+expressions are a subset of forms.  Similarly, what Common Lisp calls a
+@url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_s.htm,
+@dfn{subexpression}} is called a @dfn{subform} in this manual.} in
+@url{https://racket-lang.org/, Racket}, which in turn is inspired by
+@url{https://srfi.schemers.org/srfi-42/srfi-42.html, @acronym{SRFI,
+Scheme Request for Implementation} 42}.  They are designed in such a way
+that they can be both efficient and generic.  The distinctive feature of
+them is that a sequence form can act either as an expander or a
+generator (@pxref{Generators,,,elisp}), and the former is used in the
+iteration forms, that is, @code{for-fold} forms and derivatives.
+Essentially, @code{for-fold} forms are equivalent to @code{named-let}
+forms (@pxref{Local Variables,,,elisp}), whose self-tail calls are
+optimized to @code{while} loops (@pxref{Iteration,,,elisp})@footnote{In
+fact, @code{for-fold} forms directly expand to @code{while} loops for
+efficiency.  Moreover, the full recursive power of @code{named-let}
+forms are not needed for sequence iterations.  Nonetheless, it is useful
+to think of @code{for-fold} forms in terms of the equivalent
+@code{named-let} forms.}.  Therefore, the iteration forms can act as
+Lispy@footnote{@dfn{Lispy} in the sense that they use Lisp-like
+parenthesized syntax as opposed to Algol-like keyword-delimited syntax.
+@url{https://www.cs.cmu.edu/Groups/AI/html/cltl/clm/node235.html, The
+Common Lisp Loop Facility} has
+@url{https://doi.org/10.1145/154766.155373, its origin in Interlisp} and
+has been
+@url{https://iterate.common-lisp.dev/doc/Don_0027t-Loop-Iterate.html,
+criticized for its Algol-like syntax}.} and
+functional@footnote{@dfn{Functional} in the sense that they are
+equivalent to applications of self-tail-recursive functions that
+@url{https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-11.html,
+transform local states}.} replacements of the built-in iteration forms,
+such as @code{cl-loop} (@pxref{Loop Facility,,,cl}).
+
+A simple yet contrived @code{cl-loop} form:
+
+@example
+@group
+(cl-loop for item in '(a 2 "3")
+         for number = (or (and (numberp item) item)
+                          (and (stringp item)
+                               (string-to-number item)))
+         if number collect number)
+@is{(2 3)}
+@end group
+@end example
+
+An equivalent @code{for-list} form with an @code{:if-let} special
+clause:
+
+@example
+@group
+(for-list ((item '(a 2 "3"))
+           (:if-let (number (or (and (numberp item) item)
+                                (and (stringp item)
+                                     (string-to-number item)))))
+           number))
+@is{(2 3)}
+@end group
+@end example
+
+An equivalent @code{for-list} form with a @code{:pcase} special clause:
+
+@example
+@group
+(for-list ((item '(a 2 "3"))
+           (:pcase item (or (and (cl-type number) number)
+                            (and (cl-type string)
+                                 (app string-to-number number))))
+           number))
+@is{(2 3)}
+@end group
+@end example
+
+All other iteration forms are derived from @code{for-fold} forms, which
+in turn are equivalent to @code{named-let} forms.  In contrast, sequence
+forms are defined through the definer @code{define-for-sequence}.  When
+sequence forms are used in iteration clauses, they support aliases,
+expanders, as well as dynamic dispatch; when used as function forms,
+their function definitions are invoked, which are the corresponding
+generators.
+
+Aliases and expanders are available in iteration clauses:
+
+@example
+@group
+(for-list ((item (in-producer #'random)) (5) item))
+@is{#<a list of five pseudo-random integers>}
+@end group
+@end example
+
+Generators are available in function forms:
+
+@example
+@group
+(cl-loop for item iter-by (for-in-producer #'random)
+         repeat 5 collect item)
+@is{#<a list of five pseudo-random integers>}
+@end group
+@end example
+
+Support for destructuring is a non-aim of this package.  For that, one
+should leverage @code{pcase-let} (@pxref{Destructuring with @code{pcase}
+Patterns,,,elisp}) or similar forms @emph{downward compatible} with
+@code{let} forms.  By default, the iteration forms use @code{pcase-let}
+forms, but this is configurable through the buffer-local variable
+@code{for-binder}.
+
+The destructuring capability of @code{cl-loop} forms:
+
+@example
+@group
+(cl-loop for (number . string) in '((1 . "1") (2 . "b") (3 . "3"))
+         if (eql number (string-to-number string)) collect number)
+@is{(1 3)}
+@end group
+@end example
+
+@code{for-list} forms use @code{pcase-let} forms by default:
+
+@example
+@group
+(for-list ((`(,number . ,string) '((1 . "1") (2 . "b") (3 . "3")))
+           (:if (eql number (string-to-number string))) number))
+@is{(1 3)}
+@end group
+@end example
+
+The equivalent @code{:pcase} special clause:
+
+@example
+@group
+(for-list ((pair '((1 . "1") (2 . "b") (3 . "3")))
+           (:pcase pair `(,number . ,(app string-to-number number)))
+           number))
+@is{(1 3)}
+@end group
+@end example
+
+All things considered, the iteration forms are both as efficient as
+specialized iterations and as generic as the sequence functions
+(@pxref{Sequence Functions,,,elisp}).  Moreover, they are more easily
+extensible as compared to @code{cl-loop} forms.
+
+@node Basic Concepts
+@chapter Basic Concepts
+This package introduces several concepts pertaining to the iteration
+forms.  In particular, three concepts are fundamental and therefore are
+briefly discussed in this chapter.  More detailed specifications can be
+found in later chapters.
+
+@menu
+* For Clauses::                 The heart of an iteration form.
+* Sequence Forms::              Is it an expander or a generator?
+* Multiple Values::             Because a single value is not enough.
+@end menu
+
+@node For Clauses
+@section For Clauses
+@concept{for clause, iteration clause}
+@concept{for clause, special clause}
+@concept{terminology, an error}
+@concept{terminology, list}
+@concept{terminology, proper list}
+
+The expansion of an iteration form is driven by a series of @dfn{for
+clauses}, classified into @dfn{iteration clauses} and @dfn{special
+clauses}.  Iteration clauses decide the shapes of the expanded forms,
+and special clauses wrap the partially expanded forms in some ways.  For
+example, an iteration clause @code{(item '(a 2 "3"))} decides that
+@code{item} is bound to each @code{car} of the literal list
+(@pxref{Quoting,,,elisp}) sequence @code{(a 2 "3")} and that the
+iteration is stopped when it reaches the terminating empty list
+(@pxref{Box Diagrams,,,elisp})@footnote{In this manual, an object is a
+@dfn{list} if and only if it is a proper list.  Following
+@url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_p.htm,
+Common Lisp} and Emacs Lisp (@pxref{Cons Cells,,,elisp}), a @dfn{proper
+list} is either the empty list or a list terminated by the empty list.
+It is an error for it to be any other structure produced by @code{cons}
+(@pxref{Building Lists,,,elisp})@footnote{Following
+@url{https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-4.html,
+@rnrs{5}}, @dfn{an error} does not specify whether or when the error is
+detected or reported.}.}.  A special clause @code{(:if (numberp item))}
+@emph{following} the iteration clause decides that the partially
+expanded form is skipped unless @code{item} is @code{numberp}
+(@pxref{Predicates on Numbers,,,elisp}).
+
+@code{sum} is only updated when @code{item} is @code{numberp}:
+
+@example
+@group
+(for-fold ((sum 0))
+    ((item '(a 2 "3")) (:if (numberp item)) (+ item sum)))
+@is{2}
+@end group
+@end example
+
+An equivalent @code{named-let} form:
+
+@example
+@group
+(let ((sum 0))
+  (named-let loop ((sum sum) (tail '(a 2 "3")))
+    (if (null tail) sum
+      (let ((item (car tail)))
+        (loop (if (numberp item) (+ item sum) sum) (cdr tail))))))
+@is{2}
+@end group
+@end example
+
+Consecutive iteration clauses are considered parallel and thus iterated
+at the same time.  When one of them ends, the iteration ends.  This
+gives rise to the usefulness of infinite sequences.
+
+@concept{convention, optional form}
+@concept{convention, repeated form}
+
+@code{(in-naturals @optional{@var{start}})}@footnote{In this manual, a
+metavariable is typeset as @samp{@var{metavariable}}, an optional form
+is typeset as @samp{@optional{@var{optional-form}}}, and a form repeated
+@emph{once or more} as @samp{@repeated{@var{repeated-form}}}.  This is
+the same as the Emacs Lisp Manual (@pxref{A Sample Function
+Description,,,elisp}) modulo the @samp{@repeated{@var{repeated-form}}}
+convention.} is an infinite sequence:
+
+@example
+@group
+(for-list ((natural (in-naturals)) (item '(a b c))
+           (cons natural item)))
+@is{((0 . a) (1 . b) (2 . c))}
+@end group
+@end example
+
+As a consequence, special clauses also serve the purpose of delimiting
+iteration clauses into groups.  A group of iteration clauses
+@emph{preceded} by another group is effectively nested.  Because the
+nesting behavior is so commonly desired, implicitly nesting variants of
+the iteration forms are provided.  They transform the for clauses by
+separating each pair of adjacent iteration clauses with a vacuous
+special clause.
+
+@code{(item2 '(2 3 4))} nested by @code{(item1 '(1 2))} due to the
+presence of @code{(:let)}:
+
+@example
+@group
+(for-list ((item1 '(1 2)) (:let) (item2 '(2 3 4))
+           (cons item1 item2)))
+@is{((1 . 2) (1 . 3) (1 . 4) (2 . 2) (2 . 3) (2 . 4))}
+@end group
+@end example
+
+An equivalent @code{for-list*} form:
+
+@example
+@group
+(for-list* ((item1 '(1 2)) (item2 '(2 3 4))
+            (cons item1 item2)))
+@is{((1 . 2) (1 . 3) (1 . 4) (2 . 2) (2 . 3) (2 . 4))}
+@end group
+@end example
+
+@concept{terminology, identifier}
+
+An iteration clause normally has the form @code{(@var{form}
+@var{sequence})} where the form of @var{form} is specified by the value
+of @code{for-binder} and @var{sequence} is a sequence form.
+Alternatively, it can have the form @code{(@var{sequence})}, in which
+case it is transformed to @code{(@var{identifier} @var{sequence})} with
+a generated identifier@footnote{In
+@url{http://www.r6rs.org/final/html/r6rs-lib/r6rs-lib-Z-H-13.html,
+@rnrs{6}}, an @dfn{identifier} is roughly a syntax object of
+non-constant symbol.  Emacs Lisp does not have the concept of syntax
+object.  Nonetheless, this manual follows such usage of the
+terminology.} (@pxref{Creating Symbols,,,elisp}) as @var{identifier}.  A
+special clause has the form @code{(@var{keyword} . @var{subforms})}
+where @var{keyword} is one of the keywords (@pxref{Constant
+Variables,,,elisp}) accepted by the grammar and the form of
+@var{subforms} is decided by @var{keyword}.
+
+@node Sequence Forms
+@section Sequence Forms
+@concept{sequence form, expander}
+@concept{sequence form, iterator}
+
+A @dfn{sequence form} represents an ordered collection of values, much
+like an @dfn{iterator} (@pxref{Generators,,,elisp}).  In fact, a
+sequence form produces an iterator when evaluated as a function form
+(@pxref{Function Forms,,,elisp}).  Nonetheless, iterators are relatively
+expensive since they capture the states.  Rather than keeping the states
+in another object, a sequence form can be directly expanded in an
+iteration form when an @dfn{expander} is available.
+
+Produce an iterator that iterates over the list and iterate over
+the values of it:
+
+@example
+@group
+(let ((iterator (for-in-list '(1 2 3))))
+  (for-vector ((item (for-in-iterator iterator)) item)))
+@is{@optional{1 2 3}}
+@end group
+@end example
+
+Directly iterate over the list:
+
+@example
+@group
+(for-vector ((item (for-in-list '(1 2 3))) item))
+@is{@optional{1 2 3}}
+@end group
+@end example
+
+@concept{sequence form, alias}
+
+For convenience, a sequence constructor can have @dfn{aliases} when used
+in iteration clauses to avoid the need of shorthands
+(@pxref{Shorthands,,,elisp}).
+
+@code{for-in-list} and @code{for-in-range} have aliases:
+
+@example
+@group
+(for-list ((item (in-list '(a b c))) (number (in-range 1 5 2))
+           (cons item number)))
+@is{((a . 1) (b . 3))}
+@end group
+@end example
+
+@concept{sequence form, dynamic dispatch}
+
+@dfn{Dynamic dispatch} based on the value of the application of
+@code{type-of} (@pxref{Type Predicates,,,elisp}) to the datum is
+available when the datum is used as a sequence form in iteration
+clauses.  Functions are assumed to be iterators and dispatched to
+themselves.
+
+A @code{cons} dispatched to the application of @code{for-in-list} to it:
+
+@example
+@group
+(let ((list '(1 2 3)))
+  (for-list ((item list) item)))
+@is{(1 2 3)}
+@end group
+@end example
+
+A @code{for-in-list} iterator dispatched to itself:
+
+@example
+@group
+(let ((iterator (for-in-list '(1 2 3))))
+  (for-list ((item iterator) item)))
+@is{(1 2 3)}
+@end group
+@end example
+
+@concept{sequence form, literal object}
+@concept{terminology, after macro-expansion}
+
+Analogous to dynamic dispatch, certain @dfn{literal
+objects}@footnote{Following
+@url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_l.htm,
+Common Lisp}, a self-evaluating (@pxref{Self-Evaluating Forms,,,elisp})
+literal object can be either quoted or unquoted.} after
+macro-expansion@footnote{@dfn{After macro-expansion} alludes to the fact
+that the forms are expanded ahead of time and inspected during the
+expansion (@pxref{Expansion,,,elisp}) of one of their enclosing forms.
+This involves global macros, compiler macros, local macros, as well as
+symbol macros (@pxref{Macros,,,elisp} and @ref{Macros,,,cl}).} are
+implicitly wrapped in sequence forms when used in iteration clauses.
+Currently, literal lists, arrays (@pxref{Arrays,,,elisp}), and integers
+(@pxref{Integer Basics,,,elisp}) are recognized.
+
+Recognized literal objects are implicitly wrapped in sequence forms:
+
+@example
+@group
+(cl-symbol-macrolet ((literal-number 3))
+  (cl-macrolet ((literal-list (&rest forms) `',forms)
+                (literal-vector (&rest forms) `@optional{,@@forms}))
+    (for-sum ((number1 literal-number)
+              (number2 (literal-list 3 4 5))
+              (number3 (literal-vector 6 7 8))
+              (* number1 number2 number3)))))
+@is{108}
+@end group
+@end example
+
+An equivalent @code{for-sum} form without local macros and symbol
+macros:
+
+@example
+@group
+(for-sum ((number1 (in-range 3))
+          (number2 (in-list '(3 4 5)))
+          (number3 (in-array @optional{6 7 8}))
+          (* number1 number2 number3)))
+@is{108}
+@end group
+@end example
+
+@node Multiple Values
+@section Multiple Values
+@concept{limitation, multiple values}
+
+It is not uncommon for one to iteratively update multiple state
+variables.  To functionally do so, it is convenient to be able to
+produce multiple values from a single expression where the values are in
+turn consumed by the self-tail-recursive function.  Unfortunately, Emacs
+Lisp does not support multiple values.  To circumvent the limitation, a
+partial support for @dfn{multiple-value forms} is
+implemented@footnote{In a
+@url{https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-9.html,
+standard Scheme} implementation, a continuation can receive multiple
+values, and correspondingly a procedure can deliver multiple values to
+its continuation.  This is unfeasible to implement in Emacs Lisp.
+Instead, a multiple-value form is transformed to imperative updates with
+macro-expansion-time checking of the number of values.}.
+
+A @code{cl-loop} form involving multiple state variables:
+
+@example
+@group
+(cl-loop with value1 = 0 and value2 = '() and value3 = -1.0e+INF
+         for number below 5 do
+         (cl-incf value1 number)
+         (push number value2)
+         (cl-callf max value3 number)
+         finally return (list value1 (nreverse value2) value3))
+@is{(10 (0 1 2 3 4) 4)}
+@end group
+@end example
+
+An equivalent @code{for-do} form:
+
+@example
+@group
+(let ((value1 0) (value2 '()) (value3 -1.0e+INF))
+  (for-do ((number 5) (:do (cl-incf value1 number)
+                           (push number value2)
+                           (cl-callf max value3 number))))
+  (list value1 (nreverse value2) value3))
+@is{(10 (0 1 2 3 4) 4)}
+@end group
+@end example
+
+An equivalent @code{for-fold} form:
+
+@example
+@group
+(for-fold ((value1 0) (value2 '()) (value3 -1.0e+INF)
+           (:result (list value1 (nreverse value2) value3)))
+    ((number 5) (:values (+ number value1)
+                         (cons number value2)
+                         (max number value3))))
+@is{(10 (0 1 2 3 4) 4)}
+@end group
+@end example
+
+Other than where the iteration forms expect a multiple-value form,
+multiple-value forms can appear in certain syntactic positions after
+macro-expansion.  It is an error for a multiple-value form to be in a
+syntactically invalid position.  The formal grammar of multiple-value
+forms in an @acronym{EBNF, Extended Backus--Naur Form} is as follows:
+
+@example
+@group
+@var{multiple-value-form} = @var{tail-form}
+                    | (cond @repeated{(@var{guard} . @var{body})})
+                    | (if @var{guard} @var{multiple-value-form} . @var{body})
+                    | (@var{let} @var{varlist} . @var{body})
+                    | (@var{progn} . @var{body})
+@end group
+
+@group
+@var{tail-form} = @var{expression} | (:values @optional{@repeated{@var{expression}}})
+@end group
+
+@group
+@var{body} = (@optional{@repeated{@var{expression}}} @var{multiple-value-form})
+@end group
+
+@group
+@var{let} = let | let*
+@end group
+
+@group
+@var{progn} = progn | save-current-buffer
+      | save-excursion | save-restriction
+@end group
+@end example
+
+@concept{multiple-value form, tail form}
+@concept{terminology, generalized Boolean}
+
+The form of @var{varlist} is as in normal @code{let} and @code{let*}
+forms.  An @var{expression} and a @var{guard} are both expressions where
+the value of latter is specifically interpreted as a generalized
+Boolean@footnote{Following
+@url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_g.htm,
+Common Lisp}, a @dfn{generalized Boolean} value is an arbitrary Lisp
+object where only @code{nil} is false.} value.  A @var{tail-form} is a
+@dfn{tail form} where an @var{expression} is equivalent to
+@code{(:values @var{expression})} and a @code{(:values
+@optional{@repeated{@var{expression}}})} form produces as many values as
+there are @var{expression}s.  It is an error for two tail forms of a
+multiple-value form to produce unmatched numbers of values.  The grammar
+is actually a subset of Emacs Lisp's special forms (@pxref{Special
+Forms,,,elisp}) with @var{tail-form} added.  In a sense, special forms
+are extended to support multiple-value forms where possible.
+
+@node Buffer-Local Variables
+@chapter Buffer-Local Variables
+All buffer-local variables in this package are provided so that the
+expansion of certain forms can be configured file-locally.  This chapter
+specifies them.
+
+@defvar for-binder
+This buffer-local variable has a symbol as its value that is used as the
+head of certain @code{let}-like forms.  The function cell
+(@pxref{Function Cells,,,elisp}) of the symbol stores either a primitive
+function (@pxref{Primitive Function Type,,,elisp}) or a macro
+@emph{downward compatible} with @code{let}.  It is an error for it to
+store any other value.  The default value is @code{pcase-let}.
+
+For example, a semantics similar to @code{in-ref} clauses of
+@code{cl-loop} forms can be achieved by setting @code{for-binder} to
+@code{cl-symbol-macrolet}:
+
+@example
+@group
+for-binder
+@is{cl-symbol-macrolet}
+@end group
+
+@group
+(let ((list (list 1 2 3)))
+  (for-do ((reference (in-list list)) (:do (setf reference nil))))
+  list)
+@is{(nil nil nil)}
+@end group
+@end example
+@end defvar
+
+@node Definers
+@chapter Definers
+Two definers are available for defining sequence constructors and
+special clause operators.  This chapter specifies them.
+
+@defmac define-for-sequence @var{name} @var{arglist} @optional{@var{docstring}} @optional{@repeated{@var{subform}}} @optional{@repeated{@var{body}}}
+This definer defines the sequence constructor @var{name} as a generator
+with @var{arglist} as the argument list, an optional @var{docstring} as
+the documentation string, and optional @var{body}s as the body.  When no
+@var{body} is present and @var{arglist} does not contain a @code{&rest}
+argument (@pxref{Argument List,,,elisp}), the default body is used.
+
+The default body is as follows where @var{args} is @var{arglist} with a
+potential @code{&optional} keyword (@pxref{Argument List,,,elisp})
+removed:
+
+@example
+@group
+(iter-make (for-do ((value (@var{name} . @var{args}))
+                    (:do (iter-yield value)))))
+@end group
+@end example
+
+Additional properties can be associated with the sequence constructor
+with optional @var{subform}s where a @var{subform} is one of the
+following types:
+
+@itemize
+@item
+@code{(declare @optional{@repeated{@var{declaration}}})}
+
+@item
+@code{(:alias @optional{@repeated{@var{alias}}})}
+
+@item
+@code{(:type @optional{@repeated{@var{type}}})}
+
+@item
+@code{(:expander (@var{arg}) @repeated{@var{body}})} @emph{or}
+@code{(:expander-case @optional{@repeated{@var{case}}})}
+@end itemize
+
+It is an error for a type to appear more than once.  The form of
+@code{declare} subforms is the same as normal @code{declare} forms
+(@pxref{Declare Form,,,elisp}).  An @var{alias} is an identifier as an
+alias of @var{name} available when used in iteration clauses.  A
+@var{type} is a symbol as a type dispatched to @var{name} when used in
+iteration clauses.  When an @code{:expander} subform is present, an
+expander with @var{arg} as the sole argument and @var{body}s as the body
+is defined and available when used in iteration clauses.  The expander
+receives the iteration clause as the argument and produces an expanded
+iteration clause.  An @code{:expander-case} subform is equivalent to an
+@code{:expander} subform with @code{(pcase-exhaustive @var{arg}
+@optional{@repeated{@var{case}}})} as the sole expression in @var{body}.
+
+Note that the subforms are processed @emph{before} the generator is
+defined.  Therefore, the aliases and expander are available in the body
+of generator.
+@end defmac
+
+@defmac define-for-special-clause @var{name} @var{arglist} @optional{@var{docstring}} @optional{@repeated{@var{subform}}}
+This definer defines the special-clause operator @var{name} as an
+expander with an optional @var{docstring} as the documentation string.
+It is an error for @var{name} to be a non-keyword.  When a special
+clause @code{(@var{name} . @var{subforms})} is encountered, the expander
+is invoked.  The expander receives two arguments where the first is the
+special clause and the second is the body expanded so far as a list of
+forms, and produces the further expanded body as a list of forms.
+@var{arglist} and @var{subform}s are expanded as follows:
+
+@itemize
+@item
+When @var{arglist} has @emph{two} identifiers, @var{arglist} is the
+argument list of expander, and @var{subform}s are the body of expander;
+
+@item
+When @var{arglist} has @emph{one} identifier @var{body},
+@code{(special-clause @var{body})} is the argument list of expander, and
+@code{(pcase-exhaustive special-clause
+@optional{@repeated{@var{subform}}})} is the sole expression in the body
+of expander.
+@end itemize
+
+It is an error for @var{arglist} to be in any other form.
+@end defmac
+
+@node Iteration Forms
+@chapter Iteration Forms
+An iteration form consists of two parts: An iteration macro that governs
+the expansion process and for clauses that declare the iteration
+process.  This chapter specifies the iteration macros and special-clause
+operators.  Specifications of sequence constructors can be found in
+later chapters.
+
+@menu
+* Iteration Macros::            They head the iteration forms.
+* Special-Clause Operators::    How special are they, anyway?
+@end menu
+
+@node Iteration Macros
+@section Iteration Macros
+Iteration macros are global macros acting as the entry points of this
+package.
+
+@defmac for-fold @var{bindings} (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the fundamental building block of other
+iteration macros.  The form of @var{bindings} is the same as the
+@var{varlist} subforms of @code{let} forms except that an optional
+@code{(:result @optional{@repeated{@var{expressions}}})} form can appear
+as the last form.  @var{body}s are first transformed according to the
+following rules and appended to @var{for-clause}s preserving their
+order:
+
+@itemize
+@item
+Each form except the last one is transformed to a @code{:do} clause
+unless it is already a special clause;
+
+@item
+The last form is treated as a multiple-value form as is.
+@end itemize
+
+@var{for-clause}s are then processed in order.  Multiple adjacent
+iteration clauses are treated as a group, and special clauses serve to
+separate the groups of iteration clauses.  A group of iteration clauses
+or a special clause to the left of another group of iteration clauses or
+special clause nests the latter.  The last form is a multiple-value form
+that produces as many values as there are bindings in @var{bindings}.
+It is an error for the multiple-value form to produce not as many values
+as there are bindings in @var{bindings}.
+
+A group of iteration clauses expands to a @code{while} loop wrapping the
+body expanded so far.  A special clause expands according to its
+idiosyncratic rules, presumably wrapping the body expanded so far.
+Finally, the bindings in @var{bindings} are bound by a @code{let} form
+wrapping the body expanded so far, and the expressions in the
+@code{:result} form are appended.  Given that @var{identifiers} is the
+list of all identifiers of the bindings in @var{bindings} preserving
+their order, when no @code{:result} form is present, the expressions
+default to @code{(nil)} when there is no identifier in
+@var{identifiers}, @var{identifiers} when one, @code{((cons
+. @var{identifiers}))} when two, and @code{((list . @var{identifiers}))}
+when three or more.
+
+An iteration clause has the form @code{(@var{form} @var{sequence-form})}
+where the form of @var{form} is specified by the value of
+@code{for-binder} or the form @code{(@var{sequence-form})} transformed
+to the former with a generated identifier as @var{form}.
+
+Given the same ordering and that the @var{n}th binding in @var{bindings}
+has the form @code{(@var{identifier} @var{expression})},
+@var{identifier} is first bound to the value of @var{expression} and
+later updated to the @var{n}th value produced by the multiple-value form
+after each iteration.
+@end defmac
+
+@defmac for-fold* @var{bindings} (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@concept{iteration form, implicitly nesting}
+
+This iteration macro is the @dfn{implicitly nesting} version of
+@code{for-fold}, such that every iteration clause is a group in its own.
+This is achieved by separating each pair of adjacent iteration clauses
+with a vacuous special clause such as @code{(:let)}.
+@end defmac
+
+@defmac for-do (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro performs side effects and produces @code{nil} as
+the value.  It is equivalent to the following @code{for-fold} form:
+
+@example
+@group
+(for-fold () (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}} (:values))
+@end group
+@end example
+@end defmac
+
+@defmac for-do* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of @code{for-do}.
+@end defmac
+
+@defmac for-list (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@concept{terminology, fresh}
+
+This iteration macro accumulates the values into a
+fresh@footnote{Following
+@url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_f.htm,
+Common Lisp}, a @dfn{fresh} object is newly allocated.} list and returns
+the list.  It is like @code{for-fold}, except:
+
+@itemize
+@item
+@var{bindings} is @code{((@var{list} @var{identity}) (:result (nreverse
+@var{list})))} where @var{list} is a generated identifier and
+@var{identity} is the identity of @code{append}, that is, the empty
+list;
+
+@item
+Each expression @var{expression} in the tail forms of the multiple-value
+form is transformed to @code{(cons @var{expression} @var{list})}.  It is
+an error for the multiple-value form to produce not exactly one value.
+@end itemize
+@end defmac
+
+@defmac for-list* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of
+@code{for-list}.
+@end defmac
+
+@defmac for-lists @var{bindings} (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro accumulates the values into fresh lists and
+sequentially evaluates the expressions in the @code{:result} form with
+the identifiers in @var{bindings} bound to the lists.  It is like
+@code{for-fold}, except:
+
+@itemize
+@item
+@var{bindings} is a list of identifiers with an optional @code{:result}
+form where each identifier is initially bound to the identity of
+@code{append}, that is, the empty list;
+
+@item
+The expressions in the @code{:result} form, with the same default as
+@code{for-fold}, are wrapped in a @code{let} form with each identifier
+@var{identifier} in @var{bindings} bound to @code{(nreverse
+@var{identifier})};
+
+@item
+For each expression @var{expression} in the tail forms of the
+multiple-value form and each identifier @var{identifier} in
+@var{bindings}, @var{expression} is transformed to @code{(cons
+@var{expression} @var{identifier})}.  It is an error for the
+multiple-value form to produce not as many values as there are
+identifiers in @var{bindings}.
+@end itemize
+
+The values of @var{identifier}s during the iteration are unspecified.
+@end defmac
+
+@defmac for-lists* @var{bindings} (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of
+@code{for-lists}.
+@end defmac
+
+@defmac for-vector (@optional{@repeated{@var{for-clause}}}) [@code{:length} @var{length} @optional{@code{:init} @var{init}]} @optional{@repeated{@var{body}}}
+@concept{terminology, coerce}
+
+When neither @var{length} nor @var{init} is present, this iteration
+macro is equivalent to @code{(vconcat (for-list
+(@optional{@repeated{@var{for-clause}}})
+@optional{@repeated{@var{body}}}))}, such that it
+coerces@footnote{Following
+@url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_c.htm,
+Common Lisp}, @dfn{coerce} means to non-destructively convert an object
+to another type.} the list returned by @code{for-list} to vector.
+Otherwise, this iteration macro accumulates the values into a fresh
+vector of length @var{length} with each element being @var{init} where
+@var{init} defaults to @code{nil} when omitted.  In such case, it is
+like @code{for-fold}, except:
+
+@itemize
+@item
+The iteration form is first transformed to the following form where
+@var{vector} and @var{index} are generated identifiers provided that
+@var{length} and @var{init} are evaluated exactly once in the apparent
+evaluation order:
+
+@example
+@group
+(let ((@var{vector} (make-vector @var{length} @var{init})))
+  (let ((@var{index} 0))
+    (for-do (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}))
+  @var{vector})
+@end group
+@end example
+
+@item
+Each expression @var{expression} in the tail forms of the multiple-value
+form is transformed to @code{(setf (aref @var{vector} @var{index})
+@var{expression})} (@pxref{Setting Generalized Variables,,,elisp}), and
+the transformed multiple-value form @var{form} is inserted into the
+@code{:do} clause @code{(:do @var{form} (cl-incf @var{index}))}
+(@pxref{Modify Macros,,,cl}).  It is an error for the multiple-value
+form to produce not exactly one value;
+
+@item
+A @code{:break} clause @code{(:break (= @var{index} @var{length}))} is
+inserted after the above-mentioned @code{:do} clause.
+@end itemize
+@end defmac
+
+@defmac for-vector* (@optional{@repeated{@var{for-clause}}}) [:length @var{length} @optional{:init @var{init}]} @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of
+@code{for-vector}.
+@end defmac
+
+@defmac for-and (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro performs @code{and} on the values.  It is like
+@code{for-fold}, except:
+
+@itemize
+@item
+The iteration form is first transformed to the following form where
+@var{value} is a generated identifier:
+
+@example
+@group
+(let ((@var{value} t))
+  (for-do (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}})
+  @var{value})
+@end group
+@end example
+
+@item
+Each expression @var{expression} in the tail forms of the multiple-value
+form is transformed to @code{(setq @var{value} @var{expression})}, and
+the multiple-value form is transformed to a @code{:do} clause.  It is an
+error for the multiple-value form to produce not exactly one value;
+
+@item
+A @code{:break} clause @code{(:break (not @var{value}))} is inserted
+after the above-mentioned @code{:do} clause.
+@end itemize
+@end defmac
+
+@defmac for-and* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of
+@code{for-and}.
+@end defmac
+
+@defmac for-or (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro performs @code{or} on the values.  It is like
+@code{for-fold}, except:
+
+@itemize
+@item
+The iteration form is first transformed to the following form where
+@var{value} is a generated identifier:
+
+@example
+@group
+(let ((@var{value} nil))
+  (for-do (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}})
+  @var{value})
+@end group
+@end example
+
+@item
+Each expression @var{expression} in the tail forms of the multiple-value
+form is transformed to @code{(setq @var{value} @var{expression})}, and
+the multiple-value form is transformed to a @code{:do} clause.  It is an
+error for the multiple-value form to produce not exactly one value;
+
+@item
+A @code{:break} clause @code{(:break @var{value})} is inserted after the
+above-mentioned @code{:do} clause.
+@end itemize
+@end defmac
+
+@defmac for-or* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of @code{for-or}.
+@end defmac
+
+@defmac for-sum (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro accumulates the values into a sum.  It is like
+@code{for-fold}, except:
+
+@itemize
+@item
+@var{bindings} is @code{((@var{sum} @var{identity}))} where @var{sum} is
+a generated identifier and @var{identity} is the identity of @code{+},
+that is, @code{0};
+
+@item
+Each expression @var{expression} in the tail forms of the multiple-value
+form is transformed to @code{(+ @var{expression} @var{sum})}.  It is an
+error for the multiple-value form to produce not exactly one value.
+@end itemize
+@end defmac
+
+@defmac for-sum* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of
+@code{for-sum}.
+@end defmac
+
+@defmac for-product (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro accumulates the values into a product.  It is like
+@code{for-fold}, except:
+
+@itemize
+@item
+@var{bindings} is @code{((@var{product} @var{identity}))} where
+@var{product} is a generated identifier and @var{identity} is the
+identity of @code{*}, that is, @code{1};
+
+@item
+Each expression @var{expression} in the tail forms of the multiple-value
+form is transformed to @code{(* @var{expression} @var{product})}.  It is
+an error for the multiple-value form to produce not exactly one value.
+@end itemize
+@end defmac
+
+@defmac for-product* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of
+@code{for-product}.
+@end defmac
+
+@defmac for-first (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro returns the first value or @code{nil} if the
+iteration never begins.  It is like @code{for-fold}, except:
+
+@itemize
+@item
+@var{bindings} is @code{((@var{value} nil))} where @var{value} is a
+generated identifier;
+
+@item
+A @code{:final} clause @code{(:final)} is inserted before the
+multiple-value form, so that the iteration is immediately terminated
+after the first iteration.
+@end itemize
+@end defmac
+
+@defmac for-first* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of
+@code{for-first}.
+@end defmac
+
+@defmac for-last (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro returns the last value or @code{nil} if the
+iteration never begins.  It is like @code{for-fold}, except:
+
+@itemize
+@item
+@var{bindings} is @code{((@var{value} nil))} where @var{value} is a
+generated identifier.
+@end itemize
+@end defmac
+
+@defmac for-last* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of
+@code{for-last}.
+@end defmac
+
+@defmac for-max (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro performs @code{max} (@pxref{Comparison of
+Numbers,,,elisp}) on the values.  It is like @code{for-fold}, except:
+
+@itemize
+@item
+@var{bindings} is @code{((@var{max} -1.0e+INF))} (@pxref{Float
+Basics,,,elisp}) where @var{max} is a generated identifier;
+
+@item
+Each expression @var{expression} in the tail forms of the multiple-value
+form is transformed to @code{(max @var{expression} @var{max})}.  It is
+an error for the multiple-value form to produce not exactly one value.
+@end itemize
+@end defmac
+
+@defmac for-max* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of
+@code{for-max}.
+@end defmac
+
+@defmac for-min (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro performs @code{min} on the values.  It is like
+@code{for-fold}, except:
+
+@itemize
+@item
+@var{bindings} is @code{((@var{min} 1.0e+INF))} where @var{min} is a
+generated identifier;
+
+@item
+Each expression @var{expression} in the tail forms of the multiple-value
+form is transformed to @code{(min @var{expression} @var{min})}.  It is
+an error for the multiple-value form to produce not exactly one value.
+@end itemize
+@end defmac
+
+@defmac for-min* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of
+@code{for-min}.
+@end defmac
+
+@node Special-Clause Operators
+@section Special-Clause Operators
+@concept{terminology, auxiliary operator}
+
+Special-clause operators are @dfn{auxiliary operators} in the sense that
+they are heads of auxiliary forms that are only syntactically valid in
+certain forms.  In the case of special-clause operators, the auxiliary
+forms they head are valid in the @var{for-clause} and @var{body}
+positions of the iteration forms.  Beside special-clause operators,
+@code{:do-in} is an auxiliary operator heading a sequence form, whose
+specification can be found in later chapters.
+
+@concept{special-clause operator, the iteration}
+@concept{special-clause operator, the whole iteration}
+
+Below, @dfn{the iteration} can be an empty iteration when no iteration
+clause follows the special clauses.  Moreover, the inner iteration does
+not affect the outer iteration when nesting occurs, unless the wording
+@dfn{the whole iteration} is used.
+
+Special clauses are sequentially processed, such that the body produced
+by the expander of a special clause is fed into the expander of another
+special clause to its left.  Nonetheless, @code{:break} and
+@code{:final} clauses are specially expanded since they involve
+non-local transformation in order to terminate the whole iteration.  As
+a result, they cannot be implemented by
+@code{define-for-special-clause}.
+
+@deffn @aux{:break, @optional{@repeated{@var{guard}}}}
+This special-clause operator immediately terminates the whole iteration
+when @code{(and @optional{@repeated{@var{guard}}})} is true before the
+iteration.
+@end deffn
+
+@deffn @aux{:final, @optional{@repeated{@var{guard}}}}
+This special-clause operator terminates the whole iteration after one
+more iteration when @code{(and @optional{@repeated{@var{guard}}})} is
+true before the iteration.
+@end deffn
+
+@deffn @aux{:if, @optional{@repeated{@var{guard}}}}
+This special-clause operator skips the iteration unless @code{(and
+@optional{@repeated{@var{guard}}})} is true.
+@end deffn
+
+@deffn @aux{:if-not, @optional{@repeated{@var{guard}}}}
+This special-clause operator skips the iteration unless @code{(and
+@optional{@repeated{@var{guard}}})} is false.
+@end deffn
+
+@deffn @aux{:let, @optional{@repeated{@var{binding}}}}
+This special-clause operator wraps the iteration in the form
+@code{(@var{for-binder} (@optional{@repeated{@var{binding}}})
+@optional{@repeated{@var{body}}})} where @var{for-binder} is the value
+of @code{for-binder} and @var{body}s are the body expanded so far.
+@end deffn
+
+@deffn @aux{:if-let, @optional{@repeated{@var{binding}}}}
+This special-clause operator wraps the iteration in the form
+@code{(when-let* (@optional{@repeated{@var{binding}}})
+@optional{@repeated{@var{body}}})} where @var{body}s are the body
+expanded so far.
+@end deffn
+
+@deffn @aux{:pcase, @var{expression} @optional{@code{:exhaustive}} @optional{@repeated{@var{pattern}}}}
+This special-clause operator skips the iteration unless @code{(and
+@optional{@repeated{@var{pattern}}})} matches @var{expression} as in
+@code{pcase} (@pxref{Pattern-Matching Conditional,,,elisp}).  The match
+is exhaustive as in @code{pcase-exhaustive} when @code{:exhaustive} is
+present.
+@end deffn
+
+@deffn @aux{:pcase-not, @var{expression} @optional{@code{:as} @var{as}} @optional{@repeated{@var{pattern}}}}
+This special-clause operator skips the iteration unless @code{(and
+@optional{@repeated{@var{pattern}}})} does not match @var{expression} as
+in @code{pcase}.  When the identifier @var{as} is present, it is bound
+to the value of @var{expression} in the iteration.
+@end deffn
+
+@deffn @aux{:do, @optional{@repeated{@var{expression}}}}
+This special-clause operator sequentially evaluates @var{expression}s
+before the iteration.
+@end deffn
+
+@node Sequence Constructors
+@chapter Sequence Constructors
+Sequence constructors are the heads of sequence forms.  In particular,
+the sequence constructor @code{:do-in} is designed for use in expanders
+of other sequence constructors and is thus an auxiliary operator.  Other
+sequence constructors can act as expanders as well as generators.
+
+@deffn @aux{:do-in, @var{memoize-bindings} @var{outer-bindings} @var{loop-bindings} @var{loop-guards} @var{inner-bindings} @var{loop-forms}}
+This sequence constructor declares the forms to be appended to subforms
+in expanded iteration forms.  An iteration form essentially expands to
+the following @code{while} loop:
+
+@example
+@group
+(let @var{memoize-bindings}
+  (let @var{outer-bindings}
+    (let @var{loop-bindings}
+      (while (and . @var{loop-guards})
+        (@var{for-binder} @var{inner-bindings}
+          @optional{@repeated{@var{body}}} @optional{(cl-psetq @repeated{@var{loop-update}})}))))
+@end group
+@end example
+
+Above, @var{for-binder} is the value of @code{for-binder} and
+@var{body}s are the body expanded so far.  As a @code{:do-in} form is
+encountered, the relevant forms are appended to subforms of the same
+name.  Moreover, for each form @code{(@var{loop-identifier}
+@var{initial-form})} in @var{loop-bindings} and each form
+@var{loop-form} in @var{loop-forms}, a @var{loop-update} sequence
+@samp{@var{loop-identifier} @var{loop-form}} is produced and spliced
+into the form @code{(cl-psetq @repeated{@var{loop-update}})}
+(@pxref{Assignment,,,cl}).  It is an error for @var{loop-bindings} and
+@var{loop-forms} to have unmatched numbers of subforms.  For example, a
+possible implementation of the expander of a sequence constructor that
+iterates over list is as follows@footnote{In this example, it may seem
+unnecessary to @enquote{memoize} the value of @var{list-form} at first
+glance.  The actual purpose of doing so in this and many similar cases
+is to preserve the apparent evaluation order, although sometimes
+memoization is indeed necessary to guarantee that the subexpressions are
+evaluated exactly once (@pxref{Argument Evaluation,,,elisp}).}:
+
+@example
+@group
+(:expander-case
+ (`(,identifier (,_ ,list-form))
+  (cl-with-gensyms (list tail)
+    `(,identifier (:do-in ((,list ,list-form))
+                          ()
+                          ((,tail ,list))
+                          ((not (null ,tail)))
+                          ((,identifier (car ,tail)))
+                          ((cdr ,tail)))))))
+@end group
+@end example
+@end deffn
+
+@concept{sequence constructor, the sequence}
+
+Below, all sequence constructors have expanders.  Additional properties
+of them as defined by @code{define-for-sequence} are also specified
+where aliases are auxiliary operators.  @dfn{The sequence} refers to the
+expansion of or the iterator returned by the sequence constructor.  All
+sequence constructors when used as generators are guaranteed to delay
+the computation as much as possible, including that of the initial
+states.
+
+@deffn @seq{for-in-array, in-array, @var{array}}
+The sequence iterates over the elements of the array @var{array}.  As
+such, arrays (strings, vectors, Bool-vectors, and char-tables) are
+dispatched to it.  Moreover, a literal array after macro expansion as a
+sequence form when used in iteration clauses is treated as if this
+sequence constructor is used.
+@end deffn
+
+@deffn @seq{for-in-inclusive-range, in-inclusive-range, @var{start} @var{end} @optional{@var{step}}}
+The sequence iterates over the numbers between @var{start} and
+@var{end}.  The step size @var{step} defaults to @code{1} when it is
+@code{nil} or omitted and is added to the number after each iteration.
+The iteration terminates when the number is no longer in the closed
+range of @var{start} and @var{end}.
+@end deffn
+
+@deffn @seq{for-in-list, in-list, @var{list}}
+The sequence iterates over the elements of the list @var{list}.  As
+such, lists are dispatched to it.  Moreover, a literal list after macro
+expansion as a sequence form when used in iteration clauses is treated
+as if this sequence constructor is used.
+@end deffn
+
+@deffn @seq{for-in-naturals, in-naturals, @optional{@var{start}}}
+The sequence iterates over the natural numbers (non-negative integers)
+from @var{start} where @var{start} defaults to @code{0} when it is
+@code{nil} or omitted and is checked to be of type @code{(integer 0)}
+(@pxref{Type Predicates,,,cl}) by @code{cl-the}
+(@pxref{Declarations,,,cl}).  The type checking can be disabled by an
+@code{optimize} declaration, but this is not recommended since the type
+checking is done at compile time when @var{start} is a literal object
+anyway.
+@end deffn
+
+@deffn @seq{for-in-producer, in-producer, @var{producer} @optional{@var{predicate} @optional{@repeated{@var{arg}}}}}
+The sequence iterates over the values produced by repeated evaluations
+of the function form @code{(funcall @var{producer}
+@optional{@repeated{@var{arg}}})}.  The iteration is infinite when
+@var{predicate} is omitted.  Otherwise, the iteration terminates when
+@code{(funcall @var{predicate} @var{value})} is true where @var{value}
+is the value of the function form,
+@end deffn
+
+@deffn @seq{for-in-range, in-range, @var{end}}
+@seqx{for-in-range, in-range, @var{start} @var{end} @optional{@var{step}}}
+
+The sequence iterates over the numbers between @var{start} and
+@var{end}.  @var{start} defaults to @code{0} when omitted.  The step
+size @var{step} defaults to @code{1} when it is @code{nil} or omitted,
+and it is added to the number after each iteration.  The iteration
+terminates when the number is no longer in the range of @var{start} and
+@var{end}.  The range is right half-open when @var{step} is non-negative
+or otherwise left half-open.  Integers are dispatched to it.  Moreover,
+a literal integer after macro expansion as a sequence form when used in
+iteration clauses is as if this sequence constructor is used.
+@end deffn
+
+@deffn @seq{for-in-iterator, in-iterator, @var{iterator}}
+The sequence is equivalent to @var{iterator}.  When used as a function,
+this sequence constructor checks @var{iterator} to be of type
+@code{function} and returns @var{iterator} as is.  It is mainly useful
+for its expander to avoid the dynamic dispatch.
+@end deffn
+
+@deffn @seq{for-in-repeat, in-repeat, @repeated{@var{value}}}
+The sequence repeatedly returns each @var{value} from left to right.  It
+is equivalent to the sequence @code{(for-in-list (@var{make-circular}
+@repeated{@var{value}}))} where @var{make-circular} is a function that
+makes a circular list (@pxref{Cons Cells,,,elisp}) of the arguments.
+@end deffn
+
+@deffn @seq{for-in-value, in-value, @var{value}}
+The sequence returns @var{value} once.
+@end deffn
+
+@deffn @seq{for-on-array, on-array, @var{array}}
+The sequence iterates over the indexes of @var{array}.
+@end deffn
+
+@deffn @seq{for-on-list, on-list, @var{list}}
+The sequence iterates over the conses of @var{list}.
+@end deffn
+
+@deffn @seq{for-in-directory, in-directory, @var{directory} @optional{@var{full} @optional{@var{match} @optional{@var{nosort} @optional{@var{count}}}}}}
+The sequence iterates over the files in the directory named by the
+string @var{directory}.  It is equivalent to the following sequence
+(@pxref{Contents of Directories,,,elisp}) where @var{full},
+@var{nosort}, and @var{count} default to @code{nil} when omitted and
+@var{match} defaults to @code{directory-files-no-dot-files-regexp} when
+it is @code{nil} or omitted:
+
+@example
+@group
+(for-in-list (directory-files @var{directory}
+                              @var{full} @var{match} @var{nosort} @var{count}))
+@end group
+@end example
+@end deffn
+
+@deffn @seq{for-in-directory-recursively, in-directory-recursively, @var{dir} @var{regexp} @optional{@var{include-directories} @optional{@var{predicate} @optional{@var{follow-symlinks}}}}}
+The sequence iterates over the files under the directory named by the
+string @var{dir}.  It is equivalent to the following sequence where
+@var{include-directories}, @var{predicate}, and @var{follow-symlinks}
+default to @code{nil} when omitted:
+
+@example
+@group
+(for-in-list (directory-files-recursively
+              @var{dir} @var{regexp}
+              @var{include-directories} @var{predicate} @var{follow-symlinks}))
+@end group
+@end example
+@end deffn
+
+@deffn @seq{for-the-buffers, the-buffers, @optional{@var{frame}}}
+The sequence iterates over the buffers of the frame @var{frame}.  It is
+equivalent to @code{(for-in-list (buffer-list @var{frame}))}
+(@pxref{Buffer List,,,elisp}) where @var{frame} defaults to @code{nil}
+when omitted.
+@end deffn
+
+@deffn @seq{for-the-frames, the-frames}
+The sequence iterates over the frames.  It is @emph{not} equivalent to
+@code{(for-in-list (frame-list))} since the frames are visited from the
+selected frame in @code{next-frame} order (@pxref{Finding All
+Frames,,,elisp}).
+@end deffn
+
+@deffn @seq{for-the-overlays, the-overlays, @optional{@var{buffer}}}
+The sequence iterates over the overlays of the buffer @var{buffer}.  It
+is equivalent to the following sequence (@pxref{Current Buffer,,,elisp},
+@ref{Finding Overlays,,,elisp}, and @ref{Point,,,elisp}) where
+@var{buffer} defaults to the current buffer when it is @code{nil} or
+omitted:
+
+@example
+@group
+(for-in-list (with-current-buffer @var{buffer}
+               (overlays-in (point-min) (point-max))))
+@end group
+@end example
+@end deffn
+
+@deffn @seq{for-the-windows, the-windows, @optional{@var{frame} @optional{@var{minibuf}}}}
+The sequence iterates over the windows of the frame @var{frame}.  It is
+@emph{not} equivalent to @code{(for-in-list (window-list))}
+(@pxref{Windows and Frames,,,elisp}) since the windows are visited from
+the selected window of the frame @var{frame} in @code{next-window} order
+(@pxref{Cyclic Window Ordering,,,elisp}) where @var{frame} defaults to
+the selected frame when it is not a frame or omitted.  @var{minibuf} and
+@var{frame} are passed to @code{next-window} as the @var{minibuf} and
+@var{all-frames} arguments where @var{minibuf} and @var{frame} default
+to @code{nil} when omitted.
+@end deffn
+
+@node Concept Index
+@appendix Concept Index
+This index contains the concepts and terminologies.
+@printindex cp
+
+@node Function Index
+@appendix Function Index
+This index contains the auxiliary operators, functions, and macros.
+@printindex fn
+
+@node Variable Index
+@appendix Variable Index
+This index contains the variables.
+@printindex vr
+
+@node GNU Free Documentation License
+@appendix GNU Free Documentation License
+@include doclicense.texi
