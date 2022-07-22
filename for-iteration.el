@@ -363,14 +363,20 @@ the expanded form.
 
 \(fn [ID VALUE]...)"
   (declare (debug (&rest [symbolp form])))
-  (pcase (cl-mapcan (lambda (pair)
+  (pcase (cl-mapcar (lambda (pair)
                       (pcase-exhaustive pair
                         ((and `(,(for--lit id) ,(for--lit value))
                               (or (and (let id value) (let pair '()))
                                   pair))
                          pair)))
                     (seq-split pairs 2))
-    ('() nil) (pairs `(cl-psetq . ,pairs))))
+    ('() nil)
+    (pairs (cl-reduce (lambda (pair form)
+                        (if (null pair) form
+                          (pcase-let ((`(,id ,value) pair))
+                            `(setq ,id ,(if (null form) value
+                                          `(prog1 ,value ,form))))))
+                      pairs :from-end t :initial-value '()))))
 
 (eval-when-compile
   (defmacro for--defmacro (name arglist &rest body)
