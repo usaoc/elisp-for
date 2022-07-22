@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual documents For (version 0.1).
+
+Copyright (C) 2022 Wing Hei Chan
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled "GNU
+Free Documentation License". -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Special-Clause Operators (For)</title>
+
+<meta name="description" content="Special-Clause Operators (For)">
+<meta name="keywords" content="Special-Clause Operators (For)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Iteration-Forms.html" rel="up" title="Iteration Forms">
+<link href="Sequence-Constructors.html" rel="next" title="Sequence Constructors">
+<link href="Iteration-Macros.html" rel="prev" title="Iteration Macros">
+<style type="text/css">
+@import url("https://www.gnu.org/software/emacs/manual.css");
+cite { font-style: italic; }
+</style>
+
+</head>
+
+<body lang="en">
+<span id="Special_002dClause-Operators"></span><div class="header">
+<p>
+Previous: <a href="Iteration-Macros.html" accesskey="p" rel="prev">Iteration Macros</a>, Up: <a href="Iteration-Forms.html" accesskey="u" rel="up">Iteration Forms</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Special_002dClause-Operators-1"></span><h3 class="section">5.2 Special-Clause Operators</h3>
+<span id="index-terminology-12"></span>
+
+<p>Special-clause operators are <em>auxiliary operators</em> in the sense that
+they are heads of auxiliary forms that are only syntactically valid in
+certain forms.  In the case of special-clause operators, the auxiliary
+forms they head are valid in the <var>for-clause</var> and <var>body</var>
+positions of the iteration forms.  Beside special-clause operators,
+<code>:do-in</code> is an auxiliary operator heading a sequence form, whose
+specification can be found in later chapters.
+</p>
+<span id="index-special_002dclause-operator"></span>
+<span id="index-special_002dclause-operator-1"></span>
+
+<p>Below, <em>the iteration</em> can be an empty iteration when no iteration
+clause follows the special clauses.  Moreover, the inner iteration does
+not affect the outer iteration when nesting occurs, unless the wording
+<em>the whole iteration</em> is used.
+</p>
+<p>Special clauses are sequentially processed, such that the body produced
+by the expander of a special clause is fed into the expander of another
+special clause to its left.  Nonetheless, <code>:break</code> and
+<code>:final</code> clauses are specially expanded since they involve
+non-local transformation in order to terminate the whole iteration.  As
+a result, they cannot be implemented by
+<code>define-for-special-clause</code>.
+</p>
+<dl>
+<dt id="index-_003abreak">Auxiliary Operator: <strong>:break</strong> <em>[<var>guard</var>&hellip;]</em></dt>
+<dd><p>This special-clause operator immediately terminates the whole iteration
+when <code>(and [<var>guard</var>&hellip;])</code> is true before the
+iteration.
+</p></dd></dl>
+
+<dl>
+<dt id="index-_003afinal">Auxiliary Operator: <strong>:final</strong> <em>[<var>guard</var>&hellip;]</em></dt>
+<dd><p>This special-clause operator terminates the whole iteration after one
+more iteration when <code>(and [<var>guard</var>&hellip;])</code> is
+true before the iteration.
+</p></dd></dl>
+
+<dl>
+<dt id="index-_003aif">Auxiliary Operator: <strong>:if</strong> <em>[<var>guard</var>&hellip;]</em></dt>
+<dd><p>This special-clause operator skips the iteration unless <code>(and
+[<var>guard</var>&hellip;])</code> is true.
+</p></dd></dl>
+
+<dl>
+<dt id="index-_003aif_002dnot">Auxiliary Operator: <strong>:if-not</strong> <em>[<var>guard</var>&hellip;]</em></dt>
+<dd><p>This special-clause operator skips the iteration unless <code>(and
+[<var>guard</var>&hellip;])</code> is false.
+</p></dd></dl>
+
+<dl>
+<dt id="index-_003alet">Auxiliary Operator: <strong>:let</strong> <em>[<var>binding</var>&hellip;]</em></dt>
+<dd><p>This special-clause operator wraps the iteration in the form
+<code>(<var>for-binder</var> ([<var>binding</var>&hellip;])
+[<var>body</var>&hellip;])</code> where <var>for-binder</var> is the value
+of <code>for-binder</code> and <var>body</var>s are the body expanded so far.
+</p></dd></dl>
+
+<dl>
+<dt id="index-_003aif_002dlet">Auxiliary Operator: <strong>:if-let</strong> <em>[<var>binding</var>&hellip;]</em></dt>
+<dd><p>This special-clause operator wraps the iteration in the form
+<code>(when-let* ([<var>binding</var>&hellip;])
+[<var>body</var>&hellip;])</code> where <var>body</var>s are the body
+expanded so far.
+</p></dd></dl>
+
+<dl>
+<dt id="index-_003apcase">Auxiliary Operator: <strong>:pcase</strong> <em><var>expression</var> [<code>:exhaustive</code>] [<var>pattern</var>&hellip;]</em></dt>
+<dd><p>This special-clause operator skips the iteration unless <code>(and
+[<var>pattern</var>&hellip;])</code> matches <var>expression</var> as in
+<code>pcase</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Pattern_002dMatching-Conditional.html#Pattern_002dMatching-Conditional">(elisp)Pattern-Matching Conditional</a>).  The match
+is exhaustive as in <code>pcase-exhaustive</code> when <code>:exhaustive</code> is
+present.
+</p></dd></dl>
+
+<dl>
+<dt id="index-_003apcase_002dnot">Auxiliary Operator: <strong>:pcase-not</strong> <em><var>expression</var> [<code>:as</code> <var>as</var>] [<var>pattern</var>&hellip;]</em></dt>
+<dd><p>This special-clause operator skips the iteration unless <code>(and
+[<var>pattern</var>&hellip;])</code> does not match <var>expression</var> as
+in <code>pcase</code>.  When the identifier <var>as</var> is present, it is bound
+to the value of <var>expression</var> in the iteration.
+</p></dd></dl>
+
+<dl>
+<dt id="index-_003ado">Auxiliary Operator: <strong>:do</strong> <em>[<var>expression</var>&hellip;]</em></dt>
+<dd><p>This special-clause operator sequentially evaluates <var>expression</var>s
+before the iteration.
+</p></dd></dl>
+
+<hr>
+<div class="header">
+<p>
+Previous: <a href="Iteration-Macros.html" accesskey="p" rel="prev">Iteration Macros</a>, Up: <a href="Iteration-Forms.html" accesskey="u" rel="up">Iteration Forms</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

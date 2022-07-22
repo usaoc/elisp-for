@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual documents For (version 0.1).
+
+Copyright (C) 2022 Wing Hei Chan
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled "GNU
+Free Documentation License". -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Multiple Values (For)</title>
+
+<meta name="description" content="Multiple Values (For)">
+<meta name="keywords" content="Multiple Values (For)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Basic-Concepts.html" rel="up" title="Basic Concepts">
+<link href="Buffer_002dLocal-Variables.html" rel="next" title="Buffer-Local Variables">
+<link href="Sequence-Forms.html" rel="prev" title="Sequence Forms">
+<style type="text/css">
+@import url("https://www.gnu.org/software/emacs/manual.css");
+cite { font-style: italic; }
+</style>
+
+</head>
+
+<body lang="en">
+<span id="Multiple-Values"></span><div class="header">
+<p>
+Previous: <a href="Sequence-Forms.html" accesskey="p" rel="prev">Sequence Forms</a>, Up: <a href="Basic-Concepts.html" accesskey="u" rel="up">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Multiple-Values-1"></span><h3 class="section">2.3 Multiple Values</h3>
+<span id="index-limitation"></span>
+
+<p>It is not uncommon for one to iteratively update multiple state
+variables.  To functionally do so, it is convenient to be able to
+produce multiple values from a single expression where the values are in
+turn consumed by the self-tail-recursive function.  Unfortunately, Emacs
+Lisp does not support multiple values.  To circumvent the limitation, a
+partial support for <em>multiple-value forms</em> is
+implemented<a id="DOCF11" href="#FOOT11"><sup>11</sup></a>.
+</p>
+<p>A <code>cl-loop</code> form involving multiple state variables:
+</p>
+<div class="example">
+<pre class="example">(cl-loop with value1 = 0 and value2 = '() and value3 = -1.0e+INF
+         for number below 5 do
+         (cl-incf value1 number)
+         (push number value2)
+         (cl-callf max value3 number)
+         finally return (list value1 (nreverse value2) value3))
+     &rArr; (10 (0 1 2 3 4) 4)
+</pre></div>
+
+<p>An equivalent <code>for-do</code> form:
+</p>
+<div class="example">
+<pre class="example">(let ((value1 0) (value2 '()) (value3 -1.0e+INF))
+  (for-do ((number 5) (:do (cl-incf value1 number)
+                           (push number value2)
+                           (cl-callf max value3 number))))
+  (list value1 (nreverse value2) value3))
+     &rArr; (10 (0 1 2 3 4) 4)
+</pre></div>
+
+<p>An equivalent <code>for-fold</code> form:
+</p>
+<div class="example">
+<pre class="example">(for-fold ((value1 0) (value2 '()) (value3 -1.0e+INF)
+           (:result (list value1 (nreverse value2) value3)))
+    ((number 5) (:values (+ number value1)
+                         (cons number value2)
+                         (max number value3))))
+     &rArr; (10 (0 1 2 3 4) 4)
+</pre></div>
+
+<p>Other than where the iteration forms expect a multiple-value form,
+multiple-value forms can appear in certain syntactic positions after
+macro-expansion.  It is an error for a multiple-value form to be in a
+syntactically invalid position.  The formal grammar of multiple-value
+forms in an <acronym title="Extended Backus&ndash;Naur Form">EBNF</acronym> (Extended Backus&ndash;Naur Form) is as follows:
+</p>
+<div class="example">
+<pre class="example"><var>multiple-value-form</var> = <var>tail-form</var>
+                    | (cond (<var>guard</var> . <var>body</var>)&hellip;)
+                    | (if <var>guard</var> <var>multiple-value-form</var> . <var>body</var>)
+                    | (<var>let</var> <var>varlist</var> . <var>body</var>)
+                    | (<var>progn</var> . <var>body</var>)
+</pre><pre class="example">
+
+</pre><pre class="example"><var>tail-form</var> = <var>expression</var> | (:values [<var>expression</var>&hellip;])
+</pre><pre class="example">
+
+</pre><pre class="example"><var>body</var> = ([<var>expression</var>&hellip;] <var>multiple-value-form</var>)
+</pre><pre class="example">
+
+</pre><pre class="example"><var>let</var> = let | let*
+</pre><pre class="example">
+
+</pre><pre class="example"><var>progn</var> = progn | save-current-buffer
+      | save-excursion | save-restriction
+</pre></div>
+
+<span id="index-multiple_002dvalue-form"></span>
+<span id="index-terminology-9"></span>
+
+<p>The form of <var>varlist</var> is as in normal <code>let</code> and <code>let*</code>
+forms.  An <var>expression</var> and a <var>guard</var> are both expressions where
+the value of latter is specifically interpreted as a generalized
+Boolean<a id="DOCF12" href="#FOOT12"><sup>12</sup></a> value.  A <var>tail-form</var> is a
+<em>tail form</em> where an <var>expression</var> is equivalent to
+<code>(:values <var>expression</var>)</code> and a <code>(:values
+[<var>expression</var>&hellip;])</code> form produces as many values as
+there are <var>expression</var>s.  It is an error for two tail forms of a
+multiple-value form to produce unmatched numbers of values.  The grammar
+is actually a subset of Emacs Lisp&rsquo;s special forms (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Forms.html#Special-Forms">(elisp)Special
+Forms</a>) with <var>tail-form</var> added.  In a sense, special forms
+are extended to support multiple-value forms where possible.
+</p>
+<div class="footnote">
+<hr>
+<h4 class="footnotes-heading">Footnotes</h4>
+
+<h5><a id="FOOT11" href="#DOCF11">(11)</a></h3>
+<p>In a
+<a href="https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-9.html">standard Scheme</a> implementation, a continuation can receive multiple
+values, and correspondingly a procedure can deliver multiple values to
+its continuation.  This is unfeasible to implement in Emacs Lisp.
+Instead, a multiple-value form is transformed to imperative updates with
+macro-expansion-time checking of the number of values.</p>
+<h5><a id="FOOT12" href="#DOCF12">(12)</a></h3>
+<p>Following
+<a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_g.htm">Common Lisp</a>, a <em>generalized Boolean</em> value is an arbitrary Lisp
+object where only <code>nil</code> is false.</p>
+</div>
+<hr>
+<div class="header">
+<p>
+Previous: <a href="Sequence-Forms.html" accesskey="p" rel="prev">Sequence Forms</a>, Up: <a href="Basic-Concepts.html" accesskey="u" rel="up">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

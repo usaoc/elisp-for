@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual documents For (version 0.1).
+
+Copyright (C) 2022 Wing Hei Chan
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled "GNU
+Free Documentation License". -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Sequence Forms (For)</title>
+
+<meta name="description" content="Sequence Forms (For)">
+<meta name="keywords" content="Sequence Forms (For)">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Basic-Concepts.html" rel="up" title="Basic Concepts">
+<link href="Multiple-Values.html" rel="next" title="Multiple Values">
+<link href="For-Clauses.html" rel="prev" title="For Clauses">
+<style type="text/css">
+@import url("https://www.gnu.org/software/emacs/manual.css");
+cite { font-style: italic; }
+</style>
+
+</head>
+
+<body lang="en">
+<span id="Sequence-Forms"></span><div class="header">
+<p>
+Next: <a href="Multiple-Values.html" accesskey="n" rel="next">Multiple Values</a>, Previous: <a href="For-Clauses.html" accesskey="p" rel="prev">For Clauses</a>, Up: <a href="Basic-Concepts.html" accesskey="u" rel="up">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<span id="Sequence-Forms-1"></span><h3 class="section">2.2 Sequence Forms</h3>
+<span id="index-sequence-form"></span>
+<span id="index-sequence-form-1"></span>
+
+<p>A <em>sequence form</em> represents an ordered collection of values, much
+like an <em>iterator</em> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Generators.html#Generators">(elisp)Generators</a>).  In fact, a
+sequence form produces an iterator when evaluated as a function form
+(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Forms.html#Function-Forms">(elisp)Function Forms</a>).  Nonetheless, iterators are relatively
+expensive since they capture the states.  Rather than keeping the states
+in another object, a sequence form can be directly expanded in an
+iteration form when an <em>expander</em> is available.
+</p>
+<p>Produce an iterator that iterates over the list and iterate over
+the values of it:
+</p>
+<div class="example">
+<pre class="example">(let ((iterator (for-in-list '(1 2 3))))
+  (for-vector ((item (for-in-iterator iterator)) item)))
+     &rArr; [1 2 3]
+</pre></div>
+
+<p>Directly iterate over the list:
+</p>
+<div class="example">
+<pre class="example">(for-vector ((item (for-in-list '(1 2 3))) item))
+     &rArr; [1 2 3]
+</pre></div>
+
+<span id="index-sequence-form-2"></span>
+
+<p>For convenience, a sequence constructor can have <em>aliases</em> when used
+in iteration clauses to avoid the need of shorthands
+(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Shorthands.html#Shorthands">(elisp)Shorthands</a>).
+</p>
+<p><code>for-in-list</code> and <code>for-in-range</code> have aliases:
+</p>
+<div class="example">
+<pre class="example">(for-list ((item (in-list '(a b c))) (number (in-range 1 5 2))
+           (cons item number)))
+     &rArr; ((a . 1) (b . 3))
+</pre></div>
+
+<span id="index-sequence-form-3"></span>
+
+<p><em>Dynamic dispatch</em> based on the value of the application of
+<code>type-of</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Type-Predicates.html#Type-Predicates">(elisp)Type Predicates</a>) to the datum is
+available when the datum is used as a sequence form in iteration
+clauses.  Functions are assumed to be iterators and dispatched to
+themselves.
+</p>
+<p>A <code>cons</code> dispatched to the application of <code>for-in-list</code> to it:
+</p>
+<div class="example">
+<pre class="example">(let ((list '(1 2 3)))
+  (for-list ((item list) item)))
+     &rArr; (1 2 3)
+</pre></div>
+
+<p>A <code>for-in-list</code> iterator dispatched to itself:
+</p>
+<div class="example">
+<pre class="example">(let ((iterator (for-in-list '(1 2 3))))
+  (for-list ((item iterator) item)))
+     &rArr; (1 2 3)
+</pre></div>
+
+<span id="index-sequence-form-4"></span>
+<span id="index-terminology-8"></span>
+
+<p>Analogous to dynamic dispatch, certain <em>literal
+objects</em><a id="DOCF9" href="#FOOT9"><sup>9</sup></a> after
+macro-expansion<a id="DOCF10" href="#FOOT10"><sup>10</sup></a> are
+implicitly wrapped in sequence forms when used in iteration clauses.
+Currently, literal lists, arrays (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Arrays.html#Arrays">(elisp)Arrays</a>), and integers
+(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Integer-Basics.html#Integer-Basics">(elisp)Integer Basics</a>) are recognized.
+</p>
+<p>Recognized literal objects are implicitly wrapped in sequence forms:
+</p>
+<div class="example">
+<pre class="example">(cl-symbol-macrolet ((literal-number 3))
+  (cl-macrolet ((literal-list (&amp;rest forms) `',forms)
+                (literal-vector (&amp;rest forms) `[,@forms]))
+    (for-sum ((number1 literal-number)
+              (number2 (literal-list 3 4 5))
+              (number3 (literal-vector 6 7 8))
+              (* number1 number2 number3)))))
+     &rArr; 108
+</pre></div>
+
+<p>An equivalent <code>for-sum</code> form without local macros and symbol
+macros:
+</p>
+<div class="example">
+<pre class="example">(for-sum ((number1 (in-range 3))
+          (number2 (in-list '(3 4 5)))
+          (number3 (in-array [6 7 8]))
+          (* number1 number2 number3)))
+     &rArr; 108
+</pre></div>
+
+<div class="footnote">
+<hr>
+<h4 class="footnotes-heading">Footnotes</h4>
+
+<h5><a id="FOOT9" href="#DOCF9">(9)</a></h3>
+<p>Following
+<a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_l.htm">Common Lisp</a>, a self-evaluating (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Self_002dEvaluating-Forms.html#Self_002dEvaluating-Forms">(elisp)Self-Evaluating Forms</a>)
+literal object can be either quoted or unquoted.</p>
+<h5><a id="FOOT10" href="#DOCF10">(10)</a></h3>
+<p><em>After macro-expansion</em> alludes to the fact
+that the forms are expanded ahead of time and inspected during the
+expansion (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Expansion.html#Expansion">(elisp)Expansion</a>) of one of their enclosing forms.
+This involves global macros, compiler macros, local macros, as well as
+symbol macros (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Macros.html#Macros">(elisp)Macros</a> and <a href="https://www.gnu.org/software/emacs/manual/html_node/cl/Macros.html#Macros">(cl)Macros</a>).</p>
+</div>
+<hr>
+<div class="header">
+<p>
+Next: <a href="Multiple-Values.html" accesskey="n" rel="next">Multiple Values</a>, Previous: <a href="For-Clauses.html" accesskey="p" rel="prev">For Clauses</a>, Up: <a href="Basic-Concepts.html" accesskey="u" rel="up">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>
