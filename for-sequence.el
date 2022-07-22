@@ -529,7 +529,7 @@ See Info node `(for)Sequence Constructors'.
    (`(,id ,(or (and (or (and `(,_) (let frame-form nil))
                         `(,_ ,(for--lit frame-form)))
                     (let minibuf-form nil))
-               `(,_ ,(for--lit frame-form) ,(for--lit minibuf-form))))
+               `(,_ ,(for--lit frame-form) ,minibuf-form)))
     (cl-with-gensyms (frame minibuf current original visited)
       (let ((original-form `(frame-selected-window
                              ,(if (macroexp-const-p frame-form) nil

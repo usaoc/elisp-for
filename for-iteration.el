@@ -269,51 +269,45 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
       ((memoize-bindings '()) (outer-bindings '()) (loop-bindings '())
        (loop-guards '()) (inner-bindings '()) (loop-forms '())
        (iteration nil) (groups '()) (clauses (reverse for-clauses)))
-    (pcase-exhaustive clauses
-      ('() `(((,(lambda (_special-clause body) body))
-              ,@(if iteration
-                    `(,memoize-bindings
-                      ,outer-bindings ,loop-bindings
-                      ,loop-guards ,inner-bindings ,loop-forms)
-                  '()))
-             . ,groups))
-      (`(,(or (and `(:break . ,_) head)
-              (and `(,(and (cl-type keyword)
-                           (app (lambda (keyword)
-                                  (get keyword
-                                       'for--special-clause-expander))
-                                (and (cl-type function) expander)))
-                     . ,_)
-                   (app (lambda (special-clause)
-                          `(,expander . ,special-clause))
-                        head)))
-         . ,clauses)
-       (parse '() '() '() '() '() '() nil
-              `((,head
-                 ,@(if iteration
-                       `(,memoize-bindings
-                         ,outer-bindings ,loop-bindings
-                         ,loop-guards ,inner-bindings ,loop-forms)
-                     '()))
-                . ,groups)
-              clauses))
-      (`(,(app for--expand-iteration-clause
-               (and `(,_ (:do-in ,more-memoize-bindings
-                                 ,more-outer-bindings
-                                 ,more-loop-bindings
-                                 ,more-loop-guards
-                                 ,more-inner-bindings
-                                 ,more-loop-forms))
-                    (guard (= (length more-loop-bindings)
-                              (length more-loop-forms)))))
-         . ,clauses)
-       (parse (append more-memoize-bindings memoize-bindings)
-              (append more-outer-bindings outer-bindings)
-              (append more-loop-bindings loop-bindings)
-              (append more-loop-guards loop-guards)
-              (append more-inner-bindings inner-bindings)
-              (append more-loop-forms loop-forms)
-              t groups clauses)))))
+    (cl-flet ((get-expander (keyword)
+                (get keyword 'for--special-clause-expander))
+              (group-thunk ()
+                (if (not iteration) '()
+                  `(,memoize-bindings
+                    ,outer-bindings ,loop-bindings ,loop-guards
+                    ,inner-bindings ,loop-forms))))
+      (pcase-exhaustive clauses
+        ('() `(((,(lambda (_special-clause body) body))
+                ,@(group-thunk))
+               . ,groups))
+        (`(,(or (and `(:break . ,_) head)
+                (and `(,(and (cl-type keyword)
+                             (app get-expander
+                                  (and (cl-type function) expander)))
+                       . ,_)
+                     (app (lambda (special-clause)
+                            `(,expander . ,special-clause))
+                          head)))
+           . ,clauses)
+         (parse '() '() '() '() '() '() nil
+                `((,head ,@(group-thunk)) . ,groups) clauses))
+        (`(,(app for--expand-iteration-clause
+                 (and `(,_ (:do-in ,more-memoize-bindings
+                                   ,more-outer-bindings
+                                   ,more-loop-bindings
+                                   ,more-loop-guards
+                                   ,more-inner-bindings
+                                   ,more-loop-forms))
+                      (guard (= (length more-loop-bindings)
+                                (length more-loop-forms)))))
+           . ,clauses)
+         (parse (append more-memoize-bindings memoize-bindings)
+                (append more-outer-bindings outer-bindings)
+                (append more-loop-bindings loop-bindings)
+                (append more-loop-guards loop-guards)
+                (append more-inner-bindings inner-bindings)
+                (append more-loop-forms loop-forms)
+                t groups clauses))))))
 
 (defun for--and-guards (guards)
   "Return a form equivalent to (`and' . GUARDS).
@@ -359,13 +353,13 @@ the expanded form.
 
 \(fn [ID VALUE]...)"
   (declare (debug (&rest [symbolp form])))
-  (pcase (cl-mapcar (lambda (pair)
-                      (pcase-exhaustive pair
-                        ((and `(,(for--lit id) ,(for--lit value))
-                              (or (and (let id value) (let pair '()))
-                                  pair))
-                         pair)))
-                    (seq-split pairs 2))
+  (pcase (mapcar (lambda (pair)
+                   (pcase-exhaustive pair
+                     ((and `(,(for--lit id) ,(for--lit value))
+                           (or (and (let id value) (let pair '()))
+                               pair))
+                      pair)))
+                 (seq-split pairs 2))
     ('() nil)
     (pairs (cl-reduce (lambda (pair form)
                         (if (null pair) form
@@ -580,13 +574,10 @@ See Info node `(for)Special-Clause Operators'"
   (declare (debug for--fold-spec) (indent 2))
   (pcase-let*
       ((once (make-symbol "once"))
-       (`(,(and (app (mapcar (pcase-lambda (`(,id ,_)) id))
-                     (and ids (app (mapcar (lambda (id)
-                                             (make-symbol
-                                              (symbol-name id))))
-                                   renamed-ids)))
-                (app (mapcar (pcase-lambda (`(,_ ,value)) value))
-                     initial-values)
+       (`(,(and bindings
+                (app (mapcar (pcase-lambda (`(,id ,_))
+                               (make-symbol (symbol-name id))))
+                     renamed-ids)
                 (app length length-bindings))
           . ,result-forms)
         (for--parse-bindings bindings))
@@ -712,15 +703,16 @@ See Info node `(for)Special-Clause Operators'"
                                                  final-ids))
                                    . ,body)))))
                      (body (if (null bindings) body
-                             (cl-flet ((make-bindings (id value)
-                                         `(,id ,value)))
-                               `((let ,(cl-mapcar #'make-bindings
-                                                  renamed-ids
-                                                  initial-values)
-                                   (cl-symbol-macrolet
-                                       ,(cl-mapcar #'make-bindings
-                                                   ids renamed-ids)
-                                     ,@body ,@result-forms)))))))
+                             `((let ,(cl-mapcar
+                                      (pcase-lambda (id `(,_ ,value))
+                                        `(,id ,value))
+                                      renamed-ids bindings)
+                                 (cl-symbol-macrolet
+                                     ,(cl-mapcar
+                                       (pcase-lambda (`(,id ,_) value)
+                                         `(,id ,value))
+                                       bindings renamed-ids)
+                                   ,@body ,@result-forms))))))
                 (macroexp-progn body)))))
           (`((,(or (and `(:break . ,(app for--and-guards guard))
                         (let `(,break-ids . ,expander)
