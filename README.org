@@ -9,7 +9,7 @@
 
 For is an Emacs Lisp extension package that provides iteration and
 sequence forms inspired by Racket.  For detailed documentation, refer
-to [[https://usaoc.github.io/for/][the manual]].
+to [[https://usaoc.github.io/elisp-for/][the manual]].
 
 * Introduction
   [[https://racket-lang.org/][Racket]], extending on the idea of [[https://srfi.schemers.org/srfi-42/srfi-42.html][SRFI 42]], provides [[https://docs.racket-lang.org/reference/sequences.html][iteration]] and
