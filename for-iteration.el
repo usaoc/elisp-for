@@ -156,18 +156,18 @@ adjacent iteration clauses."
           (parse `(,clause ,@(if iteration '((:let)) '()) . ,nested)
                  t clauses)))))))
 
-(defun for--parse-value-form (form number normalize make-value)
+(defun for--parse-value-form (form number make-value)
   "Parse FORM as a multiple-value form.
 
 A tail form of FORM is (`values' [VALUE...]) with as many VALUEs
 as NUMBER.  An expression EXPR as a tail form is normalized
-to (`:values' EXPR) when NORMALIZE is non-nil, then the tail form
-FORM is replaced by (`funcall' MAKE-VALUE FORM)."
+to (`:values' EXPR), then the tail form FORM is replaced
+by (`funcall' MAKE-VALUE FORM)."
   (cl-flet ((parse-body (body)
               (pcase-let
                   ((`(,(app (lambda (form)
                               (for--parse-value-form
-                               form number normalize make-value))
+                               form number make-value))
                             (app macroexp-unprogn tail-forms))
                       . ,(app nreverse forms))
                     (reverse body)))
@@ -185,8 +185,7 @@ FORM is replaced by (`funcall' MAKE-VALUE FORM)."
                            `(,guard . ,(parse-body body)))
                          clauses)))
       (`(if ,guard ,then . ,(and `(,_ . ,_) else))
-       `(if ,guard ,(for--parse-value-form
-                     then number normalize make-value)
+       `(if ,guard ,(for--parse-value-form then number make-value)
           . ,(parse-body else)))
       (`(,(and (or 'let 'let*) head) ,bindings
          . ,(and `(,_ . ,_) body))
@@ -199,10 +198,7 @@ FORM is replaced by (`funcall' MAKE-VALUE FORM)."
       ((or (and `(:values . ,(app length (pred (= number))))
                 tail-form)
            (and (guard (= number 1))
-                (or (and (guard normalize)
-                         (app (lambda (form) `(:values ,form))
-                              tail-form))
-                    tail-form)))
+                (app (lambda (form) `(:values ,form)) tail-form)))
        (funcall make-value tail-form)))))
 
 (defun for--parse-bindings (bindings)
@@ -617,7 +613,7 @@ See Info node `(for)Special-Clause Operators'"
     (named-let expand
         ((break-ids '())
          (body `(,(for--parse-value-form
-                   value-form length-bindings 'normalize
+                   value-form length-bindings
                    (pcase-lambda (`(:values . ,forms))
                      `(for--setq . ,(cl-mapcan (lambda (id form)
                                                  `(,id ,form))
@@ -766,7 +762,7 @@ See Info node `(for)Special-Clause Operators'"
     (cl-with-gensyms (list)
       `(for-fold ((,list '()) (:result (nreverse ,list)))
            (,@for-clauses ,(for--parse-value-form
-                            value-form 1 'normalize
+                            value-form 1
                             (pcase-lambda (`(:values ,form))
                               `(cons ,form ,list))))))))
 
@@ -797,7 +793,7 @@ See Info node `(for)Special-Clause Operators'"
              . ,result-forms)))
          (,@for-clauses
           ,(for--parse-value-form
-            value-form length-bindings 'normalize
+            value-form length-bindings
             (pcase-lambda (`(:values . ,forms))
               `(:values . ,(cl-mapcar (lambda (form id)
                                         `(cons ,form ,id))
@@ -822,7 +818,7 @@ See Info node `(for)Special-Clause Operators'"
                 (for-do (,@for-clauses
                          (:do ,@(macroexp-unprogn
                                  (for--parse-value-form
-                                  value-form 1 'normalize
+                                  value-form 1
                                   (pcase-lambda (`(:values ,form))
                                     `(setf (aref ,vector ,index)
                                            ,form))))
@@ -845,7 +841,7 @@ See Info node `(for)Special-Clause Operators'"
          (for-do (,@for-clauses
                   (:do ,@(macroexp-unprogn
                           (for--parse-value-form
-                           value-form 1 'normalize
+                           value-form 1
                            (pcase-lambda (`(:values ,form))
                              `(setq ,value ,form)))))
                   (:break (not ,value))))
@@ -865,7 +861,7 @@ See Info node `(for)Special-Clause Operators'"
          (for-do (,@for-clauses
                   (:do ,@(macroexp-unprogn
                           (for--parse-value-form
-                           value-form 1 'normalize
+                           value-form 1
                            (pcase-lambda (`(:values ,form))
                              `(setq ,value ,form)))))
                   (:break ,value)))
@@ -883,7 +879,7 @@ See Info node `(for)Special-Clause Operators'"
     (cl-with-gensyms (sum)
       `(for-fold ((,sum 0))
            (,@for-clauses ,(for--parse-value-form
-                            value-form 1 'normalize
+                            value-form 1
                             (pcase-lambda (`(:values ,form))
                               `(:values (+ ,form ,sum)))))))))
 
@@ -899,7 +895,7 @@ See Info node `(for)Special-Clause Operators'"
     (cl-with-gensyms (product)
       `(for-fold ((,product 1))
            (,@for-clauses ,(for--parse-value-form
-                            value-form 1 'normalize
+                            value-form 1
                             (pcase-lambda (`(:values ,form))
                               `(:values (* ,form ,product)))))))))
 
@@ -938,7 +934,7 @@ See Info node `(for)Special-Clause Operators'"
     (cl-with-gensyms (max)
       `(for-fold ((,max -1.0e+INF))
            (,@for-clauses ,(for--parse-value-form
-                            value-form 1 'normalize
+                            value-form 1
                             (pcase-lambda (`(:values ,form))
                               `(:values (max ,form ,max)))))))))
 
@@ -954,7 +950,7 @@ See Info node `(for)Special-Clause Operators'"
     (cl-with-gensyms (min)
       `(for-fold ((,min 1.0e+INF))
            (,@for-clauses ,(for--parse-value-form
-                            value-form 1 'normalize
+                            value-form 1
                             (pcase-lambda (`(:values ,form))
                               `(:values (min ,form ,min)))))))))
 
