@@ -353,20 +353,20 @@ An equivalent @code{named-let} form:
 @end group
 @end example
 
-Consecutive iteration clauses are considered parallel and thus iterated
-at the same time.  When one of them ends, the iteration ends.  This
-gives rise to the usefulness of infinite sequences.
+Adjacent iteration clauses are considered parallel and thus iterated at
+the same time.  When one of them ends, the iteration ends.  This gives
+rise to the usefulness of infinite sequences.
 
 @concept{convention, optional form}
 @concept{convention, repeated form}
 
 @code{(in-naturals @optional{@var{start}})}@footnote{In this manual, a
 metavariable is typeset as @samp{@var{metavariable}}, an optional form
-is typeset as @samp{@optional{@var{optional-form}}}, and a form repeated
-@emph{once or more} as @samp{@repeated{@var{repeated-form}}}.  This is
-the same as the Emacs Lisp Manual (@pxref{A Sample Function
-Description,,,elisp}) modulo the @samp{@repeated{@var{repeated-form}}}
-convention.} is an infinite sequence:
+as @samp{@optional{@var{optional-form}}}, and a form repeated @emph{once
+or more} as @samp{@repeated{@var{repeated-form}}}.  This is the same as
+the Emacs Lisp Manual (@pxref{A Sample Function Description,,,elisp})
+modulo the @samp{@repeated{@var{repeated-form}}} convention.} is an
+infinite sequence:
 
 @example
 @group
