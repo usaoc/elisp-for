@@ -44,6 +44,6 @@ to [[https://usaoc.github.io/elisp-for/][the manual]].
   This package requires minimally Emacs 28.1.
 
 * Contribute
-  [[https://github.com/usaoc/for/issues][Submit an issue]] for bug reports and general discussion.  [[https://github.com/usaoc/for/pulls][Submit a
+  [[https://github.com/usaoc/elisp-for/issues][Submit an issue]] for bug reports and general discussion.  [[https://github.com/usaoc/elisp-for/pulls][Submit a
   pull request]] for patches.  Otherwise, [[mailto:whmunkchan@outlook.com][send an email]] with patches
   attached if any.

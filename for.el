@@ -3,7 +3,7 @@
 ;; Copyright (C) 2022 Wing Hei Chan
 
 ;; Author: Wing Hei Chan <whmunkchan@outlook.com>
-;; URL: https://github.com/usaoc/for
+;; URL: https://github.com/usaoc/elisp-for
 ;; Keywords: extensions
 ;; Package-Requires: ((emacs "28.1"))
 ;; Version: 0.1
