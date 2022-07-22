@@ -681,10 +681,11 @@ See Info node `(for)Special-Clause Operators'"
                                             (`(,id ,_) `(,id ,form))))
                                         loop-bindings loop-forms)
                                   ('() '())
-                                  (pairs `((for--if ,(for--and-guards
-                                                      `(,@break-ids
-                                                        ,@final-ids))
-                                               (setq . ,pairs))))))))
+                                  (pairs
+                                   `((for--if ,(for--and-guards
+                                                `(,@break-ids
+                                                  ,@final-ids))
+                                         (for--setq . ,pairs))))))))
                     (body (optimize-break body))
                     (body (optimize-final body))
                     (body (if (null inner-bindings) body
