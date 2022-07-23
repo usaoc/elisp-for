@@ -165,13 +165,10 @@ to (`:values' EXPR), then the tail form FORM is replaced
 by (`funcall' MAKE-VALUE FORM)."
   (cl-flet ((parse-body (body)
               (pcase-let
-                  ((`(,(app (lambda (form)
-                              (for--parse-value-form
-                               form number make-value))
-                            (app macroexp-unprogn tail-forms))
-                      . ,(app nreverse forms))
+                  ((`(,tail-form . ,(app nreverse forms))
                     (reverse body)))
-                `(,@forms ,@tail-forms))))
+                `(,@forms ,(for--parse-value-form
+                            tail-form number make-value)))))
     (pcase-exhaustive (for--macroexpand form)
       (`(cond . ,(and `(,_ . ,_)
                       (pred (lambda (forms)
