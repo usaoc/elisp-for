@@ -780,9 +780,11 @@ See Info node `(for)Special-Clause Operators'"
         (for--parse-body for-clauses body)))
     `(for-fold
          (,@bindings
-          (:result
-           (let ,(mapcar (lambda (id) `(,id (nreverse ,id))) ids)
-             . ,result-forms)))
+          (:result . ,(if (null ids) result-forms
+                        `((let ,(mapcar (lambda (id)
+                                          `(,id (nreverse ,id)))
+                                        ids)
+                            . ,result-forms)))))
          (,@for-clauses
           ,(for--parse-value-form
             value-form length-bindings
