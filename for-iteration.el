@@ -690,30 +690,28 @@ See Info node `(for)Special-Clause Operators'"
                body)))
         (pcase-exhaustive clauses
           ('()
-           (pcase (cl-delete-if #'macroexp-const-p
-                                (mapcar #'for--macroexpand body))
-             ('() nil)
-             (body
-              (let* ((body (if (and (null break-ids) (null final-ids))
-                               body
-                             (cl-flet ((make-bindings (id) `(,id t)))
-                               `((let (,@(mapcar #'make-bindings
-                                                 break-ids)
-                                       ,@(mapcar #'make-bindings
-                                                 final-ids))
-                                   . ,body)))))
-                     (body (if (null bindings) body
-                             `((let ,(cl-mapcar
-                                      (pcase-lambda (id `(,_ ,value))
+           (if (null body) nil
+             (let* ((body `(,@body . ,result-forms))
+                    (body (if (and (null break-ids) (null final-ids))
+                              body
+                            (cl-flet ((make-bindings (id) `(,id t)))
+                              `((let (,@(mapcar #'make-bindings
+                                                break-ids)
+                                      ,@(mapcar #'make-bindings
+                                                final-ids))
+                                  . ,body)))))
+                    (body (if (null bindings) body
+                            `((let ,(cl-mapcar
+                                     (pcase-lambda (id `(,_ ,value))
+                                       `(,id ,value))
+                                     renamed-ids bindings)
+                                (cl-symbol-macrolet
+                                    ,(cl-mapcar
+                                      (pcase-lambda (`(,id ,_) value)
                                         `(,id ,value))
-                                      renamed-ids bindings)
-                                 (cl-symbol-macrolet
-                                     ,(cl-mapcar
-                                       (pcase-lambda (`(,id ,_) value)
-                                         `(,id ,value))
-                                       bindings renamed-ids)
-                                   ,@body ,@result-forms))))))
-                (macroexp-progn body)))))
+                                      bindings renamed-ids)
+                                  . ,body))))))
+               (macroexp-progn body))))
           (`((,(or (and `(:break . ,(app for--and-guards guard))
                         (let `(,break-ids . ,expander)
                           (cl-with-gensyms (break)
