@@ -318,7 +318,7 @@ Double negations and non-nil constants in GUARDS are removed."
               (pcase (named-let negate ((guard guard))
                        (pcase (for--macroexpand guard)
                          (`(,(or 'not 'null)
-                            (for--lit `(,(or 'not 'null) ,guard)))
+                            ,(for--lit `(,(or 'not 'null) ,guard)))
                           (negate guard))
                          (`(,(or 'not 'null)
                             ,(for--lit (pred macroexp-const-p) const))
