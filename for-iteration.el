@@ -655,17 +655,15 @@ See Info node `(for)Special-Clause Operators'"
                                  inner-bindings loop-forms)
              (let* ((body (if (null loop-forms) body
                             `(,@body
-                              ,@(pcase (cl-mapcan
-                                        (lambda (binding form)
-                                          (pcase-exhaustive binding
-                                            (`(,id ,_) `(,id ,form))))
-                                        loop-bindings loop-forms)
-                                  ('() '())
-                                  (pairs
-                                   `((for--if ,(for--and-guards
-                                                `(,@break-ids
-                                                  ,@final-ids))
-                                         (for--setq . ,pairs))))))))
+                              (for--if ,(for--and-guards
+                                         `(,@break-ids
+                                           ,@final-ids))
+                                  (for--setq
+                                   . ,(cl-mapcan
+                                       (lambda (binding form)
+                                         (pcase-exhaustive binding
+                                           (`(,id ,_) `(,id ,form))))
+                                       loop-bindings loop-forms))))))
                     (body (optimize-break body))
                     (body (optimize-final body))
                     (body (if (null inner-bindings) body
