@@ -175,7 +175,7 @@ by (`funcall' MAKE-VALUE FORM)."
                               (cl-every (lambda (form)
                                           (pcase-exhaustive form
                                             (`(,_) nil)
-                                            (`(,_ . ,_) t)))
+                                            (`(,_ ,_ . ,_) t)))
                                         forms)))
                       clauses))
        `(cond . ,(mapcar (pcase-lambda (`(,guard . ,body))
