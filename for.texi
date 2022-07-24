@@ -691,7 +691,7 @@ for-binder
 @node Definers
 @chapter Definers
 Two definers are available for defining sequence constructors and
-special clause operators.  This chapter specifies them.
+special-clause operators.  This chapter specifies them.
 
 @defmac define-for-sequence @var{name} @var{arglist} @optional{@var{docstring}} @optional{@repeated{@var{subform}}} @optional{@repeated{@var{body}}}
 This definer defines the sequence constructor @var{name} as a generator
@@ -1291,7 +1291,7 @@ into the form @code{(cl-psetq @repeated{@var{loop-update}})}
 (@pxref{Assignment,,,cl}).  It is an error for @var{loop-bindings} and
 @var{loop-forms} to have unmatched numbers of subforms.  For example, a
 possible implementation of the expander of a sequence constructor that
-iterates over list is as follows@footnote{In this example, it may seem
+iterates over lists is as follows@footnote{In this example, it may seem
 unnecessary to @enquote{memoize} the value of @var{list-form} at first
 glance.  The actual purpose of doing so in this and many similar cases
 is to preserve the apparent evaluation order, although sometimes
