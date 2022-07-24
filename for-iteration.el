@@ -670,10 +670,11 @@ See Info node `(for)Special-Clause Operators'"
                     (body (optimize-final body))
                     (body (if (null inner-bindings) body
                             `((,for-binder ,inner-bindings . ,body))))
-                    (body `((while ,(for--and-guards
-                                     `(,@break-ids
-                                       ,@final-ids . ,loop-guards))
-                              . ,body)))
+                    (body (pcase (for--and-guards
+                                  `(,@break-ids
+                                    ,@final-ids . ,loop-guards))
+                            ('nil '())
+                            (guard `((while ,guard . ,body)))))
                     (body (if (null loop-bindings) body
                             `((let ,loop-bindings . ,body))))
                     (body (if (null outer-bindings) body
