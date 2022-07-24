@@ -681,48 +681,50 @@ See Info node `(for)Special-Clause Operators'"
                     (body (if (null memoize-bindings) body
                             `((let ,memoize-bindings . ,body)))))
                body)))
-        (pcase-exhaustive clauses
-          ('()
-           (if (null body) nil
-             (let* ((body `(,@body . ,result-forms))
-                    (body (if (and (null break-ids) (null final-ids))
-                              body
-                            (cl-flet ((make-bindings (id) `(,id t)))
-                              `((let (,@(mapcar #'make-bindings
-                                                break-ids)
-                                      ,@(mapcar #'make-bindings
-                                                final-ids))
-                                  . ,body)))))
-                    (body (if (null bindings) body
-                            `((let ,(cl-mapcar
-                                     (pcase-lambda (id `(,_ ,value))
-                                       `(,id ,value))
-                                     renamed-ids bindings)
-                                (cl-symbol-macrolet
-                                    ,(cl-mapcar
-                                      (pcase-lambda (`(,id ,_) value)
+        (if (null clauses)
+            (if (null body) nil
+              (let* ((body `(,@body . ,result-forms))
+                     (body (if (and (null break-ids) (null final-ids))
+                               body
+                             (cl-flet ((make-bindings (id) `(,id t)))
+                               `((let (,@(mapcar #'make-bindings
+                                                 break-ids)
+                                       ,@(mapcar #'make-bindings
+                                                 final-ids))
+                                   . ,body)))))
+                     (body (if (null bindings) body
+                             `((let ,(cl-mapcar
+                                      (pcase-lambda (id `(,_ ,value))
                                         `(,id ,value))
-                                      bindings renamed-ids)
-                                  . ,body))))))
-               (macroexp-progn body))))
-          (`((,(or (and `(:break . ,(app for--and-guards guard))
-                        (let `(,break-ids . ,expander)
-                          (cl-with-gensyms (break)
-                            `((,break . ,break-ids)
-                              . ,(lambda (_special-clause body)
-                                   `((for--if ,guard (setq ,break nil)
-                                       . ,body))))))
-                        (let special-clause nil))
-                   (and `(,expander . ,special-clause)
-                        (let break-ids break-ids)))
-              . ,iteration-forms)
-             . ,clauses)
-           (expand break-ids
-                   (funcall expander special-clause
-                            (if (null iteration-forms) body
-                              (apply #'make-iteration
-                                     body iteration-forms)))
-                   clauses)))))))
+                                      renamed-ids bindings)
+                                 (cl-symbol-macrolet
+                                     ,(cl-mapcar
+                                       (pcase-lambda (`(,id ,_) value)
+                                         `(,id ,value))
+                                       bindings renamed-ids)
+                                   . ,body))))))
+                (macroexp-progn body)))
+          (pcase-let
+              ((`((,(or (and `(:break . ,(app for--and-guards guard))
+                             (let `(,break-ids . ,expander)
+                               (cl-with-gensyms (break)
+                                 `((,break . ,break-ids)
+                                   . ,(lambda (_special-clause body)
+                                        `((for--if ,guard
+                                              (setq ,break nil)
+                                            . ,body))))))
+                             (let special-clause nil))
+                        (and `(,expander . ,special-clause)
+                             (let break-ids break-ids)))
+                   . ,iteration-forms)
+                  . ,clauses)
+                clauses))
+            (expand break-ids
+                    (funcall expander special-clause
+                             (if (null iteration-forms) body
+                               (apply #'make-iteration
+                                      body iteration-forms)))
+                    clauses)))))))
 
 (for--defmacro for-do (for-clauses &rest body)
   "The side-effecting iteration macro.
