@@ -863,7 +863,7 @@ See Info node `(for)Special-Clause Operators'"
            (,@for-clauses ,(for--parse-value-form
                             value-form 1
                             (pcase-lambda (`(:values ,form))
-                              `(:values (+ ,form ,sum)))))))))
+                              `(+ ,form ,sum))))))))
 
 (for--defmacro for-product (for-clauses &rest body)
   "The product-accumulating iteration macro.
@@ -879,7 +879,7 @@ See Info node `(for)Special-Clause Operators'"
            (,@for-clauses ,(for--parse-value-form
                             value-form 1
                             (pcase-lambda (`(:values ,form))
-                              `(:values (* ,form ,product)))))))))
+                              `(* ,form ,product))))))))
 
 (for--defmacro for-first (for-clauses &rest body)
   "The first-value-returning iteration macro.
@@ -918,7 +918,7 @@ See Info node `(for)Special-Clause Operators'"
            (,@for-clauses ,(for--parse-value-form
                             value-form 1
                             (pcase-lambda (`(:values ,form))
-                              `(:values (max ,form ,max)))))))))
+                              `(max ,form ,max))))))))
 
 (for--defmacro for-min (for-clauses &rest body)
   "The `min'-folding iteration macro.
@@ -934,7 +934,7 @@ See Info node `(for)Special-Clause Operators'"
            (,@for-clauses ,(for--parse-value-form
                             value-form 1
                             (pcase-lambda (`(:values ,form))
-                              `(:values (min ,form ,min)))))))))
+                              `(min ,form ,min))))))))
 
 ;;;; Provide
 (provide 'for-iteration)
