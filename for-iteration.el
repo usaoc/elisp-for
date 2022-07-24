@@ -801,12 +801,11 @@ See Info node `(for)Special-Clause Operators'"
             (let ((,vector (make-vector ,length ,init)))
               (let ((,index 0))
                 (for-do (,@for-clauses
-                         (:do ,@(macroexp-unprogn
-                                 (for--parse-value-form
-                                  value-form 1
-                                  (pcase-lambda (`(:values ,form))
-                                    `(setf (aref ,vector ,index)
-                                           ,form))))
+                         (:do ,(for--parse-value-form
+                                value-form 1
+                                (pcase-lambda (`(:values ,form))
+                                  `(setf (aref ,vector ,index)
+                                         ,form)))
                               (cl-incf ,index))
                          (:break (= ,index ,length)))))
               ,vector)))))
@@ -824,11 +823,10 @@ See Info node `(for)Special-Clause Operators'"
     (cl-with-gensyms (value)
       `(let ((,value t))
          (for-do (,@for-clauses
-                  (:do ,@(macroexp-unprogn
-                          (for--parse-value-form
-                           value-form 1
-                           (pcase-lambda (`(:values ,form))
-                             `(setq ,value ,form)))))
+                  (:do ,(for--parse-value-form
+                         value-form 1
+                         (pcase-lambda (`(:values ,form))
+                           `(setq ,value ,form))))
                   (:break (not ,value))))
          ,value))))
 
@@ -844,11 +842,10 @@ See Info node `(for)Special-Clause Operators'"
     (cl-with-gensyms (value)
       `(let ((,value nil))
          (for-do (,@for-clauses
-                  (:do ,@(macroexp-unprogn
-                          (for--parse-value-form
-                           value-form 1
-                           (pcase-lambda (`(:values ,form))
-                             `(setq ,value ,form)))))
+                  (:do ,(for--parse-value-form
+                         value-form 1
+                         (pcase-lambda (`(:values ,form))
+                           `(setq ,value ,form))))
                   (:break ,value)))
          ,value))))
 
