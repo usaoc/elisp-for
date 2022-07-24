@@ -501,14 +501,14 @@ See Info node `(for)Buffer-Local Variables'.")
 
 See Info node `(for)Special-Clause Operators'"
   (`(,_ . ,(app for--and-guards guard))
-   (pcase guard ('t body) (_ `((when ,guard . ,body))))))
+   (pcase guard ('t body) ('nil '()) (_ `((when ,guard . ,body))))))
 
 (define-for-special-clause :if-not (body)
   "Evaluate BODY unless all subforms are non-nil.
 
 See Info node `(for)Special-Clause Operators'"
   (`(,_ . ,(app for--and-guards guard))
-   (pcase guard ('t '()) (_ `((unless ,guard . ,body))))))
+   (pcase guard ('t '()) ('nil body) (_ `((unless ,guard . ,body))))))
 
 (define-for-special-clause :let (body)
   "Evaluate BODY with subforms bound by `for-binder'.
