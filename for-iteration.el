@@ -335,18 +335,6 @@ Double negations and non-nil constants in GUARDS are removed."
                 (guard `(,guard . ,(parse guards)))))))
     ('() t) (`(,guard) guard) (guards `(and . ,guards))))
 
-(defmacro for--if (guard then &rest else)
-  "Expand to a form equivalent to (`if' GUARD THEN [ELSE...]).
-
-\(fn GUARD THEN [ELSE...])"
-  (declare (debug (form form body)) (indent 2))
-  (pcase guard
-    ('t then) ('nil (macroexp-progn else))
-    (_ (pcase else
-         ('() `(when ,guard ,then))
-         (`(,else) `(if ,guard ,then ,else))
-         (_ `(cond (,guard ,then) (t . ,else)))))))
-
 (defmacro for--setq (&rest pairs)
   "Expand to a form equivalent to (`cl-psetq' [ID VALUE]...).
 
@@ -567,9 +555,8 @@ See Info node `(for)Special-Clause Operators'"
 
 \(fn ([(IDENTIFIER INITIAL-VALUE)] [(:result EXPRESSION...)]) (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
   (declare (debug for--fold-spec) (indent 2))
-  (pcase-let*
-      ((once (eval-when-compile (make-symbol "once")))
-       (`(,(and bindings
+  (pcase-let
+      ((`(,(and bindings
                 (app (mapcar (pcase-lambda (`(,id ,_))
                                (make-symbol (symbol-name id))))
                      renamed-ids)
@@ -577,23 +564,46 @@ See Info node `(for)Special-Clause Operators'"
           . ,result-forms)
         (for--parse-bindings bindings))
        (`(,(app (lambda (clauses)
-                  (named-let loop ((final-ids '()) (parsed '())
-                                   (clauses (reverse clauses)))
-                    (pcase-exhaustive clauses
-                      ('() `(,final-ids . ,parsed))
-                      (`((:final . ,(app for--and-guards guard))
-                         . ,clauses)
-                       (cl-with-gensyms (final)
-                         (loop `(,final . ,final-ids)
-                               `((:do (for--if ,guard
-                                          (setq ,final ',once)))
-                                 . ,parsed)
-                               clauses)))
-                      (`(,clause . ,clauses)
-                       (loop final-ids `(,clause . ,parsed)
-                             clauses)))))
+                  (named-let loop
+                      ((final-ids '()) (parsed '()) (body '())
+                       (clauses (reverse clauses)))
+                    (cl-flet ((noop-thunk ()
+                                (loop final-ids `(,clause . ,parsed)
+                                      body clauses)))
+                      (pcase-exhaustive clauses
+                        ('() `(,final-ids ,body ,parsed))
+                        (`(,clause . ,clauses)
+                         (cl-flet
+                             ((noop-thunk ()
+                                (loop final-ids `(,clause . ,parsed)
+                                      body clauses)))
+                           (pcase clause
+                             (`(:final . ,(app for--and-guards guard))
+                              (pcase guard
+                                ('t (cl-with-gensyms (final)
+                                      (loop `(,final . ,final-ids)
+                                            parsed `((setq ,final nil)
+                                                     . ,body)
+                                            clauses)))
+                                ('nil (noop-thunk))
+                                (_ (cl-with-gensyms (final)
+                                     (let ((once
+                                            (eval-when-compile
+                                              (make-symbol "once"))))
+                                       (loop `(,final . ,final-ids)
+                                             `((:do (when ,guard
+                                                      (setq ,final
+                                                            ',once)))
+                                               . ,parsed)
+                                             `((when (eq ,final
+                                                         ',once)
+                                                 (setq ,final nil))
+                                               . ,body)
+                                             clauses))))))
+                             (_ (noop-thunk)))))))))
                 `(,final-ids
-                  . ,(app for--parse-for-clauses for-clauses)))
+                  ,body
+                  ,(app for--parse-for-clauses for-clauses)))
           . ,value-form)
         (for--parse-body for-clauses body)))
     (named-let expand
@@ -604,70 +614,29 @@ See Info node `(for)Special-Clause Operators'"
                      `(for--setq . ,(cl-mapcan (lambda (id form)
                                                  `(,id ,form))
                                                renamed-ids forms))))
-                 ,@(mapcar (lambda (id)
-                             `(for--if (eq ,id ',once)
-                                  (setq ,id nil)))
-                           final-ids)))
+                 . ,body))
          (clauses (reverse for-clauses)))
-      (cl-flet*
-          ((split-body (body)
-             (named-let split ((before '()) (body body))
-               (pcase-exhaustive body
-                 ((or '() `((for--if . ,_) . ,_)) `(,body . ,before))
-                 (`(,form . ,body) (split `(,form . ,before) body)))))
-           (optimize-break (body)
-             (pcase (split-body body)
-               (`(((for--if ,guard
-                       ,(and `(setq
-                               ,(and (pred (lambda (id)
-                                             (memq id break-ids)))
-                                     break)
-                               nil)
-                             setter)
-                     . ,body)
-                   (for--if ,break ,update) . ,after)
-                  . ,(app nreverse before))
-                `(,@before
-                  (for--if ,guard ,setter ,@body ,update) . ,after))
-               (_ body)))
-           (optimize-final (body)
-             (pcase body
-               ((and (let once once)
-                     `((for--if ,guard
-                           (setq
-                            ,(and (pred (lambda (id)
-                                          (memq id final-ids)))
-                                  final)
-                            ',once))
-                       . ,(app split-body
-                               `(((for--if (eq ,final ',once)
-                                      ,(and `(setq ,final nil)
-                                            setter))
-                                  ,(and `(for--if ,final ,then)
-                                        update)
-                                  . ,after)
-                                 . ,(app nreverse before)))))
-                `((for--if ,guard ,setter) ,@before
-                  ,@(pcase guard
-                      ('t '()) ('nil `(,then)) (_ `(,update)))
-                  . ,after))
-               (_ body)))
-           (make-iteration (body memoize-bindings outer-bindings
+      (cl-flet
+          ((make-iteration (body memoize-bindings outer-bindings
                                  loop-bindings loop-guards
                                  inner-bindings loop-forms)
              (let* ((body (if (null loop-forms) body
                             `(,@body
-                              (for--if ,(for--and-guards
-                                         `(,@break-ids
-                                           ,@final-ids))
-                                  (for--setq
-                                   . ,(cl-mapcan
-                                       (lambda (binding form)
-                                         (pcase-exhaustive binding
-                                           (`(,id ,_) `(,id ,form))))
-                                       loop-bindings loop-forms))))))
-                    (body (optimize-break body))
-                    (body (optimize-final body))
+                              ,@(cl-flet*
+                                    ((make-pair (binding form)
+                                       (pcase-exhaustive binding
+                                         (`(,id ,_) `(,id ,form))))
+                                     (update-thunk ()
+                                       `(for--setq
+                                         . ,(cl-mapcan #'make-pair
+                                                       loop-bindings
+                                                       loop-forms))))
+                                  (pcase (for--and-guards
+                                          `(,@break-ids
+                                            ,@final-ids))
+                                    ('t `(,(update-thunk))) ('nil '())
+                                    (guard `((when ,guard
+                                               ,(update-thunk)))))))))
                     (body (if (null inner-bindings) body
                             `((,for-binder ,inner-bindings . ,body))))
                     (body (pcase (for--and-guards
@@ -705,27 +674,34 @@ See Info node `(for)Special-Clause Operators'"
                                        bindings renamed-ids)
                                    . ,body))))))
                 (macroexp-progn body)))
-          (pcase-let
-              ((`((,(or (and `(:break . ,(app for--and-guards guard))
-                             (let `(,break-ids . ,expander)
-                               (cl-with-gensyms (break)
-                                 `((,break . ,break-ids)
-                                   . ,(lambda (_special-clause body)
-                                        `((for--if ,guard
-                                              (setq ,break nil)
-                                            . ,body))))))
-                             (let special-clause nil))
-                        (and `(,expander . ,special-clause)
-                             (let break-ids break-ids)))
-                   . ,iteration-forms)
-                  . ,clauses)
-                clauses))
-            (expand break-ids
-                    (funcall expander special-clause
-                             (if (null iteration-forms) body
-                               (apply #'make-iteration
-                                      body iteration-forms)))
-                    clauses)))))))
+          (pcase-let ((`((,head . ,iteration-forms) . ,clauses)
+                       clauses))
+            (cl-flet ((body-thunk ()
+                        (if (null iteration-forms) body
+                          (apply #'make-iteration
+                                 body iteration-forms))))
+              (pcase-exhaustive head
+                (`(:break . ,(app for--and-guards guard))
+                 (pcase guard
+                   ('t (cl-with-gensyms (break)
+                         (expand `(,break . ,break-ids)
+                                 `((setq ,break nil)) clauses)))
+                   ('nil (expand break-ids (body-thunk) clauses))
+                   (_ (cl-with-gensyms (break)
+                        (expand `(,break . ,break-ids)
+                                (let ((break `(setq ,break nil)))
+                                  (pcase (body-thunk)
+                                    ('() `((when ,guard ,break)))
+                                    (`(,else) `((if ,guard ,break
+                                                  ,else)))
+                                    (elses `((cond (,guard ,break)
+                                                   (t . ,elses))))))
+                                clauses)))))
+                (`(,expander . ,special-clause)
+                 (expand break-ids
+                         (funcall expander
+                                  special-clause (body-thunk))
+                         clauses))))))))))
 
 (for--defmacro for-do (for-clauses &rest body)
   "The side-effecting iteration macro.
