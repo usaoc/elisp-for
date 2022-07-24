@@ -106,16 +106,16 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                      ,@(expand-prop types 'for--type)
                      (defun ,name ,arglist
                        ,@docstring ,@declaration
-                       ,@(pcase subforms
-                           ((and '()
-                                 (let (and (pred (not (memq '&rest)))
-                                           (app (remq '&optional)
-                                                args))
-                                   arglist))
-                            `((iter-make
-                               (for-do ((value (,name ,@args))
-                                        (:do (iter-yield value)))))))
-                           (`(,_ . ,_) subforms))))))))))
+                       . ,(pcase subforms
+                            ((and '()
+                                  (let (and (pred (not (memq '&rest)))
+                                            (app (remq '&optional)
+                                                 args))
+                                    arglist))
+                             `((iter-make
+                                (for-do ((value (,name ,@args))
+                                         (:do (iter-yield value)))))))
+                            (`(,_ . ,_) subforms))))))))))
 
 ;;;; Constructor
 (define-for-sequence for-in-array (array)

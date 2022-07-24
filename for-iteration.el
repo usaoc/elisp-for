@@ -275,7 +275,7 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
                     ,inner-bindings ,loop-forms))))
       (pcase-exhaustive clauses
         ('() `(((,(lambda (_special-clause body) body))
-                ,@(group-thunk))
+                . ,(group-thunk))
                . ,groups))
         (`(,(or (and `(:break . ,_) head)
                 (and `(,(and (cl-type keyword)
@@ -287,7 +287,7 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
                           head)))
            . ,clauses)
          (parse '() '() '() '() '() '() nil
-                `((,head ,@(group-thunk)) . ,groups) clauses))
+                `((,head . ,(group-thunk)) . ,groups) clauses))
         (`(,(app for--expand-iteration-clause
                  (and `(,_ (:do-in ,more-memoize-bindings
                                    ,more-outer-bindings
@@ -672,7 +672,7 @@ See Info node `(for)Special-Clause Operators'"
                             `((,for-binder ,inner-bindings . ,body))))
                     (body `((while ,(for--and-guards
                                      `(,@break-ids
-                                       ,@final-ids ,@loop-guards))
+                                       ,@final-ids . ,loop-guards))
                               . ,body)))
                     (body (if (null loop-bindings) body
                             `((let ,loop-bindings . ,body))))
