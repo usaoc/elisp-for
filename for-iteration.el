@@ -565,7 +565,7 @@ See Info node `(for)Special-Clause Operators'"
         (for--parse-bindings bindings))
        (`(,(app (lambda (clauses)
                   (named-let loop
-                      ((final-ids '()) (parsed '()) (body '())
+                      ((final-ids '()) (body '()) (parsed '())
                        (clauses (reverse clauses)))
                     (pcase-exhaustive clauses
                       ('() `(,final-ids ,body ,parsed))
@@ -575,25 +575,23 @@ See Info node `(for)Special-Clause Operators'"
                           (pcase guard
                             ('t (cl-with-gensyms (final)
                                   (loop `(,final . ,final-ids)
-                                        parsed `((setq ,final nil)
-                                                 . ,body)
-                                        clauses)))
-                            ('nil (loop final-ids `((:let) . ,parsed)
-                                        body clauses))
+                                        `((setq ,final nil) . ,body)
+                                        parsed clauses)))
+                            ('nil (loop final-ids body
+                                        `((:let) . ,parsed) clauses))
                             (_ (cl-with-gensyms (final)
                                  (let ((once '#:once))
                                    (loop `(,final . ,final-ids)
-                                         `((:do (when ,guard
-                                                  (setq ,final
-                                                        ',once)))
-                                           . ,parsed)
-                                         `((when (eq ,final
-                                                     ',once)
+                                         `((when (eq ,final ',once)
                                              (setq ,final nil))
                                            . ,body)
+                                         `((:do
+                                            (when ,guard
+                                              (setq ,final ',once)))
+                                           . ,parsed)
                                          clauses))))))
-                         (_ (loop final-ids `(,clause . ,parsed)
-                                  body clauses)))))))
+                         (_ (loop final-ids body
+                                  `(,clause . ,parsed) clauses)))))))
                 `(,final-ids
                   ,body
                   ,(app for--parse-for-clauses for-clauses)))
@@ -649,12 +647,10 @@ See Info node `(for)Special-Clause Operators'"
               (let* ((body `(,@body . ,result-forms))
                      (body (if (and (null break-ids) (null final-ids))
                                body
-                             (cl-flet ((make-bindings (id) `(,id t)))
-                               `((let (,@(mapcar #'make-bindings
-                                                 break-ids)
-                                       ,@(mapcar #'make-bindings
-                                                 final-ids))
-                                   . ,body)))))
+                             `((let ,(mapcar (lambda (id) `(,id t))
+                                             `(,@break-ids
+                                               ,@final-ids))
+                                 . ,body))))
                      (body (if (null bindings) body
                              `((let ,(cl-mapcar
                                       (pcase-lambda (id `(,_ ,value))
