@@ -567,40 +567,35 @@ See Info node `(for)Special-Clause Operators'"
                   (named-let loop
                       ((final-ids '()) (parsed '()) (body '())
                        (clauses (reverse clauses)))
-                    (cl-flet ((noop-thunk ()
-                                (loop final-ids `(,clause . ,parsed)
-                                      body clauses)))
-                      (pcase-exhaustive clauses
-                        ('() `(,final-ids ,body ,parsed))
-                        (`(,clause . ,clauses)
-                         (cl-flet
-                             ((noop-thunk ()
-                                (loop final-ids `(,clause . ,parsed)
-                                      body clauses)))
-                           (pcase clause
-                             (`(:final . ,(app for--and-guards guard))
-                              (pcase guard
-                                ('t (cl-with-gensyms (final)
-                                      (loop `(,final . ,final-ids)
-                                            parsed `((setq ,final nil)
-                                                     . ,body)
-                                            clauses)))
-                                ('nil (noop-thunk))
-                                (_ (cl-with-gensyms (final)
-                                     (let ((once
-                                            (eval-when-compile
-                                              (make-symbol "once"))))
-                                       (loop `(,final . ,final-ids)
-                                             `((:do (when ,guard
-                                                      (setq ,final
-                                                            ',once)))
-                                               . ,parsed)
-                                             `((when (eq ,final
-                                                         ',once)
-                                                 (setq ,final nil))
-                                               . ,body)
-                                             clauses))))))
-                             (_ (noop-thunk)))))))))
+                    (pcase-exhaustive clauses
+                      ('() `(,final-ids ,body ,parsed))
+                      (`(,clause . ,clauses)
+                       (pcase clause
+                         (`(:final . ,(app for--and-guards guard))
+                          (pcase guard
+                            ('t (cl-with-gensyms (final)
+                                  (loop `(,final . ,final-ids)
+                                        parsed `((setq ,final nil)
+                                                 . ,body)
+                                        clauses)))
+                            ('nil (loop final-ids `((:let) . ,parsed)
+                                        body clauses))
+                            (_ (cl-with-gensyms (final)
+                                 (let ((once
+                                        (eval-when-compile
+                                          (make-symbol "once"))))
+                                   (loop `(,final . ,final-ids)
+                                         `((:do (when ,guard
+                                                  (setq ,final
+                                                        ',once)))
+                                           . ,parsed)
+                                         `((when (eq ,final
+                                                     ',once)
+                                             (setq ,final nil))
+                                           . ,body)
+                                         clauses))))))
+                         (_ (loop final-ids `(,clause . ,parsed)
+                                  body clauses)))))))
                 `(,final-ids
                   ,body
                   ,(app for--parse-for-clauses for-clauses)))
