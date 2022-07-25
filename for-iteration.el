@@ -100,7 +100,7 @@ form and ITERATOR is an expression that produces an iterator."
   (pcase-exhaustive iteration-clause
     (`(,id ,form)
      (cl-with-gensyms (iterator next)
-       (let* ((returned (eval-when-compile (make-symbol "returned")))
+       (let* ((returned '#:returned)
               (next* `(condition-case nil (iter-next ,iterator)
                         (iter-end-of-sequence ',returned))))
          `(,id (:do-in ((,iterator ,form)) () ((,next ,next*))
@@ -581,9 +581,7 @@ See Info node `(for)Special-Clause Operators'"
                             ('nil (loop final-ids `((:let) . ,parsed)
                                         body clauses))
                             (_ (cl-with-gensyms (final)
-                                 (let ((once
-                                        (eval-when-compile
-                                          (make-symbol "once"))))
+                                 (let ((once '#:once))
                                    (loop `(,final . ,final-ids)
                                          `((:do (when ,guard
                                                   (setq ,final

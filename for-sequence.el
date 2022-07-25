@@ -357,7 +357,7 @@ See Info node `(for)Sequence Constructors'."
                       (,loop-guard) ((,id ,value)) (,loop-form))))))
    (`(,id (,_ ,(for--lit value-form)))
     (cl-with-gensyms (value)
-      (let ((returned (eval-when-compile (make-symbol "returned"))))
+      (let ((returned '#:returned))
         `(,id (:do-in ((,value ,value-form)) () ((,value ,value))
                       ((not (eq ,value ',returned)))
                       ((,id ,value)) (',returned)))))))
