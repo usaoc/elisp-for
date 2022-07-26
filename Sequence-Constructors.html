@@ -71,7 +71,7 @@ into the form <code>(cl-psetq <var>loop-update</var>&hellip;)</code>
 (see <a href="https://www.gnu.org/software/emacs/manual/html_node/cl/Assignment.html#Assignment">(cl)Assignment</a>).  It is an error for <var>loop-bindings</var> and
 <var>loop-forms</var> to have unmatched numbers of subforms.  For example, a
 possible implementation of the expander of a sequence constructor that
-iterates over lists is as follows<a id="DOCF15" href="#FOOT15"><sup>15</sup></a>:
+iterates over lists is as follows<a id="DOCF16" href="#FOOT16"><sup>16</sup></a>:
 </p>
 <div class="example">
 <pre class="example">(:expander-case
@@ -86,22 +86,19 @@ iterates over lists is as follows<a id="DOCF15" href="#FOOT15"><sup>15</sup></a>
 </pre></div>
 </dd></dl>
 
-<span id="index-sequence-constructor"></span>
-
 <p>Below, all sequence constructors have expanders.  Additional properties
 of them as defined by <code>define-for-sequence</code> are also specified
-where aliases are auxiliary operators.  <em>The sequence</em> refers to the
-expansion of or the iterator returned by the sequence constructor.  All
-sequence constructors when used as generators are guaranteed to delay
-the computation as much as possible, including that of the initial
-states.
+where aliases are auxiliary operators.  &ldquo;This sequence&rdquo; refers
+to the expansion of or the iterator returned by the sequence
+constructor.  All sequence constructors when used as generators are
+guaranteed to delay the computation as much as possible, including that
+of the initial states.
 </p>
 <dl>
 <dt id="index-for_002din_002darray">Function: <strong>for-in-array</strong> <em><var>array</var></em></dt>
 <dt id="index-in_002darray">Auxiliary Operator: <strong>in-array</strong> <em><var>array</var></em></dt>
-<dd><p>The sequence iterates over the elements of the array <var>array</var>.  As
-such, <code>string</code>s, <code>vector</code>s, <code>bool-vector</code>s, and
-<code>char-table</code>s are dispatched to it.  Moreover, a literal array
+<dd><p>This sequence iterates over the elements of the array <var>array</var>.  As
+such, <code>array</code>s are dispatched to it.  Moreover, a literal array
 after macro expansion as a sequence form when used in iteration clauses
 is treated as if this sequence constructor is used.
 </p></dd></dl>
@@ -109,7 +106,7 @@ is treated as if this sequence constructor is used.
 <dl>
 <dt id="index-for_002din_002dinclusive_002drange">Function: <strong>for-in-inclusive-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em></dt>
 <dt id="index-in_002dinclusive_002drange">Auxiliary Operator: <strong>in-inclusive-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em></dt>
-<dd><p>The sequence iterates over the numbers between <var>start</var> and
+<dd><p>This sequence iterates over the numbers between <var>start</var> and
 <var>end</var>.  The step size <var>step</var> defaults to <code>1</code> when it is
 <code>nil</code> or omitted and is added to the number after each iteration.
 The iteration terminates when the number is no longer in the closed
@@ -119,30 +116,28 @@ range of <var>start</var> and <var>end</var>.
 <dl>
 <dt id="index-for_002din_002dlist">Function: <strong>for-in-list</strong> <em><var>list</var></em></dt>
 <dt id="index-in_002dlist">Auxiliary Operator: <strong>in-list</strong> <em><var>list</var></em></dt>
-<dd><p>The sequence iterates over the elements of the non-dotted list
-<var>list</var>.  As such, <code>cons</code>es and <code>null</code> are dispatched to
-it.  Moreover, a literal list after macro expansion as a sequence form
-when used in iteration clauses is treated as if this sequence
-constructor is used.
+<dd><p>This sequence iterates over the elements of the non-dotted list
+<var>list</var>.  As such, <code>list</code>s are dispatched to it.  Moreover, a
+literal list after macro expansion as a sequence form when used in
+iteration clauses is treated as if this sequence constructor is used.
 </p></dd></dl>
 
 <dl>
 <dt id="index-for_002din_002dnaturals">Function: <strong>for-in-naturals</strong> <em>[<var>start</var>]</em></dt>
 <dt id="index-in_002dnaturals">Auxiliary Operator: <strong>in-naturals</strong> <em>[<var>start</var>]</em></dt>
-<dd><p>The sequence iterates over the natural numbers (non-negative integers)
+<dd><p>This sequence iterates over the natural numbers (non-negative integers)
 from <var>start</var> where <var>start</var> defaults to <code>0</code> when it is
-<code>nil</code> or omitted and is checked to be of type <code>(integer 0)</code>
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/cl/Type-Predicates.html#Type-Predicates">(cl)Type Predicates</a>) by <code>cl-the</code>
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/cl/Declarations.html#Declarations">(cl)Declarations</a>).  The type checking can be disabled by an
-<code>optimize</code> declaration, but this is not recommended since the type
-checking is done at compile time when <var>start</var> is a literal object
-anyway.
+<code>nil</code> or omitted and is checked to be of type <code>(integer 0)</code> by
+<code>cl-the</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/cl/Declarations.html#Declarations">(cl)Declarations</a>).  The type checking can be
+disabled by an <code>optimize</code> declaration, but this is not recommended
+since the type checking is done at compile time when <var>start</var> is a
+literal object anyway.
 </p></dd></dl>
 
 <dl>
 <dt id="index-for_002din_002dproducer">Function: <strong>for-in-producer</strong> <em><var>producer</var> [<var>predicate</var> [<var>arg</var>&hellip;]]</em></dt>
 <dt id="index-in_002dproducer">Auxiliary Operator: <strong>in-producer</strong> <em><var>producer</var> [<var>predicate</var> [<var>arg</var>&hellip;]]</em></dt>
-<dd><p>The sequence iterates over the values produced by repeated evaluations
+<dd><p>This sequence iterates over the values produced by repeated evaluations
 of the function form <code>(funcall <var>producer</var>
 [<var>arg</var>&hellip;])</code>.  The iteration is infinite when
 <var>predicate</var> is omitted.  Otherwise, the iteration terminates when
@@ -156,7 +151,7 @@ is the value of the function form,
 <dt id="index-for_002din_002drange-1">Function: <strong>for-in-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em></dt>
 <dt id="index-in_002drange-1">Auxiliary Operator: <strong>in-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em></dt>
 <dd>
-<p>The sequence iterates over the numbers between <var>start</var> and
+<p>This sequence iterates over the numbers between <var>start</var> and
 <var>end</var>.  <var>start</var> defaults to <code>0</code> when omitted.  The step
 size <var>step</var> defaults to <code>1</code> when it is <code>nil</code> or omitted,
 and it is added to the number after each iteration.  The iteration
@@ -171,17 +166,18 @@ used.
 <dl>
 <dt id="index-for_002din_002diterator">Function: <strong>for-in-iterator</strong> <em><var>iterator</var></em></dt>
 <dt id="index-in_002diterator">Auxiliary Operator: <strong>in-iterator</strong> <em><var>iterator</var></em></dt>
-<dd><p>The sequence is equivalent to <var>iterator</var>.  When used as a function,
-this sequence constructor checks <var>iterator</var> to be of type
-<code>function</code> and returns <var>iterator</var> as is.  It is mainly useful
-for its expander to avoid the dynamic dispatch.
+<dd><p>This sequence is equivalent to the sequence <var>iterator</var>.  When used
+as a function, this sequence constructor checks <var>iterator</var> to be of
+type <code>function</code> and returns <var>iterator</var> as is.  <code>function</code>s
+are dispatched to it.  It is mainly useful for its expander to avoid the
+dynamic dispatch.
 </p></dd></dl>
 
 <dl>
 <dt id="index-for_002din_002drepeat">Function: <strong>for-in-repeat</strong> <em><var>value</var>&hellip;</em></dt>
 <dt id="index-in_002drepeat">Auxiliary Operator: <strong>in-repeat</strong> <em><var>value</var>&hellip;</em></dt>
-<dd><p>The sequence repeatedly returns each <var>value</var> from left to right.  It
-is equivalent to the sequence <code>(for-in-list (<var>make-circular</var>
+<dd><p>This sequence repeatedly returns each <var>value</var> from left to right.
+It is equivalent to the sequence <code>(for-in-list (<var>make-circular</var>
 <var>value</var>&hellip;))</code> where <var>make-circular</var> is a function that
 makes a circular list of the arguments.
 </p></dd></dl>
@@ -189,26 +185,26 @@ makes a circular list of the arguments.
 <dl>
 <dt id="index-for_002din_002dvalue">Function: <strong>for-in-value</strong> <em><var>value</var></em></dt>
 <dt id="index-in_002dvalue">Auxiliary Operator: <strong>in-value</strong> <em><var>value</var></em></dt>
-<dd><p>The sequence returns <var>value</var> once.
+<dd><p>This sequence returns <var>value</var> once.
 </p></dd></dl>
 
 <dl>
 <dt id="index-for_002don_002darray">Function: <strong>for-on-array</strong> <em><var>array</var></em></dt>
 <dt id="index-on_002darray">Auxiliary Operator: <strong>on-array</strong> <em><var>array</var></em></dt>
-<dd><p>The sequence iterates over the indexes of the array <var>array</var>.
+<dd><p>This sequence iterates over the indexes of the array <var>array</var>.
 </p></dd></dl>
 
 <dl>
 <dt id="index-for_002don_002dlist">Function: <strong>for-on-list</strong> <em><var>list</var></em></dt>
 <dt id="index-on_002dlist">Auxiliary Operator: <strong>on-list</strong> <em><var>list</var></em></dt>
-<dd><p>The sequence iterates over the <code>cons</code>es of the non-dotted list
+<dd><p>This sequence iterates over the <code>cons</code>es of the non-dotted list
 <var>list</var>.
 </p></dd></dl>
 
 <dl>
 <dt id="index-for_002din_002ddirectory">Function: <strong>for-in-directory</strong> <em><var>directory</var> [<var>full</var> [<var>match</var> [<var>nosort</var> [<var>count</var>]]]]</em></dt>
 <dt id="index-in_002ddirectory">Auxiliary Operator: <strong>in-directory</strong> <em><var>directory</var> [<var>full</var> [<var>match</var> [<var>nosort</var> [<var>count</var>]]]]</em></dt>
-<dd><p>The sequence iterates over the files in the directory named by the
+<dd><p>This sequence iterates over the files in the directory named by the
 string <var>directory</var>.  It is equivalent to the following sequence
 (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Contents-of-Directories.html#Contents-of-Directories">(elisp)Contents of Directories</a>) where <var>full</var>,
 <var>nosort</var>, and <var>count</var> default to <code>nil</code> when omitted and
@@ -224,7 +220,7 @@ it is <code>nil</code> or omitted:
 <dl>
 <dt id="index-for_002din_002ddirectory_002drecursively">Function: <strong>for-in-directory-recursively</strong> <em><var>dir</var> <var>regexp</var> [<var>include-directories</var> [<var>predicate</var> [<var>follow-symlinks</var>]]]</em></dt>
 <dt id="index-in_002ddirectory_002drecursively">Auxiliary Operator: <strong>in-directory-recursively</strong> <em><var>dir</var> <var>regexp</var> [<var>include-directories</var> [<var>predicate</var> [<var>follow-symlinks</var>]]]</em></dt>
-<dd><p>The sequence iterates over the files under the directory named by the
+<dd><p>This sequence iterates over the files under the directory named by the
 string <var>dir</var>.  It is equivalent to the following sequence where
 <var>include-directories</var>, <var>predicate</var>, and <var>follow-symlinks</var>
 default to <code>nil</code> when omitted:
@@ -239,25 +235,25 @@ default to <code>nil</code> when omitted:
 <dl>
 <dt id="index-for_002dthe_002dbuffers">Function: <strong>for-the-buffers</strong> <em>[<var>frame</var>]</em></dt>
 <dt id="index-the_002dbuffers">Auxiliary Operator: <strong>the-buffers</strong> <em>[<var>frame</var>]</em></dt>
-<dd><p>The sequence iterates over the buffers of the frame <var>frame</var>.  It is
-equivalent to <code>(for-in-list (buffer-list <var>frame</var>))</code>
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffer-List.html#Buffer-List">(elisp)Buffer List</a>) where <var>frame</var> defaults to <code>nil</code>
-when omitted.
+<dd><p>This sequence iterates over the buffers of the frame <var>frame</var>.  It is
+equivalent to the sequence <code>(for-in-list (buffer-list
+<var>frame</var>))</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffer-List.html#Buffer-List">(elisp)Buffer List</a>) where <var>frame</var> defaults
+to <code>nil</code> when omitted.
 </p></dd></dl>
 
 <dl>
 <dt id="index-for_002dthe_002dframes">Function: <strong>for-the-frames</strong></dt>
 <dt id="index-the_002dframes">Auxiliary Operator: <strong>the-frames</strong></dt>
-<dd><p>The sequence iterates over the frames.  It is <em>not</em> equivalent to
-<code>(for-in-list (frame-list))</code> since the frames are visited from the
-selected frame in <code>next-frame</code> order (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Finding-All-Frames.html#Finding-All-Frames">(elisp)Finding All
-Frames</a>).
+<dd><p>This sequence iterates over the frames.  It is <em>not</em> equivalent to
+the sequence <code>(for-in-list (frame-list))</code> since the frames are
+visited from the selected frame in <code>next-frame</code> order
+(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Finding-All-Frames.html#Finding-All-Frames">(elisp)Finding All Frames</a>).
 </p></dd></dl>
 
 <dl>
 <dt id="index-for_002dthe_002doverlays">Function: <strong>for-the-overlays</strong> <em>[<var>buffer</var>]</em></dt>
 <dt id="index-the_002doverlays">Auxiliary Operator: <strong>the-overlays</strong> <em>[<var>buffer</var>]</em></dt>
-<dd><p>The sequence iterates over the overlays of the buffer <var>buffer</var>.  It
+<dd><p>This sequence iterates over the overlays of the buffer <var>buffer</var>.  It
 is equivalent to the following sequence (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Current-Buffer.html#Current-Buffer">(elisp)Current Buffer</a>,
 <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Finding-Overlays.html#Finding-Overlays">(elisp)Finding Overlays</a>, and <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Point.html#Point">(elisp)Point</a>) where
 <var>buffer</var> defaults to the current buffer when it is <code>nil</code> or
@@ -272,8 +268,8 @@ omitted:
 <dl>
 <dt id="index-for_002dthe_002dwindows">Function: <strong>for-the-windows</strong> <em>[<var>frame</var> [<var>minibuf</var>]]</em></dt>
 <dt id="index-the_002dwindows">Auxiliary Operator: <strong>the-windows</strong> <em>[<var>frame</var> [<var>minibuf</var>]]</em></dt>
-<dd><p>The sequence iterates over the windows of the frame <var>frame</var>.  It is
-<em>not</em> equivalent to <code>(for-in-list (window-list))</code>
+<dd><p>This sequence iterates over the windows of the frame <var>frame</var>.  It is
+<em>not</em> equivalent to the sequence <code>(for-in-list (window-list))</code>
 (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Windows-and-Frames.html#Windows-and-Frames">(elisp)Windows and Frames</a>) since the windows are visited from
 the selected window of the frame <var>frame</var> in <code>next-window</code> order
 (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Cyclic-Window-Ordering.html#Cyclic-Window-Ordering">(elisp)Cyclic Window Ordering</a>) where <var>frame</var> defaults to
@@ -287,7 +283,7 @@ to <code>nil</code> when omitted.
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT15" href="#DOCF15">(15)</a></h3>
+<h5><a id="FOOT16" href="#DOCF16">(16)</a></h3>
 <p>In this example, it may seem
 unnecessary to &ldquo;memoize&rdquo; the value of <var>list-form</var> at first
 glance.  The actual purpose of doing so in this and many similar cases

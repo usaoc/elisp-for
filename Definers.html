@@ -75,12 +75,15 @@ following types:
 <code>(:expander-case [<var>case</var>&hellip;])</code>
 </li></ul>
 
+<span id="index-terminology-13"></span>
+
 <p>It is an error for a type to appear more than once.  The form of
 <code>declare</code> subforms is the same as normal <code>declare</code> forms
 (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Declare-Form.html#Declare-Form">(elisp)Declare Form</a>).  An <var>alias</var> is an identifier as an
 alias of <var>name</var> available when used in iteration clauses.  A
-<var>type</var> is a symbol as a type dispatched to <var>name</var> when used in
-iteration clauses.  When an <code>:expander</code> subform is present, an
+<var>type</var> is a type specifier, whose objects when used as sequence
+forms in iteration clauses are dispatched to <var>name</var>.  It is an error
+for two <var>type</var>s to be in subtype relation<a id="DOCF13" href="#FOOT13"><sup>13</sup></a>.  When an <code>:expander</code> subform is present, an
 expander with <var>arg</var> as the sole argument and <var>body</var>s as the body
 is defined and available when used in iteration clauses.  The expander
 receives the iteration clause as the argument and produces an expanded
@@ -118,6 +121,16 @@ of expander.
 <p>It is an error for <var>arglist</var> to be in any other form.
 </p></dd></dl>
 
+<div class="footnote">
+<hr>
+<h4 class="footnotes-heading">Footnotes</h4>
+
+<h5><a id="FOOT13" href="#DOCF13">(13)</a></h3>
+<p>Following
+<a href="http://clhs.lisp.se/Body/26_glo_s.htm">Common Lisp</a>, a type is a
+<em>subtype</em> of another type when every object of the former is an
+object of the latter.</p>
+</div>
 <hr>
 <div class="header">
 <p>

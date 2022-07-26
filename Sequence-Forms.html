@@ -82,14 +82,14 @@ in iteration clauses to avoid the need of shorthands
 </pre></div>
 
 <span id="index-sequence-form-3"></span>
+<span id="index-terminology-10"></span>
 
-<p><em>Dynamic dispatch</em> based on the value of the application of
-<code>type-of</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Type-Predicates.html#Type-Predicates">(elisp)Type Predicates</a>) to the datum is
-available when the datum is used as a sequence form in iteration
-clauses.  Functions are assumed to be iterators and dispatched to
-themselves.
+<p><em>Dynamic dispatch</em> based on the type of datum is available when the
+datum is used as a sequence form in iteration clauses.  A type is
+specified by a Common Lisp-style <em>type specifier</em> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/cl/Type-Predicates.html#Type-Predicates">(cl)Type
+Predicates</a>).
 </p>
-<p>A <code>cons</code> dispatched to the application of <code>for-in-list</code> to it:
+<p>A <code>list</code> dispatched to the application of <code>for-in-list</code> to it:
 </p>
 <div class="example">
 <pre class="example">(let ((list '(1 2 3)))
@@ -97,7 +97,8 @@ themselves.
      &rArr; (1 2 3)
 </pre></div>
 
-<p>A <code>for-in-list</code> iterator dispatched to itself:
+<p>A <code>function</code> dispatched to the application of
+<code>for-in-iterator</code> to it:
 </p>
 <div class="example">
 <pre class="example">(let ((iterator (for-in-list '(1 2 3))))
@@ -106,7 +107,7 @@ themselves.
 </pre></div>
 
 <span id="index-sequence-form-4"></span>
-<span id="index-terminology-10"></span>
+<span id="index-terminology-11"></span>
 
 <p>Analogous to dynamic dispatch, certain <em>literal
 objects</em><a id="DOCF9" href="#FOOT9"><sup>9</sup></a> after
