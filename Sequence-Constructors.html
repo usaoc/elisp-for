@@ -100,10 +100,10 @@ states.
 <dt id="index-for_002din_002darray">Function: <strong>for-in-array</strong> <em><var>array</var></em></dt>
 <dt id="index-in_002darray">Auxiliary Operator: <strong>in-array</strong> <em><var>array</var></em></dt>
 <dd><p>The sequence iterates over the elements of the array <var>array</var>.  As
-such, arrays (strings, vectors, Bool-vectors, and char-tables) are
-dispatched to it.  Moreover, a literal array after macro expansion as a
-sequence form when used in iteration clauses is treated as if this
-sequence constructor is used.
+such, <code>string</code>s, <code>vector</code>s, <code>bool-vector</code>s, and
+<code>char-table</code>s are dispatched to it.  Moreover, a literal array
+after macro expansion as a sequence form when used in iteration clauses
+is treated as if this sequence constructor is used.
 </p></dd></dl>
 
 <dl>
@@ -119,10 +119,11 @@ range of <var>start</var> and <var>end</var>.
 <dl>
 <dt id="index-for_002din_002dlist">Function: <strong>for-in-list</strong> <em><var>list</var></em></dt>
 <dt id="index-in_002dlist">Auxiliary Operator: <strong>in-list</strong> <em><var>list</var></em></dt>
-<dd><p>The sequence iterates over the elements of the list <var>list</var>.  As
-such, lists are dispatched to it.  Moreover, a literal list after macro
-expansion as a sequence form when used in iteration clauses is treated
-as if this sequence constructor is used.
+<dd><p>The sequence iterates over the elements of the non-dotted list
+<var>list</var>.  As such, <code>cons</code>es and <code>null</code> are dispatched to
+it.  Moreover, a literal list after macro expansion as a sequence form
+when used in iteration clauses is treated as if this sequence
+constructor is used.
 </p></dd></dl>
 
 <dl>
@@ -161,9 +162,10 @@ size <var>step</var> defaults to <code>1</code> when it is <code>nil</code> or o
 and it is added to the number after each iteration.  The iteration
 terminates when the number is no longer in the range of <var>start</var> and
 <var>end</var>.  The range is right half-open when <var>step</var> is non-negative
-or otherwise left half-open.  Integers are dispatched to it.  Moreover,
-a literal integer after macro expansion as a sequence form when used in
-iteration clauses is as if this sequence constructor is used.
+or otherwise left half-open.  <code>integer</code>s are dispatched to it.
+Moreover, a literal integer after macro expansion as a sequence form
+when used in iteration clauses is as if this sequence constructor is
+used.
 </p></dd></dl>
 
 <dl>
@@ -181,7 +183,7 @@ for its expander to avoid the dynamic dispatch.
 <dd><p>The sequence repeatedly returns each <var>value</var> from left to right.  It
 is equivalent to the sequence <code>(for-in-list (<var>make-circular</var>
 <var>value</var>&hellip;))</code> where <var>make-circular</var> is a function that
-makes a circular list (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Cons-Cells.html#Cons-Cells">(elisp)Cons Cells</a>) of the arguments.
+makes a circular list of the arguments.
 </p></dd></dl>
 
 <dl>
@@ -193,13 +195,14 @@ makes a circular list (see <a href="https://www.gnu.org/software/emacs/manual/ht
 <dl>
 <dt id="index-for_002don_002darray">Function: <strong>for-on-array</strong> <em><var>array</var></em></dt>
 <dt id="index-on_002darray">Auxiliary Operator: <strong>on-array</strong> <em><var>array</var></em></dt>
-<dd><p>The sequence iterates over the indexes of <var>array</var>.
+<dd><p>The sequence iterates over the indexes of the array <var>array</var>.
 </p></dd></dl>
 
 <dl>
 <dt id="index-for_002don_002dlist">Function: <strong>for-on-list</strong> <em><var>list</var></em></dt>
 <dt id="index-on_002dlist">Auxiliary Operator: <strong>on-list</strong> <em><var>list</var></em></dt>
-<dd><p>The sequence iterates over the conses of <var>list</var>.
+<dd><p>The sequence iterates over the <code>cons</code>es of the non-dotted list
+<var>list</var>.
 </p></dd></dl>
 
 <dl>

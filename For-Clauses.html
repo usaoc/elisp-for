@@ -45,6 +45,8 @@ Next: <a href="Sequence-Forms.html" accesskey="n" rel="next">Sequence Forms</a>,
 <span id="index-terminology-4"></span>
 <span id="index-terminology-5"></span>
 <span id="index-terminology-6"></span>
+<span id="index-terminology-7"></span>
+<span id="index-terminology-8"></span>
 
 <p>The expansion of an iteration form is driven by a series of <em>for
 clauses</em>, classified into <em>iteration clauses</em> and <em>special
@@ -119,7 +121,7 @@ presence of <code>(:let)</code>:
      &rArr; ((1 . 2) (1 . 3) (1 . 4) (2 . 2) (2 . 3) (2 . 4))
 </pre></div>
 
-<span id="index-terminology-7"></span>
+<span id="index-terminology-9"></span>
 
 <p>An iteration clause normally has the form <code>(<var>form</var>
 <var>sequence</var>)</code> where the form of <var>form</var> is specified by the value
@@ -143,12 +145,14 @@ Language Scheme">R<sup>5</sup>RS</acronym> (<cite>Revised<sup>5</sup> Report on 
 Language Scheme</cite>)</a>, <em>an error</em> does not specify whether or when the error is
 detected or reported.</p>
 <h5><a id="FOOT6" href="#DOCF6">(6)</a></h3>
-<p>In this manual, an object is a
-<em>list</em> if and only if it is a proper list.  Following
+<p>In this manual, unless otherwise
+specified, an object is a <em>list</em> if and only if it is a proper list.
+Following
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_p.htm">Common Lisp</a> and Emacs Lisp (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Cons-Cells.html#Cons-Cells">(elisp)Cons Cells</a>), a <em>proper
 list</em> is either the empty list or a list terminated by the empty list.
 It is an error for it to be any other structure produced by <code>cons</code>
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Building-Lists.html#Building-Lists">(elisp)Building Lists</a>)<a id="DOCF5" href="#FOOT5"><sup>5</sup></a>.</p>
+(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Building-Lists.html#Building-Lists">(elisp)Building Lists</a>, that is, a <em>circular list</em> or a
+<em>dotted list</em>.)<a id="DOCF5" href="#FOOT5"><sup>5</sup></a>.</p>
 <h5><a id="FOOT7" href="#DOCF7">(7)</a></h3>
 <p>In this manual, a
 metavariable is typeset as &lsquo;<samp><var>metavariable</var></samp>&rsquo;, an optional form
