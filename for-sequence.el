@@ -106,14 +106,14 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                      ,@(expand-prop types 'for--type)
                      (defun ,name ,arglist
                        ,@docstring ,@declaration
-                       . ,(pcase subforms
+                       . ,(pcase-exhaustive subforms
                             ((and '()
                                   (let (and (pred (not (memq '&rest)))
                                             (app (remq '&optional)
                                                  args))
                                     arglist))
                              `((iter-make
-                                (for-do ((value (,name ,@args))
+                                (for-do ((value (,name . ,args))
                                          (:do (iter-yield value)))))))
                             (`(,_ . ,_) subforms))))))))))
 
@@ -122,8 +122,7 @@ BODY are the body of generator.  See Info node `(for)Definers'.
   "Return an iterator that returns each item in ARRAY.
 
 See Info node `(for)Sequence Constructors'."
-  (:alias in-array)
-  (:type string vector bool-vector char-table)
+  (:alias in-array) (:type string vector bool-vector char-table)
   (:expander-case
    (`(,id (,_ ,array-form))
     (cl-with-gensyms (array length index)
@@ -160,8 +159,7 @@ See Info node `(for)Sequence Constructors'.
   "Return an iterator that returns each element in LIST.
 
 See Info node `(for)Sequence Constructors'."
-  (:alias in-list)
-  (:type cons null)
+  (:alias in-list) (:type list)
   (:expander-case
    (`(,id (,_ ,list-form))
     (cl-with-gensyms (list tail)
@@ -264,8 +262,7 @@ half-open when STEP is negative.
 See Info node `(for)Sequence Constructors'.
 
 \(fn START-OR-END [END [STEP]])"
-  (:alias in-range)
-  (:type integer)
+  (:alias in-range) (:type integer)
   (:expander-case
    (`(,id ,(or (and (or (and `(,_ ,start-or-end-form)
                              (let end-form nil))
@@ -413,10 +410,11 @@ See Info node `(for)Sequence Constructors'.
                              `(,_ ,directory ,full ,match ,nosort))
                          (let count nil))
                     `(,_ ,directory ,full ,match ,nosort ,count))))
-    `(,id (in-list (directory-files
-                    ,directory ,full
-                    (or ,match directory-files-no-dot-files-regexp)
-                    ,nosort ,count)))))
+    `(,id (for-in-list
+           (directory-files
+            ,directory ,full
+            (or ,match directory-files-no-dot-files-regexp)
+            ,nosort ,count)))))
   (declare (side-effect-free t)))
 
 (define-for-sequence for-in-directory-recursively
@@ -445,10 +443,10 @@ See Info node `(for)Sequence Constructors'.
                `(,_ ,dir ,regexp
                     ,include-directories ,predicate
                     ,follow-symlinks)))
-    `(,id (in-list (directory-files-recursively
-                    ,dir ,regexp
-                    ,include-directories ,predicate
-                    ,follow-symlinks)))))
+    `(,id (for-in-list
+           (directory-files-recursively
+            ,dir ,regexp
+            ,include-directories ,predicate ,follow-symlinks)))))
   (declare (side-effect-free t)))
 
 (define-for-sequence for-the-buffers (&optional frame)
@@ -463,7 +461,7 @@ See Info node `(for)Sequence Constructors'.
   (:alias the-buffers)
   (:expander-case
    (`(,id ,(or (and `(,_) (let frame nil)) `(,_ ,frame)))
-    `(,id (in-list (buffer-list ,frame)))))
+    `(,id (for-in-list (buffer-list ,frame)))))
   (declare (side-effect-free t)))
 
 (define-for-sequence for-the-frames ()
@@ -505,10 +503,10 @@ See Info node `(for)Sequence Constructors'.
   (:alias the-overlays)
   (:expander-case
    (`(,id ,(or (and `(,_) (let buffer-form nil)) `(,_ ,buffer-form)))
-    `(,id (in-list (if-let ((buffer ,buffer-form))
-                       (with-current-buffer buffer
-                         (overlays-in (point-min) (point-max)))
-                     (overlays-in (point-min) (point-max)))))))
+    `(,id (for-in-list (if-let ((buffer ,buffer-form))
+                           (with-current-buffer buffer
+                             (overlays-in (point-min) (point-max)))
+                         (overlays-in (point-min) (point-max)))))))
   (declare (side-effect-free t)))
 
 (define-for-sequence for-the-windows (&optional frame minibuf)
@@ -549,6 +547,7 @@ See Info node `(for)Sequence Constructors'.
                  (while (not (eq current original))
                    (iter-yield current)
                    (cl-callf next-window current minibuf frame))))))
+
 ;;;; Provide
 (provide 'for-sequence)
 ;;; for-sequence.el ends here

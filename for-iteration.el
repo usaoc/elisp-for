@@ -83,8 +83,9 @@ calling the generator on DATUM."
 (defun for--datum-to-sequence (datum)
   "Transform DATUM to a sequence form.
 
-Currently, literal lists, arrays, and integers are transformed to
-`in-list', `in-array', and `in-range' sequences."
+Currently, literal lists, arrays, and integers after
+macro-expansion are transformed to `for-in-list', `for-in-array',
+and `for-in-range' sequences."
   (declare (side-effect-free t))
   (pcase datum
     ((for--type list) `(for-in-list ,datum))
@@ -157,7 +158,7 @@ adjacent iteration clauses."
                  t clauses)))))))
 
 (defun for--parse-value-form (form number make-value)
-  "Parse FORM as a multiple-value form.
+  "Parse FORM as a multiple-value form after macro-expansion.
 
 A tail form of FORM is (`values' [VALUE...]) with as many VALUEs
 as NUMBER.  An expression EXPR as a tail form is normalized
@@ -309,7 +310,8 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
 (defun for--and-guards (guards)
   "Return a form equivalent to (`and' . GUARDS).
 
-Double negations and non-nil constants in GUARDS are removed."
+Double negations and non-nil constants after macro-expansion in
+GUARDS are removed."
   (declare (side-effect-free t))
   (pcase (named-let parse ((guards guards))
            (pcase-exhaustive guards
@@ -338,8 +340,8 @@ Double negations and non-nil constants in GUARDS are removed."
 (defmacro for--setq (&rest pairs)
   "Expand to a form equivalent to (`cl-psetq' [ID VALUE]...).
 
-When a pair of ID and VALUE in PAIRS is `eq', eliminate them from
-the expanded form.
+When a pair of ID and VALUE in PAIRS is `eq' after
+macro-expansion, eliminate them from the expanded form.
 
 \(fn [ID VALUE]...)"
   (declare (debug (&rest [symbolp form])))
@@ -681,8 +683,8 @@ See Info node `(for)Special-Clause Operators'"
                                 (let ((break `(setq ,break nil)))
                                   (pcase (body-thunk)
                                     ('() `((when ,guard ,break)))
-                                    (`(,else) `((if ,guard ,break
-                                                  ,else)))
+                                    ((and `(,_) elses)
+                                     `((if ,guard ,break . ,elses)))
                                     (elses `((cond (,guard ,break)
                                                    (t . ,elses))))))
                                 clauses)))))

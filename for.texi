@@ -650,7 +650,7 @@ Boolean@footnote{Following
 @url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_g.htm,
 Common Lisp}, a @dfn{generalized Boolean} value is an arbitrary Lisp
 object where only @code{nil} is false.} value.  A @var{tail-form} is a
-@dfn{tail form} where an @var{expression} is equivalent to
+@dfn{tail form} where an @var{expression} is equivalent to the form
 @code{(:values @var{expression})} and a @code{(:values
 @optional{@repeated{@var{expression}}})} form produces as many values as
 there are @var{expression}s.  It is an error for two tail forms of a
@@ -939,7 +939,7 @@ This iteration macro is the implicitly nesting version of
 @concept{terminology, coerce}
 
 When neither @var{length} nor @var{init} is present, this iteration
-macro is equivalent to @code{(vconcat (for-list
+macro is equivalent to the sequence @code{(vconcat (for-list
 (@optional{@repeated{@var{for-clause}}})
 @optional{@repeated{@var{body}}}))}, such that it
 coerces@footnote{Following
@@ -1189,13 +1189,10 @@ positions of the iteration forms.  Beside special-clause operators,
 @code{:do-in} is an auxiliary operator heading a sequence form, whose
 specification can be found in later chapters.
 
-@concept{special-clause operator, the iteration}
-@concept{special-clause operator, the whole iteration}
-
-Below, @dfn{the iteration} can be an empty iteration when no iteration
-clause follows the special clauses.  Moreover, the inner iteration does
-not affect the outer iteration when nesting occurs, unless the wording
-@dfn{the whole iteration} is used.
+Below, @enquote{the iteration} can be an empty iteration when no
+iteration clause follows the special clauses.  Moreover, the inner
+iteration does not affect the outer iteration when nesting occurs,
+unless the wording @enquote{the whole iteration} is used.
 
 Special clauses are sequentially processed, such that the body produced
 by the expander of a special clause is fed into the expander of another
@@ -1317,18 +1314,16 @@ evaluated exactly once (@pxref{Argument Evaluation,,,elisp}).}:
 @end example
 @end deffn
 
-@concept{sequence constructor, the sequence}
-
 Below, all sequence constructors have expanders.  Additional properties
 of them as defined by @code{define-for-sequence} are also specified
-where aliases are auxiliary operators.  @dfn{The sequence} refers to the
-expansion of or the iterator returned by the sequence constructor.  All
-sequence constructors when used as generators are guaranteed to delay
-the computation as much as possible, including that of the initial
-states.
+where aliases are auxiliary operators.  @enquote{This sequence} refers
+to the expansion of or the iterator returned by the sequence
+constructor.  All sequence constructors when used as generators are
+guaranteed to delay the computation as much as possible, including that
+of the initial states.
 
 @deffn @seq{for-in-array, in-array, @var{array}}
-The sequence iterates over the elements of the array @var{array}.  As
+This sequence iterates over the elements of the array @var{array}.  As
 such, @code{string}s, @code{vector}s, @code{bool-vector}s, and
 @code{char-table}s are dispatched to it.  Moreover, a literal array
 after macro expansion as a sequence form when used in iteration clauses
@@ -1336,7 +1331,7 @@ is treated as if this sequence constructor is used.
 @end deffn
 
 @deffn @seq{for-in-inclusive-range, in-inclusive-range, @var{start} @var{end} @optional{@var{step}}}
-The sequence iterates over the numbers between @var{start} and
+This sequence iterates over the numbers between @var{start} and
 @var{end}.  The step size @var{step} defaults to @code{1} when it is
 @code{nil} or omitted and is added to the number after each iteration.
 The iteration terminates when the number is no longer in the closed
@@ -1344,7 +1339,7 @@ range of @var{start} and @var{end}.
 @end deffn
 
 @deffn @seq{for-in-list, in-list, @var{list}}
-The sequence iterates over the elements of the non-dotted list
+This sequence iterates over the elements of the non-dotted list
 @var{list}.  As such, @code{cons}es and @code{null} are dispatched to
 it.  Moreover, a literal list after macro expansion as a sequence form
 when used in iteration clauses is treated as if this sequence
@@ -1352,7 +1347,7 @@ constructor is used.
 @end deffn
 
 @deffn @seq{for-in-naturals, in-naturals, @optional{@var{start}}}
-The sequence iterates over the natural numbers (non-negative integers)
+This sequence iterates over the natural numbers (non-negative integers)
 from @var{start} where @var{start} defaults to @code{0} when it is
 @code{nil} or omitted and is checked to be of type @code{(integer 0)}
 (@pxref{Type Predicates,,,cl}) by @code{cl-the}
@@ -1363,7 +1358,7 @@ anyway.
 @end deffn
 
 @deffn @seq{for-in-producer, in-producer, @var{producer} @optional{@var{predicate} @optional{@repeated{@var{arg}}}}}
-The sequence iterates over the values produced by repeated evaluations
+This sequence iterates over the values produced by repeated evaluations
 of the function form @code{(funcall @var{producer}
 @optional{@repeated{@var{arg}}})}.  The iteration is infinite when
 @var{predicate} is omitted.  Otherwise, the iteration terminates when
@@ -1374,7 +1369,7 @@ is the value of the function form,
 @deffn @seq{for-in-range, in-range, @var{end}}
 @seqx{for-in-range, in-range, @var{start} @var{end} @optional{@var{step}}}
 
-The sequence iterates over the numbers between @var{start} and
+This sequence iterates over the numbers between @var{start} and
 @var{end}.  @var{start} defaults to @code{0} when omitted.  The step
 size @var{step} defaults to @code{1} when it is @code{nil} or omitted,
 and it is added to the number after each iteration.  The iteration
@@ -1387,34 +1382,34 @@ used.
 @end deffn
 
 @deffn @seq{for-in-iterator, in-iterator, @var{iterator}}
-The sequence is equivalent to @var{iterator}.  When used as a function,
-this sequence constructor checks @var{iterator} to be of type
-@code{function} and returns @var{iterator} as is.  It is mainly useful
-for its expander to avoid the dynamic dispatch.
+This sequence is equivalent to the sequence @var{iterator}.  When used
+as a function, this sequence constructor checks @var{iterator} to be of
+type @code{function} and returns @var{iterator} as is.  It is mainly
+useful for its expander to avoid the dynamic dispatch.
 @end deffn
 
 @deffn @seq{for-in-repeat, in-repeat, @repeated{@var{value}}}
-The sequence repeatedly returns each @var{value} from left to right.  It
-is equivalent to the sequence @code{(for-in-list (@var{make-circular}
+This sequence repeatedly returns each @var{value} from left to right.
+It is equivalent to the sequence @code{(for-in-list (@var{make-circular}
 @repeated{@var{value}}))} where @var{make-circular} is a function that
 makes a circular list of the arguments.
 @end deffn
 
 @deffn @seq{for-in-value, in-value, @var{value}}
-The sequence returns @var{value} once.
+This sequence returns @var{value} once.
 @end deffn
 
 @deffn @seq{for-on-array, on-array, @var{array}}
-The sequence iterates over the indexes of the array @var{array}.
+This sequence iterates over the indexes of the array @var{array}.
 @end deffn
 
 @deffn @seq{for-on-list, on-list, @var{list}}
-The sequence iterates over the @code{cons}es of the non-dotted list
+This sequence iterates over the @code{cons}es of the non-dotted list
 @var{list}.
 @end deffn
 
 @deffn @seq{for-in-directory, in-directory, @var{directory} @optional{@var{full} @optional{@var{match} @optional{@var{nosort} @optional{@var{count}}}}}}
-The sequence iterates over the files in the directory named by the
+This sequence iterates over the files in the directory named by the
 string @var{directory}.  It is equivalent to the following sequence
 (@pxref{Contents of Directories,,,elisp}) where @var{full},
 @var{nosort}, and @var{count} default to @code{nil} when omitted and
@@ -1430,7 +1425,7 @@ it is @code{nil} or omitted:
 @end deffn
 
 @deffn @seq{for-in-directory-recursively, in-directory-recursively, @var{dir} @var{regexp} @optional{@var{include-directories} @optional{@var{predicate} @optional{@var{follow-symlinks}}}}}
-The sequence iterates over the files under the directory named by the
+This sequence iterates over the files under the directory named by the
 string @var{dir}.  It is equivalent to the following sequence where
 @var{include-directories}, @var{predicate}, and @var{follow-symlinks}
 default to @code{nil} when omitted:
@@ -1445,21 +1440,21 @@ default to @code{nil} when omitted:
 @end deffn
 
 @deffn @seq{for-the-buffers, the-buffers, @optional{@var{frame}}}
-The sequence iterates over the buffers of the frame @var{frame}.  It is
-equivalent to @code{(for-in-list (buffer-list @var{frame}))}
-(@pxref{Buffer List,,,elisp}) where @var{frame} defaults to @code{nil}
-when omitted.
+This sequence iterates over the buffers of the frame @var{frame}.  It is
+equivalent to the sequence @code{(for-in-list (buffer-list
+@var{frame}))} (@pxref{Buffer List,,,elisp}) where @var{frame} defaults
+to @code{nil} when omitted.
 @end deffn
 
 @deffn @seq{for-the-frames, the-frames}
-The sequence iterates over the frames.  It is @emph{not} equivalent to
-@code{(for-in-list (frame-list))} since the frames are visited from the
-selected frame in @code{next-frame} order (@pxref{Finding All
-Frames,,,elisp}).
+This sequence iterates over the frames.  It is @emph{not} equivalent to
+the sequence @code{(for-in-list (frame-list))} since the frames are
+visited from the selected frame in @code{next-frame} order
+(@pxref{Finding All Frames,,,elisp}).
 @end deffn
 
 @deffn @seq{for-the-overlays, the-overlays, @optional{@var{buffer}}}
-The sequence iterates over the overlays of the buffer @var{buffer}.  It
+This sequence iterates over the overlays of the buffer @var{buffer}.  It
 is equivalent to the following sequence (@pxref{Current Buffer,,,elisp},
 @ref{Finding Overlays,,,elisp}, and @ref{Point,,,elisp}) where
 @var{buffer} defaults to the current buffer when it is @code{nil} or
@@ -1474,8 +1469,8 @@ omitted:
 @end deffn
 
 @deffn @seq{for-the-windows, the-windows, @optional{@var{frame} @optional{@var{minibuf}}}}
-The sequence iterates over the windows of the frame @var{frame}.  It is
-@emph{not} equivalent to @code{(for-in-list (window-list))}
+This sequence iterates over the windows of the frame @var{frame}.  It is
+@emph{not} equivalent to the sequence @code{(for-in-list (window-list))}
 (@pxref{Windows and Frames,,,elisp}) since the windows are visited from
 the selected window of the frame @var{frame} in @code{next-window} order
 (@pxref{Cyclic Window Ordering,,,elisp}) where @var{frame} defaults to
