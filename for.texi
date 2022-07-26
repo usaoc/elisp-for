@@ -306,6 +306,8 @@ found in later chapters.
 @concept{for clause, special clause}
 @concept{terminology, an error}
 @concept{terminology, list}
+@concept{terminology, circular list}
+@concept{terminology, dotted list}
 @concept{terminology, proper list}
 
 The expansion of an iteration form is driven by a series of @dfn{for
@@ -316,13 +318,15 @@ example, an iteration clause @code{(item '(a 2 "3"))} decides that
 @code{item} is bound to each @code{car} of the literal list
 (@pxref{Quoting,,,elisp}) sequence @code{(a 2 "3")} and that the
 iteration is stopped when it reaches the terminating empty list
-(@pxref{Box Diagrams,,,elisp})@footnote{In this manual, an object is a
-@dfn{list} if and only if it is a proper list.  Following
+(@pxref{Box Diagrams,,,elisp})@footnote{In this manual, unless otherwise
+specified, an object is a @dfn{list} if and only if it is a proper list.
+Following
 @url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_p.htm,
 Common Lisp} and Emacs Lisp (@pxref{Cons Cells,,,elisp}), a @dfn{proper
 list} is either the empty list or a list terminated by the empty list.
 It is an error for it to be any other structure produced by @code{cons}
-(@pxref{Building Lists,,,elisp})@footnote{Following
+(@pxref{Building Lists,,,elisp}, that is, a @dfn{circular list} or a
+@dfn{dotted list}.)@footnote{Following
 @url{https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-4.html,
 @rnrs{5}}, @dfn{an error} does not specify whether or when the error is
 detected or reported.}.}.  A special clause @code{(:if (numberp item))}
@@ -1325,10 +1329,10 @@ states.
 
 @deffn @seq{for-in-array, in-array, @var{array}}
 The sequence iterates over the elements of the array @var{array}.  As
-such, arrays (strings, vectors, Bool-vectors, and char-tables) are
-dispatched to it.  Moreover, a literal array after macro expansion as a
-sequence form when used in iteration clauses is treated as if this
-sequence constructor is used.
+such, @code{string}s, @code{vector}s, @code{bool-vector}s, and
+@code{char-table}s are dispatched to it.  Moreover, a literal array
+after macro expansion as a sequence form when used in iteration clauses
+is treated as if this sequence constructor is used.
 @end deffn
 
 @deffn @seq{for-in-inclusive-range, in-inclusive-range, @var{start} @var{end} @optional{@var{step}}}
@@ -1340,10 +1344,11 @@ range of @var{start} and @var{end}.
 @end deffn
 
 @deffn @seq{for-in-list, in-list, @var{list}}
-The sequence iterates over the elements of the list @var{list}.  As
-such, lists are dispatched to it.  Moreover, a literal list after macro
-expansion as a sequence form when used in iteration clauses is treated
-as if this sequence constructor is used.
+The sequence iterates over the elements of the non-dotted list
+@var{list}.  As such, @code{cons}es and @code{null} are dispatched to
+it.  Moreover, a literal list after macro expansion as a sequence form
+when used in iteration clauses is treated as if this sequence
+constructor is used.
 @end deffn
 
 @deffn @seq{for-in-naturals, in-naturals, @optional{@var{start}}}
@@ -1375,9 +1380,10 @@ size @var{step} defaults to @code{1} when it is @code{nil} or omitted,
 and it is added to the number after each iteration.  The iteration
 terminates when the number is no longer in the range of @var{start} and
 @var{end}.  The range is right half-open when @var{step} is non-negative
-or otherwise left half-open.  Integers are dispatched to it.  Moreover,
-a literal integer after macro expansion as a sequence form when used in
-iteration clauses is as if this sequence constructor is used.
+or otherwise left half-open.  @code{integer}s are dispatched to it.
+Moreover, a literal integer after macro expansion as a sequence form
+when used in iteration clauses is as if this sequence constructor is
+used.
 @end deffn
 
 @deffn @seq{for-in-iterator, in-iterator, @var{iterator}}
@@ -1391,7 +1397,7 @@ for its expander to avoid the dynamic dispatch.
 The sequence repeatedly returns each @var{value} from left to right.  It
 is equivalent to the sequence @code{(for-in-list (@var{make-circular}
 @repeated{@var{value}}))} where @var{make-circular} is a function that
-makes a circular list (@pxref{Cons Cells,,,elisp}) of the arguments.
+makes a circular list of the arguments.
 @end deffn
 
 @deffn @seq{for-in-value, in-value, @var{value}}
@@ -1399,11 +1405,12 @@ The sequence returns @var{value} once.
 @end deffn
 
 @deffn @seq{for-on-array, on-array, @var{array}}
-The sequence iterates over the indexes of @var{array}.
+The sequence iterates over the indexes of the array @var{array}.
 @end deffn
 
 @deffn @seq{for-on-list, on-list, @var{list}}
-The sequence iterates over the conses of @var{list}.
+The sequence iterates over the @code{cons}es of the non-dotted list
+@var{list}.
 @end deffn
 
 @deffn @seq{for-in-directory, in-directory, @var{directory} @optional{@var{full} @optional{@var{match} @optional{@var{nosort} @optional{@var{count}}}}}}
