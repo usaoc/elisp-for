@@ -477,14 +477,14 @@ in iteration clauses to avoid the need of shorthands
 @end example
 
 @concept{sequence form, dynamic dispatch}
+@concept{terminology, type specifier}
 
-@dfn{Dynamic dispatch} based on the value of the application of
-@code{type-of} (@pxref{Type Predicates,,,elisp}) to the datum is
-available when the datum is used as a sequence form in iteration
-clauses.  Functions are assumed to be iterators and dispatched to
-themselves.
+@dfn{Dynamic dispatch} based on the type of datum is available when the
+datum is used as a sequence form in iteration clauses.  A type is
+specified by a Common Lisp-style @dfn{type specifier} (@pxref{Type
+Predicates,,,cl}).
 
-A @code{cons} dispatched to the application of @code{for-in-list} to it:
+A @code{list} dispatched to the application of @code{for-in-list} to it:
 
 @example
 @group
@@ -494,7 +494,8 @@ A @code{cons} dispatched to the application of @code{for-in-list} to it:
 @end group
 @end example
 
-A @code{for-in-list} iterator dispatched to itself:
+A @code{function} dispatched to the application of
+@code{for-in-iterator} to it:
 
 @example
 @group
@@ -734,12 +735,18 @@ following types:
 @code{(:expander-case @optional{@repeated{@var{case}}})}
 @end itemize
 
+@concept{terminology, subtype}
+
 It is an error for a type to appear more than once.  The form of
 @code{declare} subforms is the same as normal @code{declare} forms
 (@pxref{Declare Form,,,elisp}).  An @var{alias} is an identifier as an
 alias of @var{name} available when used in iteration clauses.  A
-@var{type} is a symbol as a type dispatched to @var{name} when used in
-iteration clauses.  When an @code{:expander} subform is present, an
+@var{type} is a type specifier, whose objects when used as sequence
+forms in iteration clauses are dispatched to @var{name}.  It is an error
+for two @var{type}s to be in subtype relation@footnote{Following
+@url{http://clhs.lisp.se/Body/26_glo_s.htm, Common Lisp}, a type is a
+@dfn{subtype} of another type when every object of the former is an
+object of the latter.}.  When an @code{:expander} subform is present, an
 expander with @var{arg} as the sole argument and @var{body}s as the body
 is defined and available when used in iteration clauses.  The expander
 receives the iteration clause as the argument and produces an expanded
@@ -1324,8 +1331,7 @@ of the initial states.
 
 @deffn @seq{for-in-array, in-array, @var{array}}
 This sequence iterates over the elements of the array @var{array}.  As
-such, @code{string}s, @code{vector}s, @code{bool-vector}s, and
-@code{char-table}s are dispatched to it.  Moreover, a literal array
+such, @code{array}s are dispatched to it.  Moreover, a literal array
 after macro expansion as a sequence form when used in iteration clauses
 is treated as if this sequence constructor is used.
 @end deffn
@@ -1340,21 +1346,19 @@ range of @var{start} and @var{end}.
 
 @deffn @seq{for-in-list, in-list, @var{list}}
 This sequence iterates over the elements of the non-dotted list
-@var{list}.  As such, @code{cons}es and @code{null} are dispatched to
-it.  Moreover, a literal list after macro expansion as a sequence form
-when used in iteration clauses is treated as if this sequence
-constructor is used.
+@var{list}.  As such, @code{list}s are dispatched to it.  Moreover, a
+literal list after macro expansion as a sequence form when used in
+iteration clauses is treated as if this sequence constructor is used.
 @end deffn
 
 @deffn @seq{for-in-naturals, in-naturals, @optional{@var{start}}}
 This sequence iterates over the natural numbers (non-negative integers)
 from @var{start} where @var{start} defaults to @code{0} when it is
-@code{nil} or omitted and is checked to be of type @code{(integer 0)}
-(@pxref{Type Predicates,,,cl}) by @code{cl-the}
-(@pxref{Declarations,,,cl}).  The type checking can be disabled by an
-@code{optimize} declaration, but this is not recommended since the type
-checking is done at compile time when @var{start} is a literal object
-anyway.
+@code{nil} or omitted and is checked to be of type @code{(integer 0)} by
+@code{cl-the} (@pxref{Declarations,,,cl}).  The type checking can be
+disabled by an @code{optimize} declaration, but this is not recommended
+since the type checking is done at compile time when @var{start} is a
+literal object anyway.
 @end deffn
 
 @deffn @seq{for-in-producer, in-producer, @var{producer} @optional{@var{predicate} @optional{@repeated{@var{arg}}}}}
@@ -1384,8 +1388,9 @@ used.
 @deffn @seq{for-in-iterator, in-iterator, @var{iterator}}
 This sequence is equivalent to the sequence @var{iterator}.  When used
 as a function, this sequence constructor checks @var{iterator} to be of
-type @code{function} and returns @var{iterator} as is.  It is mainly
-useful for its expander to avoid the dynamic dispatch.
+type @code{function} and returns @var{iterator} as is.  @code{function}s
+are dispatched to it.  It is mainly useful for its expander to avoid the
+dynamic dispatch.
 @end deffn
 
 @deffn @seq{for-in-repeat, in-repeat, @repeated{@var{value}}}

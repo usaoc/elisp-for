@@ -42,8 +42,7 @@ A SUBFORM in SUBFORMS is one of the following types:
 - (`:alias' [ALIAS...]) where ALIAS is a identifier as an aliases
   of NAME;
 
-- (`:type' [TYPE...]) where TYPE is a symbol as a type dispatched
-  to NAME;
+- (`:type' [TYPE...]) where TYPE is a type specifier;
 
 - (`:expander' (ARG) BODY...) where (`lambda' (ARG) BODY...) is
   the definition of the expander or (`:expander-case' [CASE...])
@@ -56,8 +55,8 @@ BODY are the body of generator.  See Info node `(for)Definers'.
   (declare (debug (&define name lambda-list lambda-doc
                            [&optional
                             [&or ("declare" def-declarations)
-                                 ([&or ":alias" ":type"]
-                                  &rest symbolp)
+                                 (":alias" &rest symbolp)
+                                 (":type" &rest cl-type-spec)
                                  (&define ":expander" (arg) def-body)
                                  (&define ":expander-case"
                                           &rest (pcase-PAT body))]]
@@ -96,33 +95,35 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                     (define-symbol-prop
                      ',name 'for--sequence-expander ',id))
                   subforms)))
-        (_ (cl-flet ((expand-prop (symbols property)
-                       (mapcar (lambda (symbol)
-                                 `(define-symbol-prop
-                                   ',symbol ',property ',name))
-                               symbols)))
-             `(progn ,@expander
-                     ,@(expand-prop aliases 'for--alias)
-                     ,@(expand-prop types 'for--type)
-                     (defun ,name ,arglist
-                       ,@docstring ,@declaration
-                       . ,(pcase-exhaustive subforms
-                            ((and '()
-                                  (let (and (pred (not (memq '&rest)))
-                                            (app (remq '&optional)
-                                                 args))
-                                    arglist))
-                             `((iter-make
-                                (for-do ((value (,name . ,args))
-                                         (:do (iter-yield value)))))))
-                            (`(,_ . ,_) subforms))))))))))
+        (_ `(progn
+              ,@expander
+              ,@(mapcar (lambda (alias)
+                          `(define-symbol-prop
+                            ',alias 'for--alias ',name))
+                        aliases)
+              ,@(mapcar (lambda (type)
+                          `(setf (alist-get
+                                  ',type for--datum-dispatch-alist
+                                  nil nil #'equal)
+                                 #',name))
+                        types)
+              (defun ,name ,arglist
+                ,@docstring ,@declaration
+                . ,(pcase-exhaustive subforms
+                     ((and '() (let (and (pred (not (memq '&rest)))
+                                         (app (remq '&optional) args))
+                                 arglist))
+                      `((iter-make
+                         (for-do ((value (,name . ,args))
+                                  (:do (iter-yield value)))))))
+                     (`(,_ . ,_) subforms)))))))))
 
 ;;;; Constructor
 (define-for-sequence for-in-array (array)
   "Return an iterator that returns each item in ARRAY.
 
 See Info node `(for)Sequence Constructors'."
-  (:alias in-array) (:type string vector bool-vector char-table)
+  (:alias in-array) (:type array)
   (:expander-case
    (`(,id (,_ ,array-form))
     (cl-with-gensyms (array length index)
@@ -285,7 +286,7 @@ See Info node `(for)Sequence Constructors'.
   "Return the function ITERATOR as is.
 
 See Info node `(for)Sequence Constructors'."
-  (:alias in-iterator)
+  (:alias in-iterator) (:type function)
   (:expander-case
    (`(,id (,_ ,iterator-form))
     (for--iterator-for-clause `(,id ,iterator-form))))

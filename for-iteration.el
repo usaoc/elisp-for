@@ -67,18 +67,18 @@ Predicates'."
                 ('symbol '`',(cl-type symbol)) (_ `(cl-type ,type)))
              . ,pats))
 
+(defvar for--datum-dispatch-alist '()
+  "Alist of type specifiers vs generators.")
+
 (defun for--datum-to-iterator (datum)
   "Dispatch on DATUM and return an iterator.
 
-Return DATUM as is if it is a function.  Otherwise, apply
-`type-of' to DATUM, fetch the associated generator stored in the
-`for--type' property of the type symbol, and return the result of
-calling the generator on DATUM."
-  (pcase-exhaustive datum
-    ((cl-type function) datum)
-    ((app (lambda (datum) (get (type-of datum) 'for--type))
-          (and (cl-type function) generator))
-     (funcall generator datum))))
+Find the generator in `for--datum-dispatch-alist' and apply it to
+DATUM."
+  (funcall (alist-get datum for--datum-dispatch-alist
+                      nil nil (lambda (type datum)
+                                (cl-typep datum type)))
+           datum))
 
 (defun for--datum-to-sequence (datum)
   "Transform DATUM to a sequence form.
