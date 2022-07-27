@@ -77,10 +77,9 @@ wrapping the body expanded so far, and the expressions in the
 <code>:result</code> form are appended.  Given that <var>identifiers</var> is the
 list of all identifiers of the bindings in <var>bindings</var> preserving
 their order, when no <code>:result</code> form is present, the expressions
-default to <code>(nil)</code> when there is no identifier in
-<var>identifiers</var>, <var>identifiers</var> when one, <code>((cons
-. <var>identifiers</var>))</code> when two, and <code>((list . <var>identifiers</var>))</code>
-when three or more.
+default to <code>()</code> when there is no identifier in <var>identifiers</var>,
+<var>identifiers</var> when one, <code>((cons . <var>identifiers</var>))</code> when
+two, and <code>((list . <var>identifiers</var>))</code> when three or more.
 </p>
 <p>An iteration clause has the form <code>(<var>form</var> <var>sequence-form</var>)</code>
 where the form of <var>form</var> is specified by the value of
