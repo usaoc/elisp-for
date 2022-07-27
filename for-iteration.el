@@ -647,13 +647,13 @@ See Info node `(for)Special-Clause Operators'"
                body)))
         (if (null clauses)
             (if (null body) nil
-              (let* ((body `(,@body . ,result-forms))
-                     (body (if (and (null break-ids) (null final-ids))
+              (let* ((body (if (and (null break-ids) (null final-ids))
                                body
                              `((let ,(mapcar (lambda (id) `(,id t))
                                              `(,@break-ids
                                                ,@final-ids))
                                  . ,body))))
+                     (body `(,@body . ,result-forms))
                      (body (if (null bindings) body
                              `((let ,(cl-mapcar
                                       (pcase-lambda (id `(,_ ,value))
