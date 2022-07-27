@@ -890,10 +890,8 @@ the list.  It is like @code{for-fold}, except:
 
 @itemize
 @item
-@var{bindings} is @code{((@var{list} @var{identity}) (:result (nreverse
-@var{list})))} where @var{list} is a generated identifier and
-@var{identity} is the identity of @code{append}, that is, the empty
-list;
+@var{bindings} is @code{((@var{list} '()) (:result (nreverse
+@var{list})))} where @var{list} is a generated identifier;
 
 @item
 Each expression @var{expression} in the tail forms of the multiple-value
@@ -916,8 +914,7 @@ the identifiers in @var{bindings} bound to the lists.  It is like
 @itemize
 @item
 @var{bindings} is a list of identifiers with an optional @code{:result}
-form where each identifier is initially bound to the identity of
-@code{append}, that is, the empty list;
+form where each identifier is initially bound to @code{'()};
 
 @item
 The expressions in the @code{:result} form, with the same default as
@@ -1067,9 +1064,8 @@ This iteration macro accumulates the values into a sum.  It is like
 
 @itemize
 @item
-@var{bindings} is @code{((@var{sum} @var{identity}))} where @var{sum} is
-a generated identifier and @var{identity} is the identity of @code{+},
-that is, @code{0};
+@var{bindings} is @code{((@var{sum} 0))} where @var{sum} is a generated
+identifier;
 
 @item
 Each expression @var{expression} in the tail forms of the multiple-value
@@ -1089,9 +1085,8 @@ This iteration macro accumulates the values into a product.  It is like
 
 @itemize
 @item
-@var{bindings} is @code{((@var{product} @var{identity}))} where
-@var{product} is a generated identifier and @var{identity} is the
-identity of @code{*}, that is, @code{1};
+@var{bindings} is @code{((@var{product} 1))} where @var{product} is a
+generated identifier;
 
 @item
 Each expression @var{expression} in the tail forms of the multiple-value
