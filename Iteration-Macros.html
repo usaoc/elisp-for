@@ -127,10 +127,8 @@ fresh<a id="DOCF14" href="#FOOT14"><sup>14</sup></a> list and returns
 the list.  It is like <code>for-fold</code>, except:
 </p>
 <ul>
-<li> <var>bindings</var> is <code>((<var>list</var> <var>identity</var>) (:result (nreverse
-<var>list</var>)))</code> where <var>list</var> is a generated identifier and
-<var>identity</var> is the identity of <code>append</code>, that is, the empty
-list;
+<li> <var>bindings</var> is <code>((<var>list</var> '()) (:result (nreverse
+<var>list</var>)))</code> where <var>list</var> is a generated identifier;
 
 </li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
 form is transformed to <code>(cons <var>expression</var> <var>list</var>)</code>.  It is
@@ -153,8 +151,7 @@ the identifiers in <var>bindings</var> bound to the lists.  It is like
 </p>
 <ul>
 <li> <var>bindings</var> is a list of identifiers with an optional <code>:result</code>
-form where each identifier is initially bound to the identity of
-<code>append</code>, that is, the empty list;
+form where each identifier is initially bound to <code>'()</code>;
 
 </li><li> The expressions in the <code>:result</code> form, with the same default as
 <code>for-fold</code>, are wrapped in a <code>let</code> form with each identifier
@@ -291,9 +288,8 @@ above-mentioned <code>:do</code> clause.
 <code>for-fold</code>, except:
 </p>
 <ul>
-<li> <var>bindings</var> is <code>((<var>sum</var> <var>identity</var>))</code> where <var>sum</var> is
-a generated identifier and <var>identity</var> is the identity of <code>+</code>,
-that is, <code>0</code>;
+<li> <var>bindings</var> is <code>((<var>sum</var> 0))</code> where <var>sum</var> is a generated
+identifier;
 
 </li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
 form is transformed to <code>(+ <var>expression</var> <var>sum</var>)</code>.  It is an
@@ -313,9 +309,8 @@ error for the multiple-value form to produce not exactly one value.
 <code>for-fold</code>, except:
 </p>
 <ul>
-<li> <var>bindings</var> is <code>((<var>product</var> <var>identity</var>))</code> where
-<var>product</var> is a generated identifier and <var>identity</var> is the
-identity of <code>*</code>, that is, <code>1</code>;
+<li> <var>bindings</var> is <code>((<var>product</var> 1))</code> where <var>product</var> is a
+generated identifier;
 
 </li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
 form is transformed to <code>(* <var>expression</var> <var>product</var>)</code>.  It is
