@@ -267,20 +267,20 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
       ((memoize-bindings '()) (outer-bindings '()) (loop-bindings '())
        (loop-guards '()) (inner-bindings '()) (loop-forms '())
        (iteration nil) (groups '()) (clauses (reverse for-clauses)))
-    (cl-flet ((get-expander (keyword)
-                (get keyword 'for--special-clause-expander))
-              (group-thunk ()
-                (if (not iteration) '()
+    (cl-symbol-macrolet
+        ((group (if (not iteration) '()
                   `(,memoize-bindings
                     ,outer-bindings ,loop-bindings ,loop-guards
                     ,inner-bindings ,loop-forms))))
       (pcase-exhaustive clauses
-        ('() `(((,(lambda (_special-clause body) body))
-                . ,(group-thunk))
+        ('() `(((,(lambda (_special-clause body) body)) . ,group)
                . ,groups))
         (`(,(or (and `(:break . ,_) head)
                 (and `(,(and (cl-type keyword)
-                             (app get-expander
+                             (app (lambda (keyword)
+                                    (get keyword
+                                         'for--special-clause-expander
+                                         ))
                                   (and (cl-type function) expander)))
                        . ,_)
                      (app (lambda (special-clause)
@@ -288,7 +288,7 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
                           head)))
            . ,clauses)
          (parse '() '() '() '() '() '() nil
-                `((,head . ,(group-thunk)) . ,groups) clauses))
+                `((,head . ,group) . ,groups) clauses))
         (`(,(app for--expand-iteration-clause
                  (and `(,_ (:do-in ,more-memoize-bindings
                                    ,more-outer-bindings
@@ -668,29 +668,28 @@ See Info node `(for)Special-Clause Operators'"
                 (macroexp-progn body)))
           (pcase-let ((`((,head . ,iteration-forms) . ,clauses)
                        clauses))
-            (cl-flet ((body-thunk ()
-                        (if (null iteration-forms) body
-                          (apply #'make-iteration
-                                 body iteration-forms))))
+            (cl-symbol-macrolet
+                ((expanded (if (null iteration-forms) body
+                             (apply #'make-iteration
+                                    body iteration-forms))))
               (pcase-exhaustive head
                 (`(:break . ,(app for--and-guards guard))
                  (pcase guard
                    ('t (cl-with-gensyms (break)
                          (expand `(,break . ,break-ids)
                                  `((setq ,break nil)) clauses)))
-                   ('nil (expand break-ids (body-thunk) clauses))
+                   ('nil (expand break-ids expanded clauses))
                    (_ (cl-with-gensyms (break)
                         (expand `(,break . ,break-ids)
                                 (let ((break `(setq ,break nil)))
-                                  (pcase (body-thunk)
+                                  (pcase expanded
                                     ('() `((when ,guard ,break)))
                                     (elses `((if ,guard ,break
                                                . ,elses)))))
                                 clauses)))))
                 (`(,expander . ,special-clause)
                  (expand break-ids
-                         (funcall expander
-                                  special-clause (body-thunk))
+                         (funcall expander special-clause expanded)
                          clauses))))))))))
 
 (for--defmacro for-do (for-clauses &rest body)
