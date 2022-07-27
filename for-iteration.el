@@ -684,10 +684,8 @@ See Info node `(for)Special-Clause Operators'"
                                 (let ((break `(setq ,break nil)))
                                   (pcase (body-thunk)
                                     ('() `((when ,guard ,break)))
-                                    ((and `(,_) elses)
-                                     `((if ,guard ,break . ,elses)))
-                                    (elses `((cond (,guard ,break)
-                                                   (t . ,elses))))))
+                                    (elses `((if ,guard ,break
+                                               . ,elses)))))
                                 clauses)))))
                 (`(,expander . ,special-clause)
                  (expand break-ids
