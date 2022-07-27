@@ -558,7 +558,8 @@ See Info node `(for)Special-Clause Operators'"
 \(fn ([(IDENTIFIER INITIAL-VALUE)] [(:result EXPRESSION...)]) (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
   (declare (debug for--fold-spec) (indent 2))
   (pcase-let
-      ((`(,(and bindings
+      ((binder for-binder)
+       (`(,(and bindings
                 (app (mapcar (pcase-lambda (`(,id ,_))
                                (make-symbol (symbol-name id))))
                      renamed-ids)
@@ -631,7 +632,7 @@ See Info node `(for)Special-Clause Operators'"
                                     (guard `((when ,guard
                                                ,(update-thunk)))))))))
                     (body (if (null inner-bindings) body
-                            `((,for-binder ,inner-bindings . ,body))))
+                            `((,binder ,inner-bindings . ,body))))
                     (body (pcase (for--and-guards
                                   `(,@break-ids
                                     ,@final-ids . ,loop-guards))
