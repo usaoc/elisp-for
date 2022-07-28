@@ -1,5 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!-- This manual documents For (version 0.1).
 
 Copyright (C) 2022 Wing Hei Chan
@@ -10,9 +13,6 @@ any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled "GNU
 Free Documentation License". -->
-<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Definers (For)</title>
 
 <meta name="description" content="Definers (For)">
@@ -20,6 +20,8 @@ Free Documentation License". -->
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <link href="index.html" rel="start" title="Top">
 <link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
@@ -34,25 +36,26 @@ cite { font-style: italic; }
 </head>
 
 <body lang="en">
-<span id="Definers"></span><div class="header">
+<div class="chapter" id="Definers">
+<div class="header">
 <p>
-Next: <a href="Iteration-Forms.html" accesskey="n" rel="next">Iteration Forms</a>, Previous: <a href="Buffer_002dLocal-Variables.html" accesskey="p" rel="prev">Buffer-Local Variables</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Iteration-Forms.html" accesskey="n" rel="next">Iteration Forms</a>, Previous: <a href="Buffer_002dLocal-Variables.html" accesskey="p" rel="prev">Buffer-Local Variables</a>, Up: <a href="index.html" accesskey="u" rel="up">For</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
 <span id="Definers-1"></span><h2 class="chapter">4 Definers</h2>
 <p>Two definers are available for defining sequence constructors and
 special-clause operators.  This chapter specifies them.
 </p>
-<dl>
-<dt id="index-define_002dfor_002dsequence">Macro: <strong>define-for-sequence</strong> <em><var>name</var> <var>arglist</var> [<var>docstring</var>] [<var>subform</var>&hellip;] [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-define_002dfor_002dsequence"><span class="category">Macro: </span><span><strong>define-for-sequence</strong> <em><var>name</var> <var>arglist</var> [<var>docstring</var>] [<var>subform</var>&hellip;] [<var>body</var>&hellip;]</em><a href='#index-define_002dfor_002dsequence' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This definer defines the sequence constructor <var>name</var> as a generator
 with <var>arglist</var> as the argument list, an optional <var>docstring</var> as
 the documentation string, and optional <var>body</var>s as the body.  When no
 <var>body</var> is present and <var>arglist</var> does not contain a <code>&amp;rest</code>
-argument (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-List.html#Argument-List">(elisp)Argument List</a>), the default body is used.
+argument (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-List.html#Argument-List">(elisp)Argument List</a>), the default body is used.
 </p>
 <p>The default body is as follows where <var>args</var> is <var>arglist</var> with a
-potential <code>&amp;optional</code> keyword (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-List.html#Argument-List">(elisp)Argument List</a>)
+potential <code>&amp;optional</code> keyword (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-List.html#Argument-List">(elisp)Argument List</a>)
 removed:
 </p>
 <div class="example">
@@ -79,7 +82,7 @@ following types:
 
 <p>It is an error for a type to appear more than once.  The form of
 <code>declare</code> subforms is the same as normal <code>declare</code> forms
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Declare-Form.html#Declare-Form">(elisp)Declare Form</a>).  An <var>alias</var> is an identifier as an
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Declare-Form.html#Declare-Form">(elisp)Declare Form</a>).  An <var>alias</var> is an identifier as an
 alias of <var>name</var> available when used in iteration clauses.  A
 <var>type</var> is a type specifier, whose objects when used as sequence
 forms in iteration clauses are dispatched to <var>name</var>.  It is an error
@@ -96,8 +99,8 @@ defined.  Therefore, the aliases and expander are available in the body
 of generator.
 </p></dd></dl>
 
-<dl>
-<dt id="index-define_002dfor_002dspecial_002dclause">Macro: <strong>define-for-special-clause</strong> <em><var>name</var> <var>arglist</var> [<var>docstring</var>] [<var>subform</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-define_002dfor_002dspecial_002dclause"><span class="category">Macro: </span><span><strong>define-for-special-clause</strong> <em><var>name</var> <var>arglist</var> [<var>docstring</var>] [<var>subform</var>&hellip;]</em><a href='#index-define_002dfor_002dspecial_002dclause' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This definer defines the special-clause operator <var>name</var> as an
 expander with an optional <var>docstring</var> as the documentation string.
 It is an error for <var>name</var> to be a non-keyword.  When a special
@@ -121,11 +124,12 @@ of expander.
 <p>It is an error for <var>arglist</var> to be in any other form.
 </p></dd></dl>
 
+</div>
 <div class="footnote">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT13" href="#DOCF13">(13)</a></h3>
+<h5><a id="FOOT13" href="#DOCF13">(13)</a></h5>
 <p>Following
 <a href="http://clhs.lisp.se/Body/26_glo_s.htm">Common Lisp</a>, a type is a
 <em>subtype</em> of another type when every object of the former is an
@@ -134,7 +138,7 @@ object of the latter.</p>
 <hr>
 <div class="header">
 <p>
-Next: <a href="Iteration-Forms.html" accesskey="n" rel="next">Iteration Forms</a>, Previous: <a href="Buffer_002dLocal-Variables.html" accesskey="p" rel="prev">Buffer-Local Variables</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Iteration-Forms.html">Iteration Forms</a>, Previous: <a href="Buffer_002dLocal-Variables.html">Buffer-Local Variables</a>, Up: <a href="index.html">For</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

@@ -1,5 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!-- This manual documents For (version 0.1).
 
 Copyright (C) 2022 Wing Hei Chan
@@ -10,9 +13,6 @@ any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled "GNU
 Free Documentation License". -->
-<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>For Clauses (For)</title>
 
 <meta name="description" content="For Clauses (For)">
@@ -20,12 +20,13 @@ Free Documentation License". -->
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <link href="index.html" rel="start" title="Top">
 <link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
 <link href="Basic-Concepts.html" rel="up" title="Basic Concepts">
 <link href="Sequence-Forms.html" rel="next" title="Sequence Forms">
-<link href="Basic-Concepts.html" rel="prev" title="Basic Concepts">
 <style type="text/css">
 @import url("https://www.gnu.org/software/emacs/manual.css");
 cite { font-style: italic; }
@@ -34,7 +35,8 @@ cite { font-style: italic; }
 </head>
 
 <body lang="en">
-<span id="For-Clauses"></span><div class="header">
+<div class="section" id="For-Clauses">
+<div class="header">
 <p>
 Next: <a href="Sequence-Forms.html" accesskey="n" rel="next">Sequence Forms</a>, Up: <a href="Basic-Concepts.html" accesskey="u" rel="up">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
@@ -54,12 +56,12 @@ clauses</em>.  Iteration clauses decide the shapes of the expanded forms,
 and special clauses wrap the partially expanded forms in some ways.  For
 example, an iteration clause <code>(item '(a 2 &quot;3&quot;))</code> decides that
 <code>item</code> is bound to each <code>car</code> of the literal list
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Quoting.html#Quoting">(elisp)Quoting</a>) sequence <code>(a 2 &quot;3&quot;)</code> and that the
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Quoting.html#Quoting">(elisp)Quoting</a>) sequence <code>(a 2 &quot;3&quot;)</code> and that the
 iteration is stopped when it reaches the terminating empty list
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Box-Diagrams.html#Box-Diagrams">(elisp)Box Diagrams</a>)<a id="DOCF6" href="#FOOT6"><sup>6</sup></a>.  A special clause <code>(:if (numberp item))</code>
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Box-Diagrams.html#Box-Diagrams">(elisp)Box Diagrams</a>)<a id="DOCF6" href="#FOOT6"><sup>6</sup></a>.  A special clause <code>(:if (numberp item))</code>
 <em>following</em> the iteration clause decides that the partially
 expanded form is skipped unless <code>item</code> is <code>numberp</code>
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Predicates-on-Numbers.html#Predicates-on-Numbers">(elisp)Predicates on Numbers</a>).
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Predicates-on-Numbers.html#Predicates-on-Numbers">(elisp)Predicates on Numbers</a>).
 </p>
 <p><code>sum</code> is only updated when <code>item</code> is <code>numberp</code>:
 </p>
@@ -128,39 +130,40 @@ presence of <code>(:let)</code>:
 of <code>for-binder</code> and <var>sequence</var> is a sequence form.
 Alternatively, it can have the form <code>(<var>sequence</var>)</code>, in which
 case it is transformed to <code>(<var>identifier</var> <var>sequence</var>)</code> with
-a generated identifier<a id="DOCF8" href="#FOOT8"><sup>8</sup></a> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#Creating-Symbols">(elisp)Creating Symbols</a>) as <var>identifier</var>.  A
+a generated identifier<a id="DOCF8" href="#FOOT8"><sup>8</sup></a> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#Creating-Symbols">(elisp)Creating Symbols</a>) as <var>identifier</var>.  A
 special clause has the form <code>(<var>keyword</var> . <var>subforms</var>)</code>
-where <var>keyword</var> is one of the keywords (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Constant-Variables.html#Constant-Variables">(elisp)Constant
+where <var>keyword</var> is one of the keywords (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Constant-Variables.html#Constant-Variables">(elisp)Constant
 Variables</a>) accepted by the grammar and the form of
 <var>subforms</var> is decided by <var>keyword</var>.
 </p>
+</div>
 <div class="footnote">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT5" href="#DOCF5">(5)</a></h3>
+<h5><a id="FOOT5" href="#DOCF5">(5)</a></h5>
 <p>Following
 <a href="https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-4.html"><acronym title="Revised5 Report on the Algorithmic
 Language Scheme">R<sup>5</sup>RS</acronym> (<cite>Revised<sup>5</sup> Report on the Algorithmic
 Language Scheme</cite>)</a>, <em>an error</em> does not specify whether or when the error is
 detected or reported.</p>
-<h5><a id="FOOT6" href="#DOCF6">(6)</a></h3>
+<h5><a id="FOOT6" href="#DOCF6">(6)</a></h5>
 <p>In this manual, unless otherwise
 specified, an object is a <em>list</em> if and only if it is a proper list.
 Following
-<a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_p.htm">Common Lisp</a> and Emacs Lisp (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Cons-Cells.html#Cons-Cells">(elisp)Cons Cells</a>), a <em>proper
+<a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_p.htm">Common Lisp</a> and Emacs Lisp (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Cons-Cells.html#Cons-Cells">(elisp)Cons Cells</a>), a <em>proper
 list</em> is either the empty list or a list terminated by the empty list.
 It is an error for it to be any other structure produced by <code>cons</code>
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Building-Lists.html#Building-Lists">(elisp)Building Lists</a>, that is, a <em>circular list</em> or a
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Building-Lists.html#Building-Lists">(elisp)Building Lists</a>, that is, a <em>circular list</em> or a
 <em>dotted list</em>.)<a id="DOCF5" href="#FOOT5"><sup>5</sup></a>.</p>
-<h5><a id="FOOT7" href="#DOCF7">(7)</a></h3>
+<h5><a id="FOOT7" href="#DOCF7">(7)</a></h5>
 <p>In this manual, a
 metavariable is typeset as &lsquo;<samp><var>metavariable</var></samp>&rsquo;, an optional form
 as &lsquo;<samp>[<var>optional-form</var>]</samp>&rsquo;, and a form repeated <em>once
 or more</em> as &lsquo;<samp><var>repeated-form</var>&hellip;</samp>&rsquo;.  This is the same as
-the Emacs Lisp Manual (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/A-Sample-Function-Description.html#A-Sample-Function-Description">(elisp)A Sample Function Description</a>)
+the Emacs Lisp Manual (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/A-Sample-Function-Description.html#A-Sample-Function-Description">(elisp)A Sample Function Description</a>)
 modulo the &lsquo;<samp><var>repeated-form</var>&hellip;</samp>&rsquo; convention.</p>
-<h5><a id="FOOT8" href="#DOCF8">(8)</a></h3>
+<h5><a id="FOOT8" href="#DOCF8">(8)</a></h5>
 <p>In
 <a href="http://www.r6rs.org/final/html/r6rs-lib/r6rs-lib-Z-H-13.html"><acronym title="Revised6 Report on the Algorithmic
 Language Scheme">R<sup>6</sup>RS</acronym> (<cite>Revised<sup>6</sup> Report on the Algorithmic
@@ -172,7 +175,7 @@ terminology.</p>
 <hr>
 <div class="header">
 <p>
-Next: <a href="Sequence-Forms.html" accesskey="n" rel="next">Sequence Forms</a>, Up: <a href="Basic-Concepts.html" accesskey="u" rel="up">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Sequence-Forms.html">Sequence Forms</a>, Up: <a href="Basic-Concepts.html">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

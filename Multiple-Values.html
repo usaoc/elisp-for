@@ -1,5 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!-- This manual documents For (version 0.1).
 
 Copyright (C) 2022 Wing Hei Chan
@@ -10,9 +13,6 @@ any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled "GNU
 Free Documentation License". -->
-<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Multiple Values (For)</title>
 
 <meta name="description" content="Multiple Values (For)">
@@ -20,11 +20,12 @@ Free Documentation License". -->
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <link href="index.html" rel="start" title="Top">
 <link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
 <link href="Basic-Concepts.html" rel="up" title="Basic Concepts">
-<link href="Buffer_002dLocal-Variables.html" rel="next" title="Buffer-Local Variables">
 <link href="Sequence-Forms.html" rel="prev" title="Sequence Forms">
 <style type="text/css">
 @import url("https://www.gnu.org/software/emacs/manual.css");
@@ -34,7 +35,8 @@ cite { font-style: italic; }
 </head>
 
 <body lang="en">
-<span id="Multiple-Values"></span><div class="header">
+<div class="section" id="Multiple-Values">
+<div class="header">
 <p>
 Previous: <a href="Sequence-Forms.html" accesskey="p" rel="prev">Sequence Forms</a>, Up: <a href="Basic-Concepts.html" accesskey="u" rel="up">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
@@ -123,22 +125,23 @@ Boolean<a id="DOCF12" href="#FOOT12"><sup>12</sup></a> value.  A <var>tail-form<
 [<var>expression</var>&hellip;])</code> form produces as many values as
 there are <var>expression</var>s.  It is an error for two tail forms of a
 multiple-value form to produce unmatched numbers of values.  The grammar
-is actually a subset of Emacs Lisp&rsquo;s special forms (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Forms.html#Special-Forms">(elisp)Special
+is actually a subset of Emacs Lisp&rsquo;s special forms (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Forms.html#Special-Forms">(elisp)Special
 Forms</a>) with <var>tail-form</var> added.  In a sense, special forms
 are extended to support multiple-value forms where possible.
 </p>
+</div>
 <div class="footnote">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT11" href="#DOCF11">(11)</a></h3>
+<h5><a id="FOOT11" href="#DOCF11">(11)</a></h5>
 <p>In a
 <a href="https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-9.html">standard Scheme</a> implementation, a continuation can receive multiple
 values, and correspondingly a procedure can deliver multiple values to
 its continuation.  This is unfeasible to implement in Emacs Lisp.
 Instead, a multiple-value form is transformed to imperative updates with
 macro-expansion-time checking of the number of values.</p>
-<h5><a id="FOOT12" href="#DOCF12">(12)</a></h3>
+<h5><a id="FOOT12" href="#DOCF12">(12)</a></h5>
 <p>Following
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_g.htm">Common Lisp</a>, a <em>generalized Boolean</em> value is an arbitrary Lisp
 object where only <code>nil</code> is false.</p>
@@ -146,7 +149,7 @@ object where only <code>nil</code> is false.</p>
 <hr>
 <div class="header">
 <p>
-Previous: <a href="Sequence-Forms.html" accesskey="p" rel="prev">Sequence Forms</a>, Up: <a href="Basic-Concepts.html" accesskey="u" rel="up">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+Previous: <a href="Sequence-Forms.html">Sequence Forms</a>, Up: <a href="Basic-Concepts.html">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

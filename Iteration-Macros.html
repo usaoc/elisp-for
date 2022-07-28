@@ -1,5 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!-- This manual documents For (version 0.1).
 
 Copyright (C) 2022 Wing Hei Chan
@@ -10,9 +13,6 @@ any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled "GNU
 Free Documentation License". -->
-<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Iteration Macros (For)</title>
 
 <meta name="description" content="Iteration Macros (For)">
@@ -20,12 +20,13 @@ Free Documentation License". -->
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <link href="index.html" rel="start" title="Top">
 <link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
 <link href="Iteration-Forms.html" rel="up" title="Iteration Forms">
 <link href="Special_002dClause-Operators.html" rel="next" title="Special-Clause Operators">
-<link href="Iteration-Forms.html" rel="prev" title="Iteration Forms">
 <style type="text/css">
 @import url("https://www.gnu.org/software/emacs/manual.css");
 cite { font-style: italic; }
@@ -34,7 +35,8 @@ cite { font-style: italic; }
 </head>
 
 <body lang="en">
-<span id="Iteration-Macros"></span><div class="header">
+<div class="section" id="Iteration-Macros">
+<div class="header">
 <p>
 Next: <a href="Special_002dClause-Operators.html" accesskey="n" rel="next">Special-Clause Operators</a>, Up: <a href="Iteration-Forms.html" accesskey="u" rel="up">Iteration Forms</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
@@ -43,15 +45,14 @@ Next: <a href="Special_002dClause-Operators.html" accesskey="n" rel="next">Speci
 <p>Iteration macros are global macros acting as the entry points of this
 package.
 </p>
-<dl>
-<dt id="index-for_002dfold">Macro: <strong>for-fold</strong> <em><var>bindings</var> ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dfold"><span class="category">Macro: </span><span><strong>for-fold</strong> <em><var>bindings</var> ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dfold' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the fundamental building block of other
 iteration macros.  The form of <var>bindings</var> is the same as the
 <var>varlist</var> subforms of <code>let</code> forms except that an optional
-<code>(:result [<var>expressions</var>&hellip;])</code> form can appear
-as the last form.  <var>body</var>s are first transformed according to the
-following rules and appended to <var>for-clause</var>s preserving their
-order:
+<code>(:result <var>expressions</var>&hellip;)</code> form can appear as the
+last form.  <var>body</var>s are first transformed according to the following
+rules and appended to <var>for-clause</var>s preserving their order:
 </p>
 <ul>
 <li> Each form except the last one is transformed to a <code>:do</code> clause
@@ -77,9 +78,10 @@ wrapping the body expanded so far, and the expressions in the
 <code>:result</code> form are appended.  Given that <var>identifiers</var> is the
 list of all identifiers of the bindings in <var>bindings</var> preserving
 their order, when no <code>:result</code> form is present, the expressions
-default to <code>()</code> when there is no identifier in <var>identifiers</var>,
-<var>identifiers</var> when one, <code>((cons . <var>identifiers</var>))</code> when
-two, and <code>((list . <var>identifiers</var>))</code> when three or more.
+default to <code>(nil)</code> when there is no identifier in
+<var>identifiers</var>, <var>identifiers</var> when one, <code>((cons
+. <var>identifiers</var>))</code> when two, and <code>((list . <var>identifiers</var>))</code>
+when three or more.
 </p>
 <p>An iteration clause has the form <code>(<var>form</var> <var>sequence-form</var>)</code>
 where the form of <var>form</var> is specified by the value of
@@ -93,8 +95,8 @@ later updated to the <var>n</var>th value produced by the multiple-value form
 after each iteration.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dfold_002a">Macro: <strong>for-fold*</strong> <em><var>bindings</var> ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dfold_002a"><span class="category">Macro: </span><span><strong>for-fold*</strong> <em><var>bindings</var> ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dfold_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><span id="index-iteration-form"></span>
 
 <p>This iteration macro is the <em>implicitly nesting</em> version of
@@ -103,8 +105,8 @@ This is achieved by separating each pair of adjacent iteration clauses
 with a vacuous special clause such as <code>(:let)</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002ddo">Macro: <strong>for-do</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002ddo"><span class="category">Macro: </span><span><strong>for-do</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002ddo' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro performs side effects and produces <code>nil</code> as
 the value.  It is equivalent to the following <code>for-fold</code> form:
 </p>
@@ -113,13 +115,13 @@ the value.  It is equivalent to the following <code>for-fold</code> form:
 </pre></div>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002ddo_002a">Macro: <strong>for-do*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002ddo_002a"><span class="category">Macro: </span><span><strong>for-do*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002ddo_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of <code>for-do</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dlist">Macro: <strong>for-list</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dlist"><span class="category">Macro: </span><span><strong>for-list</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dlist' class='copiable-anchor'> &para;</a></span></dt>
 <dd><span id="index-terminology-14"></span>
 
 <p>This iteration macro accumulates the values into a
@@ -136,14 +138,14 @@ an error for the multiple-value form to produce not exactly one value.
 </li></ul>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dlist_002a">Macro: <strong>for-list*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dlist_002a"><span class="category">Macro: </span><span><strong>for-list*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dlist_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-list</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dlists">Macro: <strong>for-lists</strong> <em><var>bindings</var> ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dlists"><span class="category">Macro: </span><span><strong>for-lists</strong> <em><var>bindings</var> ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dlists' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro accumulates the values into fresh lists and
 sequentially evaluates the expressions in the <code>:result</code> form with
 the identifiers in <var>bindings</var> bound to the lists.  It is like
@@ -169,14 +171,14 @@ identifiers in <var>bindings</var>.
 <p>The values of <var>identifier</var>s during the iteration are unspecified.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dlists_002a">Macro: <strong>for-lists*</strong> <em><var>bindings</var> ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dlists_002a"><span class="category">Macro: </span><span><strong>for-lists*</strong> <em><var>bindings</var> ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dlists_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-lists</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dvector">Macro: <strong>for-vector</strong> <em>([<var>for-clause</var>&hellip;]) [<code>:length</code> <var>length</var> [<code>:init</code> <var>init</var>]] [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dvector"><span class="category">Macro: </span><span><strong>for-vector</strong> <em>([<var>for-clause</var>&hellip;]) [<code>:length</code> <var>length</var> [<code>:init</code> <var>init</var>]] [<var>body</var>&hellip;]</em><a href='#index-for_002dvector' class='copiable-anchor'> &para;</a></span></dt>
 <dd><span id="index-terminology-15"></span>
 
 <p>When neither <var>length</var> nor <var>init</var> is present, this iteration
@@ -204,10 +206,10 @@ evaluation order:
 
 </li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
 form is transformed to <code>(setf (aref <var>vector</var> <var>index</var>)
-<var>expression</var>)</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Setting-Generalized-Variables.html#Setting-Generalized-Variables">(elisp)Setting Generalized Variables</a>), and
+<var>expression</var>)</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Setting-Generalized-Variables.html#Setting-Generalized-Variables">(elisp)Setting Generalized Variables</a>), and
 the transformed multiple-value form <var>form</var> is inserted into the
 <code>:do</code> clause <code>(:do <var>form</var> (cl-incf <var>index</var>))</code>
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/cl/Modify-Macros.html#Modify-Macros">(cl)Modify Macros</a>).  It is an error for the multiple-value
+(see <a data-manual="cl" href="https://www.gnu.org/software/emacs/manual/html_node/cl/Modify-Macros.html#Modify-Macros">(cl)Modify Macros</a>).  It is an error for the multiple-value
 form to produce not exactly one value;
 
 </li><li> A <code>:break</code> clause <code>(:break (= <var>index</var> <var>length</var>))</code> is
@@ -215,14 +217,14 @@ inserted after the above-mentioned <code>:do</code> clause.
 </li></ul>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dvector_002a">Macro: <strong>for-vector*</strong> <em>([<var>for-clause</var>&hellip;]) [:length <var>length</var> [:init <var>init</var>]] [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dvector_002a"><span class="category">Macro: </span><span><strong>for-vector*</strong> <em>([<var>for-clause</var>&hellip;]) [:length <var>length</var> [:init <var>init</var>]] [<var>body</var>&hellip;]</em><a href='#index-for_002dvector_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-vector</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dand">Macro: <strong>for-and</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dand"><span class="category">Macro: </span><span><strong>for-and</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dand' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro performs <code>and</code> on the values.  It is like
 <code>for-fold</code>, except:
 </p>
@@ -246,14 +248,14 @@ after the above-mentioned <code>:do</code> clause.
 </li></ul>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dand_002a">Macro: <strong>for-and*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dand_002a"><span class="category">Macro: </span><span><strong>for-and*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dand_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-and</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dor">Macro: <strong>for-or</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dor"><span class="category">Macro: </span><span><strong>for-or</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dor' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro performs <code>or</code> on the values.  It is like
 <code>for-fold</code>, except:
 </p>
@@ -277,13 +279,13 @@ above-mentioned <code>:do</code> clause.
 </li></ul>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dor_002a">Macro: <strong>for-or*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dor_002a"><span class="category">Macro: </span><span><strong>for-or*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dor_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of <code>for-or</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dsum">Macro: <strong>for-sum</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dsum"><span class="category">Macro: </span><span><strong>for-sum</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dsum' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro accumulates the values into a sum.  It is like
 <code>for-fold</code>, except:
 </p>
@@ -297,14 +299,14 @@ error for the multiple-value form to produce not exactly one value.
 </li></ul>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dsum_002a">Macro: <strong>for-sum*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dsum_002a"><span class="category">Macro: </span><span><strong>for-sum*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dsum_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-sum</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dproduct">Macro: <strong>for-product</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dproduct"><span class="category">Macro: </span><span><strong>for-product</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dproduct' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro accumulates the values into a product.  It is like
 <code>for-fold</code>, except:
 </p>
@@ -318,14 +320,14 @@ an error for the multiple-value form to produce not exactly one value.
 </li></ul>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dproduct_002a">Macro: <strong>for-product*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dproduct_002a"><span class="category">Macro: </span><span><strong>for-product*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dproduct_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-product</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dfirst">Macro: <strong>for-first</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dfirst"><span class="category">Macro: </span><span><strong>for-first</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dfirst' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro returns the first value or <code>nil</code> if the
 iteration never begins.  It is like <code>for-fold</code>, except:
 </p>
@@ -339,14 +341,14 @@ after the first iteration.
 </li></ul>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dfirst_002a">Macro: <strong>for-first*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dfirst_002a"><span class="category">Macro: </span><span><strong>for-first*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dfirst_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-first</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dlast">Macro: <strong>for-last</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dlast"><span class="category">Macro: </span><span><strong>for-last</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dlast' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro returns the last value or <code>nil</code> if the
 iteration never begins.  It is like <code>for-fold</code>, except:
 </p>
@@ -356,19 +358,19 @@ generated identifier.
 </li></ul>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dlast_002a">Macro: <strong>for-last*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dlast_002a"><span class="category">Macro: </span><span><strong>for-last*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dlast_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-last</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dmax">Macro: <strong>for-max</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
-<dd><p>This iteration macro performs <code>max</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Comparison-of-Numbers.html#Comparison-of-Numbers">(elisp)Comparison of
+<dl class="def">
+<dt id="index-for_002dmax"><span class="category">Macro: </span><span><strong>for-max</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dmax' class='copiable-anchor'> &para;</a></span></dt>
+<dd><p>This iteration macro performs <code>max</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Comparison-of-Numbers.html#Comparison-of-Numbers">(elisp)Comparison of
 Numbers</a>) on the values.  It is like <code>for-fold</code>, except:
 </p>
 <ul>
-<li> <var>bindings</var> is <code>((<var>max</var> -1.0e+INF))</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Float-Basics.html#Float-Basics">(elisp)Float
+<li> <var>bindings</var> is <code>((<var>max</var> -1.0e+INF))</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Float-Basics.html#Float-Basics">(elisp)Float
 Basics</a>) where <var>max</var> is a generated identifier;
 
 </li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
@@ -377,14 +379,14 @@ an error for the multiple-value form to produce not exactly one value.
 </li></ul>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dmax_002a">Macro: <strong>for-max*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dmax_002a"><span class="category">Macro: </span><span><strong>for-max*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dmax_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-max</code>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dmin">Macro: <strong>for-min</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dmin"><span class="category">Macro: </span><span><strong>for-min</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dmin' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro performs <code>min</code> on the values.  It is like
 <code>for-fold</code>, except:
 </p>
@@ -398,20 +400,21 @@ an error for the multiple-value form to produce not exactly one value.
 </li></ul>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dmin_002a">Macro: <strong>for-min*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em></dt>
+<dl class="def">
+<dt id="index-for_002dmin_002a"><span class="category">Macro: </span><span><strong>for-min*</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dmin_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-min</code>.
 </p></dd></dl>
 
+</div>
 <div class="footnote">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT14" href="#DOCF14">(14)</a></h3>
+<h5><a id="FOOT14" href="#DOCF14">(14)</a></h5>
 <p>Following
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_f.htm">Common Lisp</a>, a <em>fresh</em> object is newly allocated.</p>
-<h5><a id="FOOT15" href="#DOCF15">(15)</a></h3>
+<h5><a id="FOOT15" href="#DOCF15">(15)</a></h5>
 <p>Following
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_c.htm">Common Lisp</a>, <em>coerce</em> means to non-destructively convert an object
 to another type.</p>
@@ -419,7 +422,7 @@ to another type.</p>
 <hr>
 <div class="header">
 <p>
-Next: <a href="Special_002dClause-Operators.html" accesskey="n" rel="next">Special-Clause Operators</a>, Up: <a href="Iteration-Forms.html" accesskey="u" rel="up">Iteration Forms</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Special_002dClause-Operators.html">Special-Clause Operators</a>, Up: <a href="Iteration-Forms.html">Iteration Forms</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

@@ -1,5 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!-- This manual documents For (version 0.1).
 
 Copyright (C) 2022 Wing Hei Chan
@@ -10,9 +13,6 @@ any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled "GNU
 Free Documentation License". -->
-<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Buffer-Local Variables (For)</title>
 
 <meta name="description" content="Buffer-Local Variables (For)">
@@ -20,12 +20,14 @@ Free Documentation License". -->
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <link href="index.html" rel="start" title="Top">
 <link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
 <link href="index.html" rel="up" title="Top">
 <link href="Definers.html" rel="next" title="Definers">
-<link href="Multiple-Values.html" rel="prev" title="Multiple Values">
+<link href="Basic-Concepts.html" rel="prev" title="Basic Concepts">
 <style type="text/css">
 @import url("https://www.gnu.org/software/emacs/manual.css");
 cite { font-style: italic; }
@@ -34,9 +36,10 @@ cite { font-style: italic; }
 </head>
 
 <body lang="en">
-<span id="Buffer_002dLocal-Variables"></span><div class="header">
+<div class="chapter" id="Buffer_002dLocal-Variables">
+<div class="header">
 <p>
-Next: <a href="Definers.html" accesskey="n" rel="next">Definers</a>, Previous: <a href="Basic-Concepts.html" accesskey="p" rel="prev">Basic Concepts</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Definers.html" accesskey="n" rel="next">Definers</a>, Previous: <a href="Basic-Concepts.html" accesskey="p" rel="prev">Basic Concepts</a>, Up: <a href="index.html" accesskey="u" rel="up">For</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
 <span id="Buffer_002dLocal-Variables-1"></span><h2 class="chapter">3 Buffer-Local Variables</h2>
@@ -44,12 +47,12 @@ Next: <a href="Definers.html" accesskey="n" rel="next">Definers</a>, Previous: <
 expansion of certain forms can be configured file-locally.  This chapter
 specifies them.
 </p>
-<dl>
-<dt id="index-for_002dbinder">Variable: <strong>for-binder</strong></dt>
+<dl class="def">
+<dt id="index-for_002dbinder"><span class="category">Variable: </span><span><strong>for-binder</strong><a href='#index-for_002dbinder' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This buffer-local variable has a symbol as its value that is used as the
 head of certain <code>let</code>-like forms.  The function cell
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Cells.html#Function-Cells">(elisp)Function Cells</a>) of the symbol stores either a primitive
-function (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Primitive-Function-Type.html#Primitive-Function-Type">(elisp)Primitive Function Type</a>) or a macro
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Cells.html#Function-Cells">(elisp)Function Cells</a>) of the symbol stores either a primitive
+function (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Primitive-Function-Type.html#Primitive-Function-Type">(elisp)Primitive Function Type</a>) or a macro
 <em>downward compatible</em> with <code>let</code>.  It is an error for it to
 store any other value.  The default value is <code>pcase-let</code>.
 </p>
@@ -69,6 +72,7 @@ store any other value.  The default value is <code>pcase-let</code>.
 </pre></div>
 </dd></dl>
 
+</div>
 
 
 

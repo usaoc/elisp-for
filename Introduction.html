@@ -1,5 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!-- This manual documents For (version 0.1).
 
 Copyright (C) 2022 Wing Hei Chan
@@ -10,9 +13,6 @@ any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled "GNU
 Free Documentation License". -->
-<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Introduction (For)</title>
 
 <meta name="description" content="Introduction (For)">
@@ -20,6 +20,8 @@ Free Documentation License". -->
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <link href="index.html" rel="start" title="Top">
 <link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
@@ -34,9 +36,10 @@ cite { font-style: italic; }
 </head>
 
 <body lang="en">
-<span id="Introduction"></span><div class="header">
+<div class="chapter" id="Introduction">
+<div class="header">
 <p>
-Next: <a href="Basic-Concepts.html" accesskey="n" rel="next">Basic Concepts</a>, Previous: <a href="index.html" accesskey="p" rel="prev">Top</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Basic-Concepts.html" accesskey="n" rel="next">Basic Concepts</a>, Previous: <a href="index.html" accesskey="p" rel="prev">For</a>, Up: <a href="index.html" accesskey="u" rel="up">For</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
 <span id="Introduction-1"></span><h2 class="chapter">1 Introduction</h2>
@@ -56,14 +59,14 @@ forms<a id="DOCF1" href="#FOOT1"><sup>1</sup></a> in
 <a href="https://srfi.schemers.org/srfi-42/srfi-42.html"><acronym title="Scheme Request for Implementation">SRFI</acronym> (Scheme Request for Implementation) 42</a>.  They are designed in such a way
 that they can be both efficient and generic.  The distinctive feature of
 them is that a sequence form can act either as an expander or a
-generator (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Generators.html#Generators">(elisp)Generators</a>), and the former is used in the
+generator (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Generators.html#Generators">(elisp)Generators</a>), and the former is used in the
 iteration forms, that is, <code>for-fold</code> forms and derivatives.
 Essentially, <code>for-fold</code> forms are equivalent to <code>named-let</code>
-forms (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Local-Variables.html#Local-Variables">(elisp)Local Variables</a>), whose self-tail calls are
-optimized to <code>while</code> loops (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Iteration.html#Iteration">(elisp)Iteration</a>)<a id="DOCF2" href="#FOOT2"><sup>2</sup></a>.  Therefore, the iteration forms can act as
+forms (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Local-Variables.html#Local-Variables">(elisp)Local Variables</a>), whose self-tail calls are
+optimized to <code>while</code> loops (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Iteration.html#Iteration">(elisp)Iteration</a>)<a id="DOCF2" href="#FOOT2"><sup>2</sup></a>.  Therefore, the iteration forms can act as
 Lispy<a id="DOCF3" href="#FOOT3"><sup>3</sup></a> and
 functional<a id="DOCF4" href="#FOOT4"><sup>4</sup></a> replacements of the built-in iteration forms,
-such as <code>cl-loop</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/cl/Loop-Facility.html#Loop-Facility">(cl)Loop Facility</a>).
+such as <code>cl-loop</code> (see <a data-manual="cl" href="https://www.gnu.org/software/emacs/manual/html_node/cl/Loop-Facility.html#Loop-Facility">(cl)Loop Facility</a>).
 </p>
 <p>A simple yet contrived <code>cl-loop</code> form:
 </p>
@@ -123,7 +126,7 @@ generators.
 </pre></div>
 
 <p>Support for destructuring is a non-aim of this package.  For that, one
-should leverage <code>pcase-let</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Destructuring-with-pcase-Patterns.html#Destructuring-with-pcase-Patterns">(elisp)Destructuring with <code>pcase</code>
+should leverage <code>pcase-let</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Destructuring-with-pcase-Patterns.html#Destructuring-with-pcase-Patterns">(elisp)Destructuring with <code>pcase</code>
 Patterns</a>) or similar forms <em>downward compatible</em> with
 <code>let</code> forms.  By default, the iteration forms use <code>pcase-let</code>
 forms, but this is configurable through the buffer-local variable
@@ -156,30 +159,31 @@ forms, but this is configurable through the buffer-local variable
 
 <p>All things considered, the iteration forms are both as efficient as
 specialized iterations and as generic as the sequence functions
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Sequence-Functions.html#Sequence-Functions">(elisp)Sequence Functions</a>).  Moreover, they are more easily
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Sequence-Functions.html#Sequence-Functions">(elisp)Sequence Functions</a>).  Moreover, they are more easily
 extensible as compared to <code>cl-loop</code> forms.
 </p>
+</div>
 <div class="footnote">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT1" href="#DOCF1">(1)</a></h3>
+<h5><a id="FOOT1" href="#DOCF1">(1)</a></h5>
 <p>Following
 <a href="https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-7.html">Scheme</a> as opposed to
-<a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_e.htm">Common Lisp</a> and Emacs Lisp (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Forms.html#Forms">(elisp)Forms</a>), this manual refers
-to an arbitrary Lisp object (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Lisp-Data-Types.html#Lisp-Data-Types">(elisp)Lisp Data Types</a>) as a
+<a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_e.htm">Common Lisp</a> and Emacs Lisp (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Forms.html#Forms">(elisp)Forms</a>), this manual refers
+to an arbitrary Lisp object (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Lisp-Data-Types.html#Lisp-Data-Types">(elisp)Lisp Data Types</a>) as a
 <em>form</em> and a form intended to be evaluated
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Evaluation.html#Evaluation">(elisp)Evaluation</a>) as an <em>expression</em>.  This means
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Evaluation.html#Evaluation">(elisp)Evaluation</a>) as an <em>expression</em>.  This means
 expressions are a subset of forms.  Similarly, what Common Lisp calls a
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_s.htm"><em>subexpression</em></a> is called a <em>subform</em> in this manual.</p>
-<h5><a id="FOOT2" href="#DOCF2">(2)</a></h3>
+<h5><a id="FOOT2" href="#DOCF2">(2)</a></h5>
 <p>In
 fact, <code>for-fold</code> forms directly expand to <code>while</code> loops for
 efficiency.  Moreover, the full recursive power of <code>named-let</code>
 forms are not needed for sequence iterations.  Nonetheless, it is useful
 to think of <code>for-fold</code> forms in terms of the equivalent
 <code>named-let</code> forms.</p>
-<h5><a id="FOOT3" href="#DOCF3">(3)</a></h3>
+<h5><a id="FOOT3" href="#DOCF3">(3)</a></h5>
 <p><em>Lispy</em> in the sense that they use Lisp-like
 parenthesized syntax as opposed to Algol-like keyword-delimited syntax.
 <a href="https://www.cs.cmu.edu/Groups/AI/html/cltl/clm/node235.html">The
@@ -187,7 +191,7 @@ Common Lisp Loop Facility</a> has
 <a href="https://doi.org/10.1145/154766.155373">its origin in Interlisp</a> and
 has been
 <a href="https://iterate.common-lisp.dev/doc/Don_0027t-Loop-Iterate.html">criticized for its Algol-like syntax</a>.</p>
-<h5><a id="FOOT4" href="#DOCF4">(4)</a></h3>
+<h5><a id="FOOT4" href="#DOCF4">(4)</a></h5>
 <p><em>Functional</em> in the sense that they are
 equivalent to applications of self-tail-recursive functions that
 <a href="https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-11.html">transform local states</a>.</p>
@@ -195,7 +199,7 @@ equivalent to applications of self-tail-recursive functions that
 <hr>
 <div class="header">
 <p>
-Next: <a href="Basic-Concepts.html" accesskey="n" rel="next">Basic Concepts</a>, Previous: <a href="index.html" accesskey="p" rel="prev">Top</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Basic-Concepts.html">Basic Concepts</a>, Previous: <a href="index.html">For</a>, Up: <a href="index.html">For</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

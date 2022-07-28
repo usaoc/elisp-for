@@ -1,5 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!-- This manual documents For (version 0.1).
 
 Copyright (C) 2022 Wing Hei Chan
@@ -10,9 +13,6 @@ any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled "GNU
 Free Documentation License". -->
-<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Sequence Constructors (For)</title>
 
 <meta name="description" content="Sequence Constructors (For)">
@@ -20,12 +20,14 @@ Free Documentation License". -->
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <link href="index.html" rel="start" title="Top">
 <link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
 <link href="index.html" rel="up" title="Top">
 <link href="Concept-Index.html" rel="next" title="Concept Index">
-<link href="Special_002dClause-Operators.html" rel="prev" title="Special-Clause Operators">
+<link href="Iteration-Forms.html" rel="prev" title="Iteration Forms">
 <style type="text/css">
 @import url("https://www.gnu.org/software/emacs/manual.css");
 cite { font-style: italic; }
@@ -34,9 +36,10 @@ cite { font-style: italic; }
 </head>
 
 <body lang="en">
-<span id="Sequence-Constructors"></span><div class="header">
+<div class="chapter" id="Sequence-Constructors">
+<div class="header">
 <p>
-Next: <a href="Concept-Index.html" accesskey="n" rel="next">Concept Index</a>, Previous: <a href="Iteration-Forms.html" accesskey="p" rel="prev">Iteration Forms</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Concept-Index.html" accesskey="n" rel="next">Concept Index</a>, Previous: <a href="Iteration-Forms.html" accesskey="p" rel="prev">Iteration Forms</a>, Up: <a href="index.html" accesskey="u" rel="up">For</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
 <span id="Sequence-Constructors-1"></span><h2 class="chapter">6 Sequence Constructors</h2>
@@ -45,8 +48,8 @@ the sequence constructor <code>:do-in</code> is designed for use in expanders
 of other sequence constructors and is thus an auxiliary operator.  Other
 sequence constructors can act as expanders as well as generators.
 </p>
-<dl>
-<dt id="index-_003ado_002din">Auxiliary Operator: <strong>:do-in</strong> <em><var>memoize-bindings</var> <var>outer-bindings</var> <var>loop-bindings</var> <var>loop-guards</var> <var>inner-bindings</var> <var>loop-forms</var></em></dt>
+<dl class="def">
+<dt id="index-_003ado_002din"><span class="category">Auxiliary Operator: </span><span><strong>:do-in</strong> <em><var>memoize-bindings</var> <var>outer-bindings</var> <var>loop-bindings</var> <var>loop-guards</var> <var>inner-bindings</var> <var>loop-forms</var></em><a href='#index-_003ado_002din' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence constructor declares the forms to be appended to subforms
 in expanded iteration forms.  An iteration form essentially expands to
 the following <code>while</code> loop:
@@ -68,7 +71,7 @@ name.  Moreover, for each form <code>(<var>loop-identifier</var>
 <var>loop-form</var> in <var>loop-forms</var>, a <var>loop-update</var> sequence
 &lsquo;<samp><var>loop-identifier</var> <var>loop-form</var></samp>&rsquo; is produced and spliced
 into the form <code>(cl-psetq <var>loop-update</var>&hellip;)</code>
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/cl/Assignment.html#Assignment">(cl)Assignment</a>).  It is an error for <var>loop-bindings</var> and
+(see <a data-manual="cl" href="https://www.gnu.org/software/emacs/manual/html_node/cl/Assignment.html#Assignment">(cl)Assignment</a>).  It is an error for <var>loop-bindings</var> and
 <var>loop-forms</var> to have unmatched numbers of subforms.  For example, a
 possible implementation of the expander of a sequence constructor that
 iterates over lists is as follows<a id="DOCF16" href="#FOOT16"><sup>16</sup></a>:
@@ -94,18 +97,18 @@ constructor.  All sequence constructors when used as generators are
 guaranteed to delay the computation as much as possible, including that
 of the initial states.
 </p>
-<dl>
-<dt id="index-for_002din_002darray">Function: <strong>for-in-array</strong> <em><var>array</var></em></dt>
-<dt id="index-in_002darray">Auxiliary Operator: <strong>in-array</strong> <em><var>array</var></em></dt>
+<dl class="def">
+<dt id="index-for_002din_002darray"><span class="category">Function: </span><span><strong>for-in-array</strong> <em><var>array</var></em><a href='#index-for_002din_002darray' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002darray"><span class="category">Auxiliary Operator: </span><span><strong>in-array</strong> <em><var>array</var></em><a href='#index-in_002darray' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the elements of the array <var>array</var>.  As
 such, <code>array</code>s are dispatched to it.  Moreover, a literal array
 after macro expansion as a sequence form when used in iteration clauses
 is treated as if this sequence constructor is used.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002din_002dinclusive_002drange">Function: <strong>for-in-inclusive-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em></dt>
-<dt id="index-in_002dinclusive_002drange">Auxiliary Operator: <strong>in-inclusive-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em></dt>
+<dl class="def">
+<dt id="index-for_002din_002dinclusive_002drange"><span class="category">Function: </span><span><strong>for-in-inclusive-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em><a href='#index-for_002din_002dinclusive_002drange' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002dinclusive_002drange"><span class="category">Auxiliary Operator: </span><span><strong>in-inclusive-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em><a href='#index-in_002dinclusive_002drange' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the numbers between <var>start</var> and
 <var>end</var>.  The step size <var>step</var> defaults to <code>1</code> when it is
 <code>nil</code> or omitted and is added to the number after each iteration.
@@ -113,30 +116,30 @@ The iteration terminates when the number is no longer in the closed
 range of <var>start</var> and <var>end</var>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002din_002dlist">Function: <strong>for-in-list</strong> <em><var>list</var></em></dt>
-<dt id="index-in_002dlist">Auxiliary Operator: <strong>in-list</strong> <em><var>list</var></em></dt>
+<dl class="def">
+<dt id="index-for_002din_002dlist"><span class="category">Function: </span><span><strong>for-in-list</strong> <em><var>list</var></em><a href='#index-for_002din_002dlist' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002dlist"><span class="category">Auxiliary Operator: </span><span><strong>in-list</strong> <em><var>list</var></em><a href='#index-in_002dlist' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the elements of the non-dotted list
 <var>list</var>.  As such, <code>list</code>s are dispatched to it.  Moreover, a
 literal list after macro expansion as a sequence form when used in
 iteration clauses is treated as if this sequence constructor is used.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002din_002dnaturals">Function: <strong>for-in-naturals</strong> <em>[<var>start</var>]</em></dt>
-<dt id="index-in_002dnaturals">Auxiliary Operator: <strong>in-naturals</strong> <em>[<var>start</var>]</em></dt>
+<dl class="def">
+<dt id="index-for_002din_002dnaturals"><span class="category">Function: </span><span><strong>for-in-naturals</strong> <em>[<var>start</var>]</em><a href='#index-for_002din_002dnaturals' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002dnaturals"><span class="category">Auxiliary Operator: </span><span><strong>in-naturals</strong> <em>[<var>start</var>]</em><a href='#index-in_002dnaturals' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the natural numbers (non-negative integers)
 from <var>start</var> where <var>start</var> defaults to <code>0</code> when it is
 <code>nil</code> or omitted and is checked to be of type <code>(integer 0)</code> by
-<code>cl-the</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/cl/Declarations.html#Declarations">(cl)Declarations</a>).  The type checking can be
+<code>cl-the</code> (see <a data-manual="cl" href="https://www.gnu.org/software/emacs/manual/html_node/cl/Declarations.html#Declarations">(cl)Declarations</a>).  The type checking can be
 disabled by an <code>optimize</code> declaration, but this is not recommended
 since the type checking is done at compile time when <var>start</var> is a
 literal object anyway.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002din_002dproducer">Function: <strong>for-in-producer</strong> <em><var>producer</var> [<var>predicate</var> [<var>arg</var>&hellip;]]</em></dt>
-<dt id="index-in_002dproducer">Auxiliary Operator: <strong>in-producer</strong> <em><var>producer</var> [<var>predicate</var> [<var>arg</var>&hellip;]]</em></dt>
+<dl class="def">
+<dt id="index-for_002din_002dproducer"><span class="category">Function: </span><span><strong>for-in-producer</strong> <em><var>producer</var> [<var>predicate</var> [<var>arg</var>&hellip;]]</em><a href='#index-for_002din_002dproducer' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002dproducer"><span class="category">Auxiliary Operator: </span><span><strong>in-producer</strong> <em><var>producer</var> [<var>predicate</var> [<var>arg</var>&hellip;]]</em><a href='#index-in_002dproducer' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the values produced by repeated evaluations
 of the function form <code>(funcall <var>producer</var>
 [<var>arg</var>&hellip;])</code>.  The iteration is infinite when
@@ -145,11 +148,11 @@ of the function form <code>(funcall <var>producer</var>
 is the value of the function form,
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002din_002drange">Function: <strong>for-in-range</strong> <em><var>end</var></em></dt>
-<dt id="index-in_002drange">Auxiliary Operator: <strong>in-range</strong> <em><var>end</var></em></dt>
-<dt id="index-for_002din_002drange-1">Function: <strong>for-in-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em></dt>
-<dt id="index-in_002drange-1">Auxiliary Operator: <strong>in-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em></dt>
+<dl class="def">
+<dt id="index-for_002din_002drange"><span class="category">Function: </span><span><strong>for-in-range</strong> <em><var>end</var></em><a href='#index-for_002din_002drange' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002drange"><span class="category">Auxiliary Operator: </span><span><strong>in-range</strong> <em><var>end</var></em><a href='#index-in_002drange' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-for_002din_002drange-1"><span class="category">Function: </span><span><strong>for-in-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em><a href='#index-for_002din_002drange-1' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002drange-1"><span class="category">Auxiliary Operator: </span><span><strong>in-range</strong> <em><var>start</var> <var>end</var> [<var>step</var>]</em><a href='#index-in_002drange-1' class='copiable-anchor'> &para;</a></span></dt>
 <dd>
 <p>This sequence iterates over the numbers between <var>start</var> and
 <var>end</var>.  <var>start</var> defaults to <code>0</code> when omitted.  The step
@@ -163,9 +166,9 @@ when used in iteration clauses is as if this sequence constructor is
 used.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002din_002diterator">Function: <strong>for-in-iterator</strong> <em><var>iterator</var></em></dt>
-<dt id="index-in_002diterator">Auxiliary Operator: <strong>in-iterator</strong> <em><var>iterator</var></em></dt>
+<dl class="def">
+<dt id="index-for_002din_002diterator"><span class="category">Function: </span><span><strong>for-in-iterator</strong> <em><var>iterator</var></em><a href='#index-for_002din_002diterator' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002diterator"><span class="category">Auxiliary Operator: </span><span><strong>in-iterator</strong> <em><var>iterator</var></em><a href='#index-in_002diterator' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence is equivalent to the sequence <var>iterator</var>.  When used
 as a function, this sequence constructor checks <var>iterator</var> to be of
 type <code>function</code> and returns <var>iterator</var> as is.  <code>function</code>s
@@ -173,40 +176,40 @@ are dispatched to it.  It is mainly useful for its expander to avoid the
 dynamic dispatch.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002din_002drepeat">Function: <strong>for-in-repeat</strong> <em><var>value</var>&hellip;</em></dt>
-<dt id="index-in_002drepeat">Auxiliary Operator: <strong>in-repeat</strong> <em><var>value</var>&hellip;</em></dt>
+<dl class="def">
+<dt id="index-for_002din_002drepeat"><span class="category">Function: </span><span><strong>for-in-repeat</strong> <em><var>value</var>&hellip;</em><a href='#index-for_002din_002drepeat' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002drepeat"><span class="category">Auxiliary Operator: </span><span><strong>in-repeat</strong> <em><var>value</var>&hellip;</em><a href='#index-in_002drepeat' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence repeatedly returns each <var>value</var> from left to right.
 It is equivalent to the sequence <code>(for-in-list (<var>make-circular</var>
 <var>value</var>&hellip;))</code> where <var>make-circular</var> is a function that
 makes a circular list of the arguments.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002din_002dvalue">Function: <strong>for-in-value</strong> <em><var>value</var></em></dt>
-<dt id="index-in_002dvalue">Auxiliary Operator: <strong>in-value</strong> <em><var>value</var></em></dt>
+<dl class="def">
+<dt id="index-for_002din_002dvalue"><span class="category">Function: </span><span><strong>for-in-value</strong> <em><var>value</var></em><a href='#index-for_002din_002dvalue' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002dvalue"><span class="category">Auxiliary Operator: </span><span><strong>in-value</strong> <em><var>value</var></em><a href='#index-in_002dvalue' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence returns <var>value</var> once.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002don_002darray">Function: <strong>for-on-array</strong> <em><var>array</var></em></dt>
-<dt id="index-on_002darray">Auxiliary Operator: <strong>on-array</strong> <em><var>array</var></em></dt>
+<dl class="def">
+<dt id="index-for_002don_002darray"><span class="category">Function: </span><span><strong>for-on-array</strong> <em><var>array</var></em><a href='#index-for_002don_002darray' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-on_002darray"><span class="category">Auxiliary Operator: </span><span><strong>on-array</strong> <em><var>array</var></em><a href='#index-on_002darray' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the indexes of the array <var>array</var>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002don_002dlist">Function: <strong>for-on-list</strong> <em><var>list</var></em></dt>
-<dt id="index-on_002dlist">Auxiliary Operator: <strong>on-list</strong> <em><var>list</var></em></dt>
+<dl class="def">
+<dt id="index-for_002don_002dlist"><span class="category">Function: </span><span><strong>for-on-list</strong> <em><var>list</var></em><a href='#index-for_002don_002dlist' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-on_002dlist"><span class="category">Auxiliary Operator: </span><span><strong>on-list</strong> <em><var>list</var></em><a href='#index-on_002dlist' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the <code>cons</code>es of the non-dotted list
 <var>list</var>.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002din_002ddirectory">Function: <strong>for-in-directory</strong> <em><var>directory</var> [<var>full</var> [<var>match</var> [<var>nosort</var> [<var>count</var>]]]]</em></dt>
-<dt id="index-in_002ddirectory">Auxiliary Operator: <strong>in-directory</strong> <em><var>directory</var> [<var>full</var> [<var>match</var> [<var>nosort</var> [<var>count</var>]]]]</em></dt>
+<dl class="def">
+<dt id="index-for_002din_002ddirectory"><span class="category">Function: </span><span><strong>for-in-directory</strong> <em><var>directory</var> [<var>full</var> [<var>match</var> [<var>nosort</var> [<var>count</var>]]]]</em><a href='#index-for_002din_002ddirectory' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002ddirectory"><span class="category">Auxiliary Operator: </span><span><strong>in-directory</strong> <em><var>directory</var> [<var>full</var> [<var>match</var> [<var>nosort</var> [<var>count</var>]]]]</em><a href='#index-in_002ddirectory' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the files in the directory named by the
 string <var>directory</var>.  It is equivalent to the following sequence
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Contents-of-Directories.html#Contents-of-Directories">(elisp)Contents of Directories</a>) where <var>full</var>,
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Contents-of-Directories.html#Contents-of-Directories">(elisp)Contents of Directories</a>) where <var>full</var>,
 <var>nosort</var>, and <var>count</var> default to <code>nil</code> when omitted and
 <var>match</var> defaults to <code>directory-files-no-dot-files-regexp</code> when
 it is <code>nil</code> or omitted:
@@ -217,9 +220,9 @@ it is <code>nil</code> or omitted:
 </pre></div>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002din_002ddirectory_002drecursively">Function: <strong>for-in-directory-recursively</strong> <em><var>dir</var> <var>regexp</var> [<var>include-directories</var> [<var>predicate</var> [<var>follow-symlinks</var>]]]</em></dt>
-<dt id="index-in_002ddirectory_002drecursively">Auxiliary Operator: <strong>in-directory-recursively</strong> <em><var>dir</var> <var>regexp</var> [<var>include-directories</var> [<var>predicate</var> [<var>follow-symlinks</var>]]]</em></dt>
+<dl class="def">
+<dt id="index-for_002din_002ddirectory_002drecursively"><span class="category">Function: </span><span><strong>for-in-directory-recursively</strong> <em><var>dir</var> <var>regexp</var> [<var>include-directories</var> [<var>predicate</var> [<var>follow-symlinks</var>]]]</em><a href='#index-for_002din_002ddirectory_002drecursively' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002ddirectory_002drecursively"><span class="category">Auxiliary Operator: </span><span><strong>in-directory-recursively</strong> <em><var>dir</var> <var>regexp</var> [<var>include-directories</var> [<var>predicate</var> [<var>follow-symlinks</var>]]]</em><a href='#index-in_002ddirectory_002drecursively' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the files under the directory named by the
 string <var>dir</var>.  It is equivalent to the following sequence where
 <var>include-directories</var>, <var>predicate</var>, and <var>follow-symlinks</var>
@@ -232,30 +235,30 @@ default to <code>nil</code> when omitted:
 </pre></div>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dthe_002dbuffers">Function: <strong>for-the-buffers</strong> <em>[<var>frame</var>]</em></dt>
-<dt id="index-the_002dbuffers">Auxiliary Operator: <strong>the-buffers</strong> <em>[<var>frame</var>]</em></dt>
+<dl class="def">
+<dt id="index-for_002dthe_002dbuffers"><span class="category">Function: </span><span><strong>for-the-buffers</strong> <em>[<var>frame</var>]</em><a href='#index-for_002dthe_002dbuffers' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-the_002dbuffers"><span class="category">Auxiliary Operator: </span><span><strong>the-buffers</strong> <em>[<var>frame</var>]</em><a href='#index-the_002dbuffers' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the buffers of the frame <var>frame</var>.  It is
 equivalent to the sequence <code>(for-in-list (buffer-list
-<var>frame</var>))</code> (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffer-List.html#Buffer-List">(elisp)Buffer List</a>) where <var>frame</var> defaults
+<var>frame</var>))</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffer-List.html#Buffer-List">(elisp)Buffer List</a>) where <var>frame</var> defaults
 to <code>nil</code> when omitted.
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dthe_002dframes">Function: <strong>for-the-frames</strong></dt>
-<dt id="index-the_002dframes">Auxiliary Operator: <strong>the-frames</strong></dt>
+<dl class="def">
+<dt id="index-for_002dthe_002dframes"><span class="category">Function: </span><span><strong>for-the-frames</strong><a href='#index-for_002dthe_002dframes' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-the_002dframes"><span class="category">Auxiliary Operator: </span><span><strong>the-frames</strong><a href='#index-the_002dframes' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the frames.  It is <em>not</em> equivalent to
 the sequence <code>(for-in-list (frame-list))</code> since the frames are
 visited from the selected frame in <code>next-frame</code> order
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Finding-All-Frames.html#Finding-All-Frames">(elisp)Finding All Frames</a>).
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Finding-All-Frames.html#Finding-All-Frames">(elisp)Finding All Frames</a>).
 </p></dd></dl>
 
-<dl>
-<dt id="index-for_002dthe_002doverlays">Function: <strong>for-the-overlays</strong> <em>[<var>buffer</var>]</em></dt>
-<dt id="index-the_002doverlays">Auxiliary Operator: <strong>the-overlays</strong> <em>[<var>buffer</var>]</em></dt>
+<dl class="def">
+<dt id="index-for_002dthe_002doverlays"><span class="category">Function: </span><span><strong>for-the-overlays</strong> <em>[<var>buffer</var>]</em><a href='#index-for_002dthe_002doverlays' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-the_002doverlays"><span class="category">Auxiliary Operator: </span><span><strong>the-overlays</strong> <em>[<var>buffer</var>]</em><a href='#index-the_002doverlays' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the overlays of the buffer <var>buffer</var>.  It
-is equivalent to the following sequence (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Current-Buffer.html#Current-Buffer">(elisp)Current Buffer</a>,
-<a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Finding-Overlays.html#Finding-Overlays">(elisp)Finding Overlays</a>, and <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Point.html#Point">(elisp)Point</a>) where
+is equivalent to the following sequence (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Current-Buffer.html#Current-Buffer">(elisp)Current Buffer</a>,
+<a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Finding-Overlays.html#Finding-Overlays">(elisp)Finding Overlays</a>, and <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Point.html#Point">(elisp)Point</a>) where
 <var>buffer</var> defaults to the current buffer when it is <code>nil</code> or
 omitted:
 </p>
@@ -265,36 +268,37 @@ omitted:
 </pre></div>
 </dd></dl>
 
-<dl>
-<dt id="index-for_002dthe_002dwindows">Function: <strong>for-the-windows</strong> <em>[<var>frame</var> [<var>minibuf</var>]]</em></dt>
-<dt id="index-the_002dwindows">Auxiliary Operator: <strong>the-windows</strong> <em>[<var>frame</var> [<var>minibuf</var>]]</em></dt>
+<dl class="def">
+<dt id="index-for_002dthe_002dwindows"><span class="category">Function: </span><span><strong>for-the-windows</strong> <em>[<var>frame</var> [<var>minibuf</var>]]</em><a href='#index-for_002dthe_002dwindows' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-the_002dwindows"><span class="category">Auxiliary Operator: </span><span><strong>the-windows</strong> <em>[<var>frame</var> [<var>minibuf</var>]]</em><a href='#index-the_002dwindows' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the windows of the frame <var>frame</var>.  It is
 <em>not</em> equivalent to the sequence <code>(for-in-list (window-list))</code>
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Windows-and-Frames.html#Windows-and-Frames">(elisp)Windows and Frames</a>) since the windows are visited from
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Windows-and-Frames.html#Windows-and-Frames">(elisp)Windows and Frames</a>) since the windows are visited from
 the selected window of the frame <var>frame</var> in <code>next-window</code> order
-(see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Cyclic-Window-Ordering.html#Cyclic-Window-Ordering">(elisp)Cyclic Window Ordering</a>) where <var>frame</var> defaults to
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Cyclic-Window-Ordering.html#Cyclic-Window-Ordering">(elisp)Cyclic Window Ordering</a>) where <var>frame</var> defaults to
 the selected frame when it is not a frame or omitted.  <var>minibuf</var> and
 <var>frame</var> are passed to <code>next-window</code> as the <var>minibuf</var> and
 <var>all-frames</var> arguments where <var>minibuf</var> and <var>frame</var> default
 to <code>nil</code> when omitted.
 </p></dd></dl>
 
+</div>
 <div class="footnote">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT16" href="#DOCF16">(16)</a></h3>
+<h5><a id="FOOT16" href="#DOCF16">(16)</a></h5>
 <p>In this example, it may seem
 unnecessary to &ldquo;memoize&rdquo; the value of <var>list-form</var> at first
 glance.  The actual purpose of doing so in this and many similar cases
 is to preserve the apparent evaluation order, although sometimes
 memoization is indeed necessary to guarantee that the subexpressions are
-evaluated exactly once (see <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-Evaluation.html#Argument-Evaluation">(elisp)Argument Evaluation</a>).</p>
+evaluated exactly once (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-Evaluation.html#Argument-Evaluation">(elisp)Argument Evaluation</a>).</p>
 </div>
 <hr>
 <div class="header">
 <p>
-Next: <a href="Concept-Index.html" accesskey="n" rel="next">Concept Index</a>, Previous: <a href="Iteration-Forms.html" accesskey="p" rel="prev">Iteration Forms</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Concept-Index.html">Concept Index</a>, Previous: <a href="Iteration-Forms.html">Iteration Forms</a>, Up: <a href="index.html">For</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 
