@@ -657,7 +657,8 @@ See Info node `(for)Special-Clause Operators'"
                                                     `(,id t))
                                                   ids)
                                       . ,body)))))
-                     (body `(,@body . ,result-forms))
+                     (body (if (null result-forms) body
+                             `(,@body . ,result-forms)))
                      (body (if (null bindings) body
                              `((let ,(cl-mapcar
                                       (pcase-lambda (id `(,_ ,value))
