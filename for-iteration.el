@@ -207,27 +207,31 @@ result forms are used.  Return a `cons' of BINDINGS without the
 result forms and the result forms."
   (declare (side-effect-free t))
   (pcase-exhaustive bindings
-    ((or (app reverse
-              `((:result . ,result-forms)
-                . ,(app (lambda (bindings)
-                          (named-let parse
-                              ((parsed '()) (bindings bindings))
-                            (pcase-exhaustive bindings
-                              ('() parsed)
-                              (`(,(and `(,_ ,_) binding) . ,bindings)
-                               (parse `(,binding . ,parsed)
-                                      bindings)))))
-                        bindings)))
-         (and (let result-forms
-                (let ((ids (mapcar (lambda (binding)
-                                     (pcase-exhaustive binding
-                                       (`(,id ,_) id)))
-                                   bindings)))
-                  (pcase ids
-                    ('() '(nil)) (`(,_) ids)
-                    (`(,_ ,_) `((cons . ,ids)))
-                    (_ `((list . ,ids))))))
-              (let bindings bindings)))
+    ((or (and '() bindings (let result-forms '(nil)))
+         (and `(,_ . ,_)
+              (or (app reverse
+                       `((:result . ,(and `(,_ . ,_) result-forms))
+                         . ,(app (lambda (bindings)
+                                   (named-let parse
+                                       ((parsed '())
+                                        (bindings bindings))
+                                     (pcase-exhaustive bindings
+                                       ('() parsed)
+                                       (`(,(and `(,_ ,_) binding)
+                                          . ,bindings)
+                                        (parse `(,binding . ,parsed)
+                                               bindings)))))
+                                 bindings)))
+                  (and bindings
+                       (app (mapcar (lambda (binding)
+                                      (pcase-exhaustive binding
+                                        (`(,id ,_) id))))
+                            (or (and `(,_) result-forms)
+                                (and `(,_ ,_) (app (lambda (ids)
+                                                     `((cons . ,ids)))
+                                                   result-forms))
+                                (app (lambda (ids) `((list . ,ids)))
+                                     result-forms)))))))
      `(,bindings . ,result-forms))))
 
 (defun for--parse-body (for-clauses body)

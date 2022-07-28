@@ -807,10 +807,9 @@ package.
 This iteration macro is the fundamental building block of other
 iteration macros.  The form of @var{bindings} is the same as the
 @var{varlist} subforms of @code{let} forms except that an optional
-@code{(:result @optional{@repeated{@var{expressions}}})} form can appear
-as the last form.  @var{body}s are first transformed according to the
-following rules and appended to @var{for-clause}s preserving their
-order:
+@code{(:result @repeated{@var{expressions}})} form can appear as the
+last form.  @var{body}s are first transformed according to the following
+rules and appended to @var{for-clause}s preserving their order:
 
 @itemize
 @item
