@@ -691,11 +691,8 @@ See Info node `(for)Special-Clause Operators'"
                    ('nil (expand break-ids expanded clauses))
                    (_ (cl-with-gensyms (break)
                         (expand `(,break . ,break-ids)
-                                (let ((break `(setq ,break nil)))
-                                  (pcase expanded
-                                    ('() `((when ,guard ,break)))
-                                    (elses `((if ,guard ,break
-                                               . ,elses)))))
+                                `((if ,guard (setq ,break nil)
+                                    . ,expanded))
                                 clauses)))))
                 (`(,expander . ,special-clause)
                  (expand break-ids
