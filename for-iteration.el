@@ -341,22 +341,20 @@ GUARDS are removed."
                 (guard `(,guard . ,(parse guards)))))))
     ('() t) (`(,guard) guard) (guards `(and . ,guards))))
 
-(defun for--update (ids values)
-  "Return a form updating IDS to VALUES.
+(defmacro for--setq (&rest pairs)
+  "Expand to a form equivalent to (`cl-psetq' [ID VALUE]...).
 
-For each ID in IDS and each VALUE IN VALUES, if ID and VALUE is
-`eq' after macro-expansion, eliminate them from the returned
-form."
-  (declare (side-effect-free t))
-  (named-let expand ((ids ids) (values values))
-    (pcase-exhaustive ids
-      ((and '() (let '() values)) nil)
-      ((and `(,(for--lit id) . ,ids)
-            (let `(,(for--lit id) . ,values) values))
-       (expand ids values))
-      ((and `(,(for--lit id) . ,ids)
-            (let `(,(for--lit value) . ,values) values))
-       (let ((form (expand ids values)))
+When a pair of ID and VALUE in PAIRS is `eq' after
+macro-expansion, eliminate them from the expanded form.
+
+\(fn [ID VALUE]...)"
+  (declare (debug (&rest [symbolp form])))
+  (named-let expand ((pairs pairs))
+    (pcase-exhaustive pairs
+      ('() nil)
+      (`(,(for--lit id) ,(for--lit id) . ,pairs) (expand pairs))
+      (`(,(for--lit id) ,(for--lit value) . ,pairs)
+       (let ((form (expand pairs)))
          `(setq ,id ,(if (not form) value `(prog1 ,value ,form))))))))
 
 (eval-when-compile
@@ -608,11 +606,15 @@ See Info node `(for)Special-Clause Operators'"
         (for--parse-body for-clauses body)))
     (named-let expand
         ((break-ids '())
-         (body `(,@(pcase (for--parse-value-form
-                           value-form length-bindings
-                           (pcase-lambda (`(:values . ,forms))
-                             (for--update renamed-ids forms)))
-                     ('nil '()) (form `(,form)))
+         (body `(,(for--parse-value-form
+                   value-form length-bindings
+                   (if (zerop length-bindings)
+                       (pcase-lambda (`(:values)) nil)
+                     (pcase-lambda (`(:values . ,forms))
+                       `(for--setq
+                         . ,(cl-mapcan (lambda (id form)
+                                         `(,id ,form))
+                                       renamed-ids forms)))))
                  . ,body))
          (clauses (reverse for-clauses)))
       (cl-flet
@@ -621,20 +623,23 @@ See Info node `(for)Special-Clause Operators'"
                                  inner-bindings loop-forms)
              (let* ((body (if (null loop-forms) body
                             `(,@body
-                              ,@(pcase (for--update
-                                        (mapcar (lambda (binding)
-                                                  (pcase-exhaustive
-                                                      binding
-                                                    (`(,id ,_) id)))
-                                                loop-bindings)
-                                        loop-forms)
-                                  ('nil '())
-                                  (form (pcase (for--and-guards
-                                                `(,@break-ids
-                                                  ,@final-ids))
-                                          ('t `(,form)) ('nil '())
-                                          (guard `((when ,guard
-                                                     ,form)))))))))
+                              ,@(cl-symbol-macrolet
+                                    ((update
+                                       `(for--setq
+                                         . ,(cl-mapcan
+                                             (lambda (binding form)
+                                               (pcase-exhaustive
+                                                   binding
+                                                 (`(,id ,_)
+                                                  `(,id ,form))))
+                                             loop-bindings
+                                             loop-forms))))
+                                  (pcase (for--and-guards
+                                          `(,@break-ids
+                                            ,@final-ids))
+                                    ('t `(,update)) ('nil '())
+                                    (guard `((when ,guard
+                                               ,update))))))))
                     (body (if (null inner-bindings) body
                             `((,binder ,inner-bindings . ,body))))
                     (body (pcase (for--and-guards
