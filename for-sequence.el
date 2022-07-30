@@ -402,19 +402,23 @@ See Info node `(for)Sequence Constructors'.
 \(fn DIRECTORY [FULL [MATCH [NOSORT [COUNT]]]])"
   (:alias in-directory)
   (:expander-case
-   (`(,id ,(and (or (and (or (and (or (and (or (and `(,_ ,directory)
-                                                    (let full nil))
-                                               `(,_ ,directory ,full))
-                                           (let match nil))
-                                      `(,_ ,directory ,full ,match))
-                                  (let nosort nil))
-                             `(,_ ,directory ,full ,match ,nosort))
-                         (let count nil))
-                    `(,_ ,directory ,full ,match ,nosort ,count))))
+   (`(,id ,(or (and (or (and (or (and (or (and `(,_ ,directory)
+                                               (let full nil))
+                                          `(,_ ,directory ,full))
+                                      (let match-form nil))
+                                 `(,_ ,directory ,full ,match-form))
+                             (let nosort nil))
+                        `(,_ ,directory ,full ,match-form ,nosort))
+                    (let count nil))
+               `(,_ ,directory ,full ,match-form ,nosort ,count)))
     `(,id (for-in-list
            (directory-files
             ,directory ,full
-            (or ,match directory-files-no-dot-files-regexp)
+            ,(pcase (for--macroexpand match-form)
+               ('nil 'directory-files-no-dot-files-regexp)
+               ((and (pred macroexp-const-p) match) match)
+               (match `(or ,match
+                           directory-files-no-dot-files-regexp)))
             ,nosort ,count)))))
   (declare (side-effect-free t)))
 
