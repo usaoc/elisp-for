@@ -200,11 +200,13 @@ See Info node `(for)Sequence Constructors'.
 \(fn PRODUCER [PREDICATE [ARG...]])"
   (:alias in-producer)
   (:expander-case
-   (`(,id ,(or (and `(,_ ,producer-form)
-                    (let predicate-form '#'ignore)
-                    (let arg-forms '()))
-               `(,_ ,producer-form
-                    ,(for--lit predicate-form) . ,arg-forms)))
+   (`(,id (,_ ,producer-form))
+    (cl-with-gensyms (producer value)
+      (let ((value-form `(funcall ,producer)))
+        `(,id (:do-in ((,producer ,producer-form)) ()
+                      ((,value ,value-form)) () ((,id ,value))
+                      (,value-form))))))
+   (`(,id (,_ ,producer-form ,(for--lit predicate-form) . ,arg-forms))
     (pcase-let
         ((`(,predicate . ,make-guards)
           (pcase predicate-form
