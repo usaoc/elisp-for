@@ -321,15 +321,14 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
 When a pair of ID and VALUE in PAIRS is `eq' after
 macro-expansion, eliminate them from the expanded form.
 
-\(fn [ID VALUE]...)"
-  (declare (debug (&rest [symbolp form])))
-  (named-let expand ((pairs pairs))
-    (pcase-exhaustive pairs
-      ('() nil)
-      (`(,(for--lit id) ,(for--lit id) . ,pairs) (expand pairs))
-      (`(,(for--lit id) ,(for--lit value) . ,pairs)
-       (let ((form (expand pairs)))
-         `(setq ,id ,(if (not form) value `(prog1 ,value ,form))))))))
+\(fn (ID VALUE)...)"
+  (declare (debug (&rest (symbolp form))))
+  (cl-reduce (lambda (pair form)
+               (pcase-exhaustive pair
+                 (`(,(for--lit id) ,(for--lit id)) form)
+                 (`(,(for--lit id) ,(for--lit value))
+                  `(setq ,id (prog1 ,value ,form)))))
+             pairs :from-end t :initial-value nil))
 
 (eval-when-compile
   (defmacro for--defmacro (name arglist &rest body)
@@ -570,8 +569,7 @@ See Info node `(for)Special-Clause Operators'"
                        (pcase-lambda (`(:values)) nil)
                      (pcase-lambda (`(:values . ,forms))
                        `(for--setq
-                         . ,(cl-mapcan (lambda (id form)
-                                         `(,id ,form))
+                         . ,(cl-mapcar (lambda (id form) `(,id ,form))
                                        renamed-ids forms)))))
                  . ,body))
          (clauses (reverse for-clauses)))
@@ -583,7 +581,7 @@ See Info node `(for)Special-Clause Operators'"
                             `(,@body
                               (when (and ,@break-ids ,@final-ids)
                                 (for--setq
-                                 . ,(cl-mapcan
+                                 . ,(cl-mapcar
                                      (lambda (binding form)
                                        (pcase-exhaustive binding
                                          (`(,id ,_) `(,id ,form))))
