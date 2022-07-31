@@ -315,36 +315,6 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
                 (append more-loop-forms loop-forms)
                 t groups clauses))))))
 
-(defun for--and-guards (guards)
-  "Return a form equivalent to (`and' . GUARDS).
-
-Double negations and non-nil constants after macro-expansion in
-GUARDS are removed."
-  (declare (side-effect-free t))
-  (pcase (named-let parse ((guards guards))
-           (pcase-exhaustive guards
-             ('() '())
-             (`(,guard . ,guards)
-              (pcase (named-let negate ((guard guard))
-                       (pcase (for--macroexpand guard)
-                         ((and (pred macroexp-const-p) const)
-                          (and const t))
-                         (`(,(or 'not 'null)
-                            ,(for--lit `(,(or 'not 'null) ,guard)))
-                          (negate guard))
-                         ((or `(,(and (or 'not 'null) head)
-                                ,(for--lit
-                                  (or (and (pred macroexp-const-p)
-                                           (app not guard))
-                                      (app (lambda (guard)
-                                             `(,head ,guard))
-                                           guard))))
-                              guard)
-                          guard)))
-                ('t (parse guards)) ('nil '(nil))
-                (guard `(,guard . ,(parse guards)))))))
-    ('() t) (`(,guard) guard) (guards `(and . ,guards))))
-
 (defmacro for--setq (&rest pairs)
   "Expand to a form equivalent to (`cl-psetq' [ID VALUE]...).
 
@@ -498,27 +468,25 @@ See Info node `(for)Buffer-Local Variables'.")
   "Evaluate BODY when all subforms are non-nil.
 
 See Info node `(for)Special-Clause Operators'"
-  (`(,_ . ,(app for--and-guards guard))
-   (pcase guard ('t body) ('nil '()) (_ `((when ,guard . ,body))))))
+  (`(,_ . ,guards) `((when (and . ,guards) . ,body))) )
 
 (define-for-special-clause :if-not (body)
   "Evaluate BODY unless all subforms are non-nil.
 
 See Info node `(for)Special-Clause Operators'"
-  (`(,_ . ,(app for--and-guards guard))
-   (pcase guard ('t '()) ('nil body) (_ `((unless ,guard . ,body))))))
+  (`(,_ . ,guards) `((unless (and . ,guards) . ,body))) )
 
 (define-for-special-clause :let (body)
   "Evaluate BODY with subforms bound by `for-binder'.
 
 See Info node `(for)Special-Clause Operators'"
-  (`(,_) body) (`(,_ . ,bindings) `((,for-binder ,bindings . ,body))))
+  (`(,_ . ,bindings) `((,for-binder ,bindings . ,body))))
 
 (define-for-special-clause :if-let (body)
   "Evaluate BODY with subforms bound by `when-let*'.
 
 See Info node `(for)Special-Clause Operators'"
-  (`(,_) body) (`(,_ . ,bindings) `((when-let* ,bindings . ,body))))
+  (`(,_ . ,bindings) `((when-let* ,bindings . ,body))))
 
 (define-for-special-clause :pcase (body)
   "Evaluate BODY when the first subform is matched.
@@ -528,13 +496,10 @@ optional sequence [`:exhaustive'] is present in the remaining
 subforms, match exhaustively, that is, use `pcase-exhaustive'.
 
 See Info node `(for)Special-Clause Operators'"
-  ((or `(,_ ,expr) `(,_ ,expr :exhaustive)) `(,expr . ,body))
   ((or (and `(,_ ,expr :exhaustive . ,pats)
             (let head 'pcase-exhaustive))
        (and `(,_ ,expr . ,pats) (let head 'pcase)))
-   `((,head ,expr
-            (,(pcase pats (`(,pat) pat) (_ `(and . ,pats)))
-             . ,body)))))
+   `((,head ,expr ((and . ,pats) . ,body)))))
 
 (define-for-special-clause :pcase-not (body)
   "Evaluate BODY when the first subform is not matched.
@@ -545,12 +510,9 @@ subforms, the value of the first subform is bound to AS, and the
 subforms after the sequence are the patterns.
 
 See Info node `(for)Special-Clause Operators'"
-  ((or `(,_ ,expr) `(,_ ,expr :as ,(cl-type symbol))) `(,expr))
   ((or `(,_ ,expr :as ,(and (cl-type symbol) as) . ,pats)
        (and `(,_ ,expr . ,pats) (let as '_)))
-   `((pcase ,expr
-       (,(pcase pats (`(,pat) pat) (_ `(and . ,pats))) nil)
-       (,as . ,body)))))
+   `((pcase ,expr ((and . ,pats) nil) (,as . ,body)))))
 
 (define-for-special-clause :do (body)
   "Evaluate the subforms before evaluating BODY.
@@ -582,25 +544,17 @@ See Info node `(for)Special-Clause Operators'"
                       ('() `(,final-ids ,body ,parsed))
                       (`(,clause . ,clauses)
                        (pcase clause
-                         (`(:final . ,(app for--and-guards guard))
-                          (pcase guard
-                            ('t (cl-with-gensyms (final)
-                                  (loop `(,final . ,final-ids)
-                                        `((setq ,final nil) . ,body)
-                                        parsed clauses)))
-                            ('nil (loop final-ids body
-                                        `((:let) . ,parsed) clauses))
-                            (_ (cl-with-gensyms (final)
-                                 (let ((once '#:once))
-                                   (loop `(,final . ,final-ids)
-                                         `((when (eq ,final ',once)
-                                             (setq ,final nil))
-                                           . ,body)
-                                         `((:do
-                                            (when ,guard
-                                              (setq ,final ',once)))
-                                           . ,parsed)
-                                         clauses))))))
+                         (`(:final . ,guards)
+                          (cl-with-gensyms (final)
+                            (let ((once '#:once))
+                              (loop `(,final . ,final-ids)
+                                    `((when (eq ,final ',once)
+                                        (setq ,final nil))
+                                      . ,body)
+                                    `((:do (when (and . ,guards)
+                                             (setq ,final ',once)))
+                                      . ,parsed)
+                                    clauses))))
                          (_ (loop final-ids body
                                   `(,clause . ,parsed) clauses)))))))
                 `(,final-ids
@@ -627,30 +581,18 @@ See Info node `(for)Special-Clause Operators'"
                                  inner-bindings loop-forms)
              (let* ((body (if (null loop-forms) body
                             `(,@body
-                              ,@(cl-symbol-macrolet
-                                    ((update
-                                       `(for--setq
-                                         . ,(cl-mapcan
-                                             (lambda (binding form)
-                                               (pcase-exhaustive
-                                                   binding
-                                                 (`(,id ,_)
-                                                  `(,id ,form))))
-                                             loop-bindings
-                                             loop-forms))))
-                                  (pcase (for--and-guards
-                                          `(,@break-ids
-                                            ,@final-ids))
-                                    ('t `(,update)) ('nil '())
-                                    (guard `((when ,guard
-                                               ,update))))))))
+                              (when (and ,@break-ids ,@final-ids)
+                                (for--setq
+                                 . ,(cl-mapcan
+                                     (lambda (binding form)
+                                       (pcase-exhaustive binding
+                                         (`(,id ,_) `(,id ,form))))
+                                     loop-bindings loop-forms))))))
                     (body (if (null inner-bindings) body
                             `((,binder ,inner-bindings . ,body))))
-                    (body (pcase (for--and-guards
-                                  `(,@break-ids
-                                    ,@final-ids . ,loop-guards))
-                            ('nil '())
-                            (guard `((while ,guard . ,body)))))
+                    (body `((while (and ,@break-ids
+                                        ,@final-ids . ,loop-guards)
+                              . ,body)))
                     (body (if (null loop-bindings) body
                             `((let ,loop-bindings . ,body))))
                     (body (if (null outer-bindings) body
@@ -659,27 +601,25 @@ See Info node `(for)Special-Clause Operators'"
                             `((let ,memoize-bindings . ,body)))))
                body)))
         (if (null clauses)
-            (if (null body) nil
-              (let* ((body (pcase (nconc break-ids final-ids)
-                             ('() body)
-                             (ids `((let ,(mapcar (lambda (id)
-                                                    `(,id t))
-                                                  ids)
-                                      . ,body)))))
-                     (body (if (null result-forms) body
-                             `(,@body . ,result-forms)))
-                     (body (if (null bindings) body
-                             `((let ,(cl-mapcar
-                                      (pcase-lambda (id `(,_ ,value))
-                                        `(,id ,value))
-                                      renamed-ids bindings)
-                                 (cl-symbol-macrolet
-                                     ,(cl-mapcar
-                                       (pcase-lambda (`(,id ,_) value)
-                                         `(,id ,value))
-                                       bindings renamed-ids)
-                                   . ,body))))))
-                (macroexp-progn body)))
+            (let* ((body (pcase (nconc break-ids final-ids)
+                           ('() body)
+                           (ids `((let ,(mapcar (lambda (id) `(,id t))
+                                                ids)
+                                    . ,body)))))
+                   (body (if (null result-forms) body
+                           `(,@body . ,result-forms)))
+                   (body (if (null bindings) body
+                           `((let ,(cl-mapcar
+                                    (pcase-lambda (id `(,_ ,value))
+                                      `(,id ,value))
+                                    renamed-ids bindings)
+                               (cl-symbol-macrolet
+                                   ,(cl-mapcar
+                                     (pcase-lambda (`(,id ,_) value)
+                                       `(,id ,value))
+                                     bindings renamed-ids)
+                                 . ,body))))))
+              (macroexp-progn body))
           (pcase-let ((`((,head . ,iteration-forms) . ,clauses)
                        clauses))
             (cl-symbol-macrolet
@@ -687,17 +627,12 @@ See Info node `(for)Special-Clause Operators'"
                              (apply #'make-iteration
                                     body iteration-forms))))
               (pcase-exhaustive head
-                (`(:break . ,(app for--and-guards guard))
-                 (pcase guard
-                   ('t (cl-with-gensyms (break)
-                         (expand `(,break . ,break-ids)
-                                 `((setq ,break nil)) clauses)))
-                   ('nil (expand break-ids expanded clauses))
-                   (_ (cl-with-gensyms (break)
-                        (expand `(,break . ,break-ids)
-                                `((if ,guard (setq ,break nil)
-                                    . ,expanded))
-                                clauses)))))
+                (`(:break . ,guards)
+                 (cl-with-gensyms (break)
+                   (expand `(,break . ,break-ids)
+                           `((if (and . ,guards) (setq ,break nil)
+                               . ,expanded))
+                           clauses)))
                 (`(,expander . ,special-clause)
                  (expand break-ids
                          (funcall expander special-clause expanded)

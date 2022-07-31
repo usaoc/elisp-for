@@ -165,8 +165,7 @@ See Info node `(for)Sequence Constructors'."
    (`(,id (,_ ,list-form))
     (cl-with-gensyms (list tail)
       `(,id (:do-in ((,list ,list-form)) () ((,tail ,list))
-                    ((not (null ,tail))) ((,id (car ,tail)))
-                    ((cdr ,tail)))))))
+                    (,tail) ((,id (car ,tail))) ((cdr ,tail)))))))
   (declare (side-effect-free t)))
 
 (define-for-sequence for-in-naturals (&optional start)
@@ -333,13 +332,7 @@ See Info node `(for)Sequence Constructors'.
 See Info node `(for)Sequence Constructors'."
   (:alias in-value)
   (:expander-case
-   (`(,id (,_ ,(for--lit (pred macroexp-const-p) value-form)))
-    (cl-with-gensyms (value)
-      (let ((loop-guard (if value-form value `(not ,value)))
-            (loop-form (not value-form)))
-        `(,id (:do-in ((,value ,value-form)) () ((,value ,value))
-                      (,loop-guard) ((,id ,value)) (,loop-form))))))
-   (`(,id (,_ ,(for--lit value-form)))
+   (`(,id (,_ ,value-form))
     (cl-with-gensyms (value)
       (let ((returned '#:returned))
         `(,id (:do-in ((,value ,value-form)) () ((,value ,value))
@@ -370,8 +363,7 @@ See Info node `(for)Sequence Constructors'."
    (`(,id (,_ ,list-form))
     (cl-with-gensyms (list tail)
       `(,id (:do-in ((,list ,list-form)) () ((,tail ,list))
-                    ((not (null ,tail))) ((,id ,tail))
-                    ((cdr ,tail)))))))
+                    (,tail) ((,id ,tail)) ((cdr ,tail)))))))
   (declare (side-effect-free t)))
 
 (define-for-sequence for-in-directory
@@ -391,20 +383,16 @@ See Info node `(for)Sequence Constructors'.
    (`(,id ,(or (and (or (and (or (and (or (and `(,_ ,directory)
                                                (let full nil))
                                           `(,_ ,directory ,full))
-                                      (let match-form nil))
-                                 `(,_ ,directory ,full ,match-form))
+                                      (let match nil))
+                                 `(,_ ,directory ,full ,match))
                              (let nosort nil))
-                        `(,_ ,directory ,full ,match-form ,nosort))
+                        `(,_ ,directory ,full ,match ,nosort))
                     (let count nil))
-               `(,_ ,directory ,full ,match-form ,nosort ,count)))
+               `(,_ ,directory ,full ,match ,nosort ,count)))
     `(,id (for-in-list
            (directory-files
             ,directory ,full
-            ,(pcase (for--macroexpand match-form)
-               ('nil 'directory-files-no-dot-files-regexp)
-               ((and (pred macroexp-const-p) match) match)
-               (match `(or ,match
-                           directory-files-no-dot-files-regexp)))
+            (or ,match directory-files-no-dot-files-regexp)
             ,nosort ,count)))))
   (declare (side-effect-free t)))
 
@@ -516,20 +504,18 @@ See Info node `(for)Sequence Constructors'.
   (:alias the-windows)
   (:expander-case
    (`(,id ,(or (and (or (and `(,_) (let frame-form nil))
-                        `(,_ ,(for--lit frame-form)))
+                        `(,_ ,frame-form))
                     (let minibuf-form nil))
-               `(,_ ,(for--lit frame-form) ,minibuf-form)))
+               `(,_ ,frame-form ,minibuf-form)))
     (cl-with-gensyms (frame minibuf current original visited)
-      (let ((original-form `(frame-selected-window
-                             ,(if (macroexp-const-p frame-form) nil
-                                `(and (framep ,frame) ,frame)))))
-        `(,id (:do-in ((,frame ,frame-form) (,minibuf ,minibuf-form))
-                      ((,original ,original-form) (,visited nil))
-                      ((,current ,original))
-                      ((or (not (eq ,current ,original))
-                           (and (not ,visited) (setq ,visited t))))
-                      ((,id ,current))
-                      ((next-window ,current ,minibuf ,frame))))))))
+      `(,id (:do-in ((,frame ,frame-form) (,minibuf ,minibuf-form))
+                    ((,original (and (framep ,frame) ,frame))
+                     (,visited nil))
+                    ((,current ,original))
+                    ((or (not (eq ,current ,original))
+                         (and (not ,visited) (setq ,visited t))))
+                    ((,id ,current))
+                    ((next-window ,current ,minibuf ,frame)))))))
   (declare (side-effect-free t))
   (iter-make (let ((original (frame-selected-window
                               (and (framep frame) frame))))
