@@ -138,13 +138,13 @@ literal object anyway.
 </p></dd></dl>
 
 <dl class="def">
-<dt id="index-for_002din_002dproducer"><span class="category">Function: </span><span><strong>for-in-producer</strong> <em><var>producer</var> [<var>predicate</var> [<var>arg</var>&hellip;]]</em><a href='#index-for_002din_002dproducer' class='copiable-anchor'> &para;</a></span></dt>
-<dt id="index-in_002dproducer"><span class="category">Auxiliary Operator: </span><span><strong>in-producer</strong> <em><var>producer</var> [<var>predicate</var> [<var>arg</var>&hellip;]]</em><a href='#index-in_002dproducer' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-for_002din_002dproducer"><span class="category">Function: </span><span><strong>for-in-producer</strong> <em><var>producer</var> [<var>continuep</var> [<var>arg</var>&hellip;]]</em><a href='#index-for_002din_002dproducer' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002dproducer"><span class="category">Auxiliary Operator: </span><span><strong>in-producer</strong> <em><var>producer</var> [<var>continuep</var> [<var>arg</var>&hellip;]]</em><a href='#index-in_002dproducer' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the values produced by repeated evaluations
 of the function form <code>(funcall <var>producer</var>
 [<var>arg</var>&hellip;])</code>.  The iteration is infinite when
-<var>predicate</var> is omitted.  Otherwise, the iteration terminates when
-<code>(funcall <var>predicate</var> <var>value</var>)</code> is true where <var>value</var>
+<var>continuep</var> is omitted.  Otherwise, the iteration terminates when
+<code>(funcall <var>continuep</var> <var>value</var>)</code> is false where <var>value</var>
 is the value of the function form,
 </p></dd></dl>
 

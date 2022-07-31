@@ -84,13 +84,17 @@ in iteration clauses to avoid the need of shorthands
      &rArr; ((a . 1) (b . 3))
 </pre></div>
 
+<span id="index-error"></span>
 <span id="index-sequence-form-3"></span>
 <span id="index-terminology-10"></span>
 
-<p><em>Dynamic dispatch</em> based on the type of datum is available when the
+<p><em>Dynamic dispatch</em> based on the types of datum is available when the
 datum is used as a sequence form in iteration clauses.  A type is
 specified by a Common Lisp-style <em>type specifier</em> (see <a data-manual="cl" href="https://www.gnu.org/software/emacs/manual/html_node/cl/Type-Predicates.html#Type-Predicates">(cl)Type
-Predicates</a>).
+Predicates</a>).  When all types of datum are unspecified, that is,
+<em>unhandled type</em>s, <code>for-unhandled-type</code> is signaled with the
+singleton list of datum as <code>data</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Signaling-Errors.html#Signaling-Errors">(elisp)Signaling
+Errors</a>).
 </p>
 <p>A <code>list</code> dispatched to the application of <code>for-in-list</code> to it:
 </p>
@@ -107,6 +111,15 @@ Predicates</a>).
 <pre class="example">(let ((iterator (for-in-list '(1 2 3))))
   (for-list ((item iterator) item)))
      &rArr; (1 2 3)
+</pre></div>
+
+<p><code>(make-record 'some-type 0 nil)</code> triggers
+<code>for-unhandled-type</code>:
+</p>
+<div class="example">
+<pre class="example">(let ((some-object (make-record 'some-type 0 nil)))
+  (for-list ((item some-object) item)))
+     error&rarr; Unhandled type: #s(some-type)
 </pre></div>
 
 <span id="index-sequence-form-4"></span>

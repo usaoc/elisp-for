@@ -86,12 +86,13 @@ following types:
 alias of <var>name</var> available when used in iteration clauses.  A
 <var>type</var> is a type specifier, whose objects when used as sequence
 forms in iteration clauses are dispatched to <var>name</var>.  It is an error
-for two <var>type</var>s to be in subtype relation<a id="DOCF13" href="#FOOT13"><sup>13</sup></a>.  When an <code>:expander</code> subform is present, an
-expander with <var>arg</var> as the sole argument and <var>body</var>s as the body
-is defined and available when used in iteration clauses.  The expander
-receives the iteration clause as the argument and produces an expanded
-iteration clause.  An <code>:expander-case</code> subform is equivalent to an
-<code>:expander</code> subform with <code>(pcase-exhaustive <var>arg</var>
+for two <var>type</var>s not to be in disjoint relation<a id="DOCF13" href="#FOOT13"><sup>13</sup></a>.  When an
+<code>:expander</code> subform is present, an expander with <var>arg</var> as the
+sole argument and <var>body</var>s as the body is defined and available when
+used in iteration clauses.  The expander receives the iteration clause
+as the argument and produces an expanded iteration clause.  An
+<code>:expander-case</code> subform is equivalent to an <code>:expander</code>
+subform with <code>(pcase-exhaustive <var>arg</var>
 [<var>case</var>&hellip;])</code> as the sole expression in <var>body</var>.
 </p>
 <p>Note that the subforms are processed <em>before</em> the generator is
@@ -131,9 +132,8 @@ of expander.
 
 <h5><a id="FOOT13" href="#DOCF13">(13)</a></h5>
 <p>Following
-<a href="http://clhs.lisp.se/Body/26_glo_s.htm">Common Lisp</a>, a type is a
-<em>subtype</em> of another type when every object of the former is an
-object of the latter.</p>
+<a href="http://clhs.lisp.se/Body/26_glo_d.htm">Common Lisp</a>, two types are
+<em>disjoint</em> when they have no element in common</p>
 </div>
 <hr>
 <div class="header">
