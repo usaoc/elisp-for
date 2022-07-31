@@ -190,14 +190,14 @@ See Info node `(for)Sequence Constructors'.
 (define-for-sequence for-in-producer (producer &rest args)
   "Return an iterator that returns each call to PRODUCER.
 
-When PREDICATE is omitted, the iterator is infinite.  Otherwise,
-PREDICATE is a unary predicate.  PRODUCER is applied to ARGS in
-each iteration, and the produced value is tested by PREDICATE.
-When PREDICATE returns non-nil, the iterator stops.
+When CONTINUEP is omitted, the iterator is infinite.  Otherwise,
+CONTINUEP is a unary predicate.  PRODUCER is applied to ARGS in
+each iteration, and the produced value is tested by CONTINUEP.
+When CONTINUEP returns nil, the iterator stops.
 
 See Info node `(for)Sequence Constructors'.
 
-\(fn PRODUCER [PREDICATE [ARG...]])"
+\(fn PRODUCER [CONTINUEP [ARG...]])"
   (:alias in-producer)
   (:expander-case
    (`(,id (,_ ,producer-form))
@@ -206,49 +206,33 @@ See Info node `(for)Sequence Constructors'.
         `(,id (:do-in ((,producer ,producer-form)) ()
                       ((,value ,value-form)) () ((,id ,value))
                       (,value-form))))))
-   (`(,id (,_ ,producer-form ,(for--lit predicate-form) . ,arg-forms))
+   (`(,id (,_ ,producer-form ,continuep-form . ,arg-forms))
     (pcase-let
-        ((`(,predicate . ,make-guards)
-          (pcase predicate-form
-            ((or (and (or `#',(or 'not 'null) `',(or 'not 'null))
-                      (let make-guards
-                        (lambda (_predicate value) `(,value))))
-                 (and (or '#'always ''always)
-                      (let make-guards
-                        (lambda (_predicate _value) '(nil))))
-                 (and (or '#'ignore ''ignore)
-                      (let make-guards
-                        (lambda (_predicate _value) '()))))
-             `(,(make-symbol "_predicate") . ,make-guards))
-            (_ (cl-with-gensyms (predicate)
-                 `(,predicate
-                   . ,(lambda (predicate value)
-                        `((not (funcall ,predicate ,value)))))))))
-         (`(,arg-ids . ,arg-bindings)
+        ((`(,arg-ids . ,arg-bindings)
           (for-lists (ids bindings)
               ((arg-form (in-list arg-forms))
                (cl-with-gensyms (arg)
                  (:values arg `(,arg ,arg-form)))))))
-      (cl-with-gensyms (producer value)
+      (cl-with-gensyms (producer continuep value)
         (let ((value-form `(funcall ,producer . ,arg-ids)))
           `(,id (:do-in ((,producer ,producer-form)
-                         (,predicate ,predicate-form) ,@arg-bindings)
+                         (,continuep ,continuep-form) . ,arg-bindings)
                         () ((,value ,value-form))
-                        ,(funcall make-guards predicate value)
+                        ((funcall ,continuep ,value))
                         ((,id ,value)) (,value-form))))))))
   (declare (side-effect-free t))
   (if (null args)
       (iter-make (let ((value (funcall producer)))
                    (cl-loop (iter-yield value)
                             (setq value (funcall producer)))))
-    (pcase-let ((`(,predicate . ,args) args))
+    (pcase-let ((`(,continuep . ,args) args))
       (if (null args)
           (iter-make (let ((value (funcall producer)))
-                       (while (not (funcall predicate value))
+                       (while (funcall continuep value)
                          (iter-yield value)
                          (setq value (funcall producer)))))
         (iter-make (let ((value (apply producer args)))
-                     (while (not (funcall predicate value))
+                     (while (funcall continuep value)
                        (iter-yield value)
                        (setq value (apply producer args)))))))))
 

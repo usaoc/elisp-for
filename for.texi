@@ -1363,12 +1363,12 @@ since the type checking is done at compile time when @var{start} is a
 literal object anyway.
 @end deffn
 
-@deffn @seq{for-in-producer, in-producer, @var{producer} @optional{@var{predicate} @optional{@repeated{@var{arg}}}}}
+@deffn @seq{for-in-producer, in-producer, @var{producer} @optional{@var{continuep} @optional{@repeated{@var{arg}}}}}
 This sequence iterates over the values produced by repeated evaluations
 of the function form @code{(funcall @var{producer}
 @optional{@repeated{@var{arg}}})}.  The iteration is infinite when
-@var{predicate} is omitted.  Otherwise, the iteration terminates when
-@code{(funcall @var{predicate} @var{value})} is true where @var{value}
+@var{continuep} is omitted.  Otherwise, the iteration terminates when
+@code{(funcall @var{continuep} @var{value})} is false where @var{value}
 is the value of the function form,
 @end deffn
 
