@@ -753,7 +753,7 @@ alias of @var{name} available when used in iteration clauses.  A
 forms in iteration clauses are dispatched to @var{name}.  It is an error
 for two @var{type}s not to be in disjoint relation@footnote{Following
 @url{http://clhs.lisp.se/Body/26_glo_d.htm, Common Lisp}, two types are
-@dfn{disjoint} when they have no element in common}.  When an
+@dfn{disjoint} when they have no element in common.}.  When an
 @code{:expander} subform is present, an expander with @var{arg} as the
 sole argument and @var{body}s as the body is defined and available when
 used in iteration clauses.  The expander receives the iteration clause
