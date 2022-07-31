@@ -158,7 +158,7 @@ adjacent iteration clauses."
          (`(,(cl-type keyword) . ,_)
           (parse `(,clause . ,nested) nil clauses))
          (`(,_ ,_)
-          (parse `(,clause ,@(if iteration '((:let)) '()) . ,nested)
+          (parse `(,clause ,@(if iteration '((:do)) '()) . ,nested)
                  t clauses)))))))
 
 (defun for--parse-value-form (form number make-value)
