@@ -23,6 +23,10 @@
 Language Scheme}}
 @end macro
 
+@macro err{error}
+     @error{} \error\
+@end macro
+
 @macro res{result}
      @result{} \result\
 @end macro
@@ -465,13 +469,17 @@ in iteration clauses to avoid the need of shorthands
 @end group
 @end example
 
+@concept{error, unhandled type}
 @concept{sequence form, dynamic dispatch}
 @concept{terminology, type specifier}
 
-@dfn{Dynamic dispatch} based on the type of datum is available when the
+@dfn{Dynamic dispatch} based on the types of datum is available when the
 datum is used as a sequence form in iteration clauses.  A type is
 specified by a Common Lisp-style @dfn{type specifier} (@pxref{Type
-Predicates,,,cl}).
+Predicates,,,cl}).  When all types of datum are unspecified, that is,
+@dfn{unhandled type}s, @code{for-unhandled-type} is signaled with the
+singleton list of datum as @code{data} (@pxref{Signaling
+Errors,,,elisp}).
 
 A @code{list} dispatched to the application of @code{for-in-list} to it:
 
@@ -491,6 +499,17 @@ A @code{function} dispatched to the application of
 (let ((iterator (for-in-list '(1 2 3))))
   (for-list ((item iterator) item)))
 @res{(1 2 3)}
+@end group
+@end example
+
+@code{(make-record 'some-type 0 nil)} triggers
+@code{for-unhandled-type}:
+
+@example
+@group
+(let ((some-object (make-record 'some-type 0 nil)))
+  (for-list ((item some-object) item)))
+@err{Unhandled type: #s(some-type)}
 @end group
 @end example
 
@@ -724,7 +743,7 @@ following types:
 @code{(:expander-case @optional{@repeated{@var{case}}})}
 @end itemize
 
-@concept{terminology, subtype}
+@concept{terminology, disjoint}
 
 It is an error for a type to appear more than once.  The form of
 @code{declare} subforms is the same as normal @code{declare} forms
@@ -732,15 +751,15 @@ It is an error for a type to appear more than once.  The form of
 alias of @var{name} available when used in iteration clauses.  A
 @var{type} is a type specifier, whose objects when used as sequence
 forms in iteration clauses are dispatched to @var{name}.  It is an error
-for two @var{type}s to be in subtype relation@footnote{Following
-@url{http://clhs.lisp.se/Body/26_glo_s.htm, Common Lisp}, a type is a
-@dfn{subtype} of another type when every object of the former is an
-object of the latter.}.  When an @code{:expander} subform is present, an
-expander with @var{arg} as the sole argument and @var{body}s as the body
-is defined and available when used in iteration clauses.  The expander
-receives the iteration clause as the argument and produces an expanded
-iteration clause.  An @code{:expander-case} subform is equivalent to an
-@code{:expander} subform with @code{(pcase-exhaustive @var{arg}
+for two @var{type}s not to be in disjoint relation@footnote{Following
+@url{http://clhs.lisp.se/Body/26_glo_d.htm, Common Lisp}, two types are
+@dfn{disjoint} when they have no element in common}.  When an
+@code{:expander} subform is present, an expander with @var{arg} as the
+sole argument and @var{body}s as the body is defined and available when
+used in iteration clauses.  The expander receives the iteration clause
+as the argument and produces an expanded iteration clause.  An
+@code{:expander-case} subform is equivalent to an @code{:expander}
+subform with @code{(pcase-exhaustive @var{arg}
 @optional{@repeated{@var{case}}})} as the sole expression in @var{body}.
 
 Note that the subforms are processed @emph{before} the generator is

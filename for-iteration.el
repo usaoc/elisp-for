@@ -70,15 +70,19 @@ Predicates'."
 (defvar for--datum-dispatch-alist '()
   "Alist of type specifiers vs generators.")
 
+(define-error 'for-unhandled-type "Unhandled type")
+
 (defun for--datum-to-iterator (datum)
   "Dispatch on DATUM and return an iterator.
 
 Find the generator in `for--datum-dispatch-alist' and apply it to
 DATUM."
-  (funcall (alist-get datum for--datum-dispatch-alist
-                      nil nil (lambda (type datum)
-                                (cl-typep datum type)))
-           datum))
+  (let ((missing '#:missing))
+    (pcase (alist-get datum for--datum-dispatch-alist
+                      missing nil (lambda (type datum)
+                                    (cl-typep datum type)))
+      ((pred (eq missing)) (signal 'for-unhandled-type (list datum)))
+      (generator (funcall generator datum)))))
 
 (defun for--datum-to-sequence (datum)
   "Transform DATUM to a sequence form.
