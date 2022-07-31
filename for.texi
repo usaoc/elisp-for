@@ -23,7 +23,7 @@
 Language Scheme}}
 @end macro
 
-@macro is{result}
+@macro res{result}
      @result{} \result\
 @end macro
 
@@ -186,7 +186,7 @@ A simple yet contrived @code{cl-loop} form:
                           (and (stringp item)
                                (string-to-number item)))
          if number collect number)
-@is{(2 3)}
+@res{(2 3)}
 @end group
 @end example
 
@@ -200,7 +200,7 @@ clause:
                                 (and (stringp item)
                                      (string-to-number item)))))
            number))
-@is{(2 3)}
+@res{(2 3)}
 @end group
 @end example
 
@@ -213,7 +213,7 @@ An equivalent @code{for-list} form with a @code{:pcase} special clause:
                             (and (cl-type string)
                                  (app string-to-number number))))
            number))
-@is{(2 3)}
+@res{(2 3)}
 @end group
 @end example
 
@@ -230,7 +230,7 @@ Aliases and expanders are available in iteration clauses:
 @example
 @group
 (for-list ((item (in-producer #'random)) (5) item))
-@is{#<a list of five pseudo-random integers>}
+@res{#<a list of five pseudo-random integers>}
 @end group
 @end example
 
@@ -240,7 +240,7 @@ Generators are available in function forms:
 @group
 (cl-loop for item iter-by (for-in-producer #'random)
          repeat 5 collect item)
-@is{#<a list of five pseudo-random integers>}
+@res{#<a list of five pseudo-random integers>}
 @end group
 @end example
 
@@ -257,7 +257,7 @@ The destructuring capability of @code{cl-loop} forms:
 @group
 (cl-loop for (number . string) in '((1 . "1") (2 . "b") (3 . "3"))
          if (eql number (string-to-number string)) collect number)
-@is{(1 3)}
+@res{(1 3)}
 @end group
 @end example
 
@@ -267,7 +267,7 @@ The destructuring capability of @code{cl-loop} forms:
 @group
 (for-list ((`(,number . ,string) '((1 . "1") (2 . "b") (3 . "3")))
            (:if (eql number (string-to-number string))) number))
-@is{(1 3)}
+@res{(1 3)}
 @end group
 @end example
 
@@ -329,7 +329,7 @@ expanded form is skipped unless @code{item} is @code{numberp}
 @group
 (for-fold ((sum 0))
     ((item '(a 2 "3")) (:if (numberp item)) (+ item sum)))
-@is{2}
+@res{2}
 @end group
 @end example
 
@@ -342,7 +342,7 @@ An equivalent @code{named-let} form:
     (if (null tail) sum
       (let ((item (car tail)))
         (loop (if (numberp item) (+ item sum) sum) (cdr tail))))))
-@is{2}
+@res{2}
 @end group
 @end example
 
@@ -365,7 +365,7 @@ infinite sequence:
 @group
 (for-list ((natural (in-naturals)) (item '(a b c))
            (cons natural item)))
-@is{((0 . a) (1 . b) (2 . c))}
+@res{((0 . a) (1 . b) (2 . c))}
 @end group
 @end example
 
@@ -384,7 +384,7 @@ presence of @code{(:let)}:
 @group
 (for-list ((item1 '(1 2)) (:let) (item2 '(2 3 4))
            (cons item1 item2)))
-@is{((1 . 2) (1 . 3) (1 . 4) (2 . 2) (2 . 3) (2 . 4))}
+@res{((1 . 2) (1 . 3) (1 . 4) (2 . 2) (2 . 3) (2 . 4))}
 @end group
 @end example
 
@@ -394,7 +394,7 @@ An equivalent @code{for-list*} form:
 @group
 (for-list* ((item1 '(1 2)) (item2 '(2 3 4))
             (cons item1 item2)))
-@is{((1 . 2) (1 . 3) (1 . 4) (2 . 2) (2 . 3) (2 . 4))}
+@res{((1 . 2) (1 . 3) (1 . 4) (2 . 2) (2 . 3) (2 . 4))}
 @end group
 @end example
 
@@ -436,7 +436,7 @@ the values of it:
 @group
 (let ((iterator (for-in-list '(1 2 3))))
   (for-vector ((item (for-in-iterator iterator)) item)))
-@is{@optional{1 2 3}}
+@res{@optional{1 2 3}}
 @end group
 @end example
 
@@ -445,7 +445,7 @@ Directly iterate over the list:
 @example
 @group
 (for-vector ((item (for-in-list '(1 2 3))) item))
-@is{@optional{1 2 3}}
+@res{@optional{1 2 3}}
 @end group
 @end example
 
@@ -461,7 +461,7 @@ in iteration clauses to avoid the need of shorthands
 @group
 (for-list ((item (in-list '(a b c))) (number (in-range 1 5 2))
            (cons item number)))
-@is{((a . 1) (b . 3))}
+@res{((a . 1) (b . 3))}
 @end group
 @end example
 
@@ -479,7 +479,7 @@ A @code{list} dispatched to the application of @code{for-in-list} to it:
 @group
 (let ((list '(1 2 3)))
   (for-list ((item list) item)))
-@is{(1 2 3)}
+@res{(1 2 3)}
 @end group
 @end example
 
@@ -490,7 +490,7 @@ A @code{function} dispatched to the application of
 @group
 (let ((iterator (for-in-list '(1 2 3))))
   (for-list ((item iterator) item)))
-@is{(1 2 3)}
+@res{(1 2 3)}
 @end group
 @end example
 
@@ -522,7 +522,7 @@ Recognized literal objects are implicitly wrapped in sequence forms:
               (number2 (literal-list 3 4 5))
               (number3 (literal-vector 6 7 8))
               (* number1 number2 number3)))))
-@is{108}
+@res{108}
 @end group
 @end example
 
@@ -535,7 +535,7 @@ macros:
           (number2 (in-list '(3 4 5)))
           (number3 (in-array @optional{6 7 8}))
           (* number1 number2 number3)))
-@is{108}
+@res{108}
 @end group
 @end example
 
@@ -567,7 +567,7 @@ A @code{cl-loop} form involving multiple state variables:
          (push number value2)
          (cl-callf max value3 number)
          finally return (list value1 (nreverse value2) value3))
-@is{(10 (0 1 2 3 4) 4)}
+@res{(10 (0 1 2 3 4) 4)}
 @end group
 @end example
 
@@ -580,7 +580,7 @@ An equivalent @code{for-do} form:
                            (push number value2)
                            (cl-callf max value3 number))))
   (list value1 (nreverse value2) value3))
-@is{(10 (0 1 2 3 4) 4)}
+@res{(10 (0 1 2 3 4) 4)}
 @end group
 @end example
 
@@ -593,7 +593,7 @@ An equivalent @code{for-fold} form:
     ((number 5) (:values (+ number value1)
                          (cons number value2)
                          (max number value3))))
-@is{(10 (0 1 2 3 4) 4)}
+@res{(10 (0 1 2 3 4) 4)}
 @end group
 @end example
 
@@ -670,14 +670,14 @@ For example, a semantics similar to @code{in-ref} clauses of
 @example
 @group
 for-binder
-@is{cl-symbol-macrolet}
+@res{cl-symbol-macrolet}
 @end group
 
 @group
 (let ((list (list 1 2 3)))
   (for-do ((reference (in-list list)) (:do (setf reference nil))))
   list)
-@is{(nil nil nil)}
+@res{(nil nil nil)}
 @end group
 @end example
 @end defvar
