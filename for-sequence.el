@@ -278,6 +278,14 @@ See Info node `(for)Sequence Constructors'."
   (declare (pure t) (side-effect-free t))
   (cl-the function iterator))
 
+(defsubst for--make-circular (&rest values)
+  "Make a circular list of VALUES."
+  (declare (pure t) (side-effect-free error-free))
+  (let ((last nil))
+    (let ((tail values))
+      (while tail (cl-shiftf last tail (cdr tail))))
+    (setf (cdr last) values)))
+
 (define-for-sequence for-in-repeat (value &rest values)
   "Return an iterator that repeatedly returns each VALUE.
 
@@ -286,36 +294,11 @@ See Info node `(for)Sequence Constructors'.
 \(fn VALUE...)"
   (:alias in-repeat)
   (:expander-case
-   ((and `(,_ ,(and `(,_ ,_ . ,_)
-                    `(,_ . ,(app (mapcar #'for--macroexpand)
-                                 value-forms))))
-         (or (and (guard (for-and ((value-form (in-list value-forms))
-                                   (macroexp-const-p value-form))))
-                  (let value-bindings '())
-                  (let values-form `',(setf (cdr (last value-forms))
-                                            value-forms)))
-             (let `(,value-bindings . ,values-form)
-               (cl-flet ((make-list* (ids)
-                           (for-fold ((form 'values))
-                               ((id (in-list ids))
-                                `(cons ,id ,form)))))
-                 (for-fold
-                     ((bindings '()) (ids '())
-                      (:result
-                       `(,(nreverse bindings)
-                         . ,(pcase-let
-                                ((`(,first . ,(app make-list* list*))
-                                  ids))
-                              `(let ((values (cons ,first '())))
-                                 (setf (cdr values) ,list*))))))
-                     ((value-form (in-list value-forms))
-                      (cl-with-gensyms (value)
-                        (:values `((,value ,value-form) . ,bindings)
-                                 `(,value . ,ids))))))))
-         `(,id . ,_))
-    (cl-with-gensyms (values)
-      `(,id (:do-in ,value-bindings () ((,values ,values-form)) ()
-                    ((,id (car ,values))) ((cdr ,values)))))))
+   (`(,id (,_ . ,(and `(,_ . ,_) value-forms)))
+    (cl-with-gensyms (values tail)
+      `(,id (:do-in ((,values (for--make-circular . ,value-forms))) ()
+                    ((,tail ,values)) () ((,id (car ,tail)))
+                    ((cdr ,tail)))))))
   (declare (side-effect-free t))
   (iter-make (iter-yield value)
              (let ((last nil))
