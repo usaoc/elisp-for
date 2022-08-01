@@ -136,7 +136,7 @@ when SEQUENCE-FORM is a `:do-in' form."
       (`(,_ (,(and (cl-type symbol)
                    (app (lambda (head)
                           (get head 'for--sequence-expander))
-                        (and (cl-type function) expander)))
+                        (and (pred identity) expander)))
              . ,_))
        (expand (funcall expander clause)))
       (`(,id ,datum)
@@ -289,7 +289,7 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
                                     (get keyword
                                          'for--special-clause-expander
                                          ))
-                                  (and (cl-type function) expander)))
+                                  (and (pred identity) expander)))
                        . ,_)
                      (app (lambda (special-clause)
                             `(,expander . ,special-clause))
