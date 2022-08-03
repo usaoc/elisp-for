@@ -210,6 +210,8 @@ result forms and the result forms."
   (declare (side-effect-free t))
   (pcase-exhaustive bindings
     ((or (and '() bindings (let result-forms '(nil)))
+         (and `((:result . ,(and `(,_ . ,_) result-forms)))
+              (let bindings '()))
          (and `(,_ . ,_)
               (or (app reverse
                        `((:result . ,(and `(,_ . ,_) result-forms))
@@ -241,27 +243,28 @@ appended to FOR-CLAUSES.  Finally, the multiple-value form of the
 parsed for clauses is extracted, and a `cons' of the remaining
 for clauses and the multiple-value form is returned."
   (declare (side-effect-free t))
-  (pcase-exhaustive body
-    ((or (and '() (let (and `(,_ . ,_)
-                            (app reverse
-                                 `(,value-form
-                                   . ,(app nreverse clauses))))
-                    for-clauses))
-         (and `(,_ . ,_) (let (or '() `(,_ . ,_)) for-clauses)
-              (app reverse
-                   (app (mapcar
-                         (pcase-lambda
-                           ((or (and `(,(cl-type keyword) . ,_)
-                                     clause)
-                                (app (lambda (form) `(:do ,form))
-                                     clause)))
-                           clause))
-                        `(,(or `(:do ,value-form) value-form)
-                          . ,(app nreverse
-                                  (app (lambda (clauses)
-                                         `(,@for-clauses ,@clauses))
-                                       clauses)))))))
-     `(,clauses . ,value-form))))
+  (cl-flet ((transform (form)
+              (pcase form
+                (`(,(cl-type keyword) . ,_) form) (_ `(:do ,form)))))
+    (pcase-exhaustive body
+      ((or (and '() (let (or (and `(,value-form) (let clauses '()))
+                             (and `(,_ . ,_)
+                                  (app reverse
+                                       `(,value-form
+                                         . ,(app nreverse clauses)))))
+                      for-clauses))
+           (and (let (or '() `(,_ . ,_)) for-clauses)
+                (or (and `(,value-form) (let clauses for-clauses))
+                    (and `(,_ . ,_)
+                         (app reverse
+                              `(,value-form
+                                . ,(app nreverse
+                                        (app (mapcar #'transform)
+                                             (app (lambda (clauses)
+                                                    `(,@for-clauses
+                                                      ,@clauses))
+                                                  clauses)))))))))
+       `(,clauses . ,value-form)))))
 
 (defun for--parse-for-clauses (for-clauses)
   "Parse FOR-CLAUSES.
