@@ -153,13 +153,13 @@ adjacent iteration clauses."
                     (clauses (reverse for-clauses)))
     (pcase-exhaustive clauses
       ('() nested)
-      (`(,clause . ,clauses)
-       (pcase-exhaustive clause
-         (`(,(cl-type keyword) . ,_)
-          (parse `(,clause . ,nested) nil clauses))
-         (`(,_ ,_)
-          (parse `(,clause ,@(if iteration '((:do)) '()) . ,nested)
-                 t clauses)))))))
+      ((and `(,clause . ,clauses)
+            (or (and (let `(,(cl-type keyword) . ,_) clause)
+                     (let infix '()) (let iteration nil))
+                (and (let `(,_ ,_) clause)
+                     (let infix (if iteration '((:do)) '()))
+                     (let iteration t))))
+       (parse `(,clause ,@infix . ,nested) iteration clauses)))))
 
 (defun for--parse-value-form (form number make-value)
   "Parse FORM as a multiple-value form after macro-expansion.
@@ -176,12 +176,10 @@ by (`funcall' MAKE-VALUE FORM)."
                             tail-form number make-value)))))
     (pcase-exhaustive (for--macroexpand form)
       (`(cond . ,(and `(,_ . ,_)
-                      (pred (lambda (forms)
-                              (cl-every (lambda (form)
-                                          (pcase-exhaustive form
-                                            (`(,_) nil)
-                                            (`(,_ ,_ . ,_) t)))
-                                        forms)))
+                      (pred (cl-every (lambda (form)
+                                        (pcase-exhaustive form
+                                          (`(,_) nil)
+                                          (`(,_ ,_ . ,_) t)))))
                       clauses))
        `(cond . ,(mapcar (pcase-lambda (`(,guard . ,body))
                            `(,guard . ,(parse-body body)))
@@ -215,28 +213,24 @@ result forms and the result forms."
          (and `(,_ . ,_)
               (or (app reverse
                        `((:result . ,(and `(,_ . ,_) result-forms))
-                         . ,(app (lambda (bindings)
-                                   (named-let parse
-                                       ((parsed '())
-                                        (bindings bindings))
-                                     (pcase-exhaustive bindings
-                                       ('() parsed)
-                                       (`(,(and `(,_ ,_) binding)
-                                          . ,bindings)
-                                        (parse `(,binding . ,parsed)
-                                               bindings)))))
-                                 bindings)))
+                         . ,(app nreverse bindings)))
                   (and bindings
                        (app (mapcar (lambda (binding)
                                       (pcase-exhaustive binding
-                                        (`(,id ,_) id))))
+                                        ((or `(,id ,_) id) id))))
                             (or (and `(,_) result-forms)
                                 (and `(,_ ,_) (app (lambda (ids)
                                                      `((cons . ,ids)))
                                                    result-forms))
                                 (app (lambda (ids) `((list . ,ids)))
                                      result-forms)))))))
-     `(,bindings . ,result-forms))))
+     `(,(mapcar (lambda (binding)
+                  (pcase-exhaustive binding
+                    ((or (and `(,_ ,_) binding)
+                         (app (lambda (id) `(,id nil)) binding))
+                     binding)))
+                bindings)
+       . ,result-forms))))
 
 (defun for--parse-body (for-clauses body)
   "Parse FOR-CLAUSES and BODY as the subforms of `for-fold'.
@@ -248,20 +242,25 @@ parsed for clauses is extracted, and a `cons' of the remaining
 for clauses and the multiple-value form is returned."
   (declare (side-effect-free t))
   (pcase-exhaustive body
-    ((or (and '() (let `(,value-form . ,(app nreverse clauses))
-                    (reverse for-clauses)))
-         (app reverse
-              (app (mapcar (pcase-lambda
-                             ((or (and `(,(cl-type keyword) . ,_)
-                                       clause)
-                                  (app (lambda (form) `(:do ,form))
-                                       clause)))
-                             clause))
-                   `(,(or `(:do ,value-form) value-form)
-                     . ,(app nreverse
-                             (app (lambda (clauses)
-                                    `(,@for-clauses ,@clauses))
-                                  clauses))))))
+    ((or (and '() (let (and `(,_ . ,_)
+                            (app reverse
+                                 `(,value-form
+                                   . ,(app nreverse clauses))))
+                    for-clauses))
+         (and `(,_ . ,_) (let (or '() `(,_ . ,_)) for-clauses)
+              (app reverse
+                   (app (mapcar
+                         (pcase-lambda
+                           ((or (and `(,(cl-type keyword) . ,_)
+                                     clause)
+                                (app (lambda (form) `(:do ,form))
+                                     clause)))
+                           clause))
+                        `(,(or `(:do ,value-form) value-form)
+                          . ,(app nreverse
+                                  (app (lambda (clauses)
+                                         `(,@for-clauses ,@clauses))
+                                       clauses)))))))
      `(,clauses . ,value-form))))
 
 (defun for--parse-for-clauses (for-clauses)
