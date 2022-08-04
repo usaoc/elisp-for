@@ -153,13 +153,14 @@ adjacent iteration clauses."
                     (clauses (reverse for-clauses)))
     (pcase-exhaustive clauses
       ('() nested)
-      ((and `(,clause . ,clauses)
-            (or (and (let `(,(cl-type keyword) . ,_) clause)
-                     (let infix '()) (let iteration nil))
-                (and (let `(,_ ,_) clause)
-                     (let infix (if iteration '((:do)) '()))
-                     (let iteration t))))
-       (parse `(,clause ,@infix . ,nested) iteration clauses)))))
+      (`(,clause . ,clauses)
+       (pcase-exhaustive clause
+         (`(,(cl-type keyword) . ,_)
+          (parse `(,clause . ,nested) nil clauses))
+         (`(,_ ,_)
+          (parse (if iteration `(,clause (:do) . ,nested)
+                   `(,clause . ,nested))
+                 t clauses)))))))
 
 (defun for--parse-value-form (form number make-value)
   "Parse FORM as a multiple-value form after macro-expansion.
