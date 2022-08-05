@@ -124,7 +124,12 @@ when SEQUENCE-FORM is a `:do-in' form."
                  (`(,sequence) `(,(make-symbol "_id") ,sequence))
                  (`(,_ ,_) clause))))
     (pcase-exhaustive clause
-      (`(,_ (:do-in ,_ ,_ ,_ ,_ ,_ ,_)) clause)
+      ((and `(,_ (:do-in ,(cl-type list) ,(cl-type list)
+                         ,(and (cl-type list) loop-bindings)
+                         ,(cl-type list) ,(cl-type list)
+                         ,(and (cl-type list) loop-forms)))
+            (guard (= (length loop-bindings) (length loop-forms))))
+       clause)
       (`(,id ,(app for--datum-to-sequence
                    (and (pred identity) sequence)))
        (expand `(,id ,sequence)))
@@ -300,23 +305,20 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
            . ,clauses)
          (parse '() '() '() '() '() '() nil
                 `((,head . ,group) . ,groups) clauses))
-        (`(,(app for--expand-iteration-clause
-                 (and `(,_ (:do-in ,more-memoize-bindings
-                                   ,more-outer-bindings
-                                   ,more-loop-bindings
-                                   ,more-loop-guards
-                                   ,more-inner-bindings
-                                   ,more-loop-forms))
-                      (guard (= (length more-loop-bindings)
-                                (length more-loop-forms)))))
-           . ,clauses)
-         (parse (append more-memoize-bindings memoize-bindings)
-                (append more-outer-bindings outer-bindings)
-                (append more-loop-bindings loop-bindings)
-                (append more-loop-guards loop-guards)
-                (append more-inner-bindings inner-bindings)
-                (append more-loop-forms loop-forms)
-                t groups clauses))))))
+        (`(,(app for--expand-iteration-clause clause) . ,clauses)
+         (pcase-let
+             ((`(,_ (:do-in
+                     ,more-memoize-bindings ,more-outer-bindings
+                     ,more-loop-bindings ,more-loop-guards
+                     ,more-inner-bindings ,more-loop-forms))
+               clause))
+           (parse `(,@more-memoize-bindings . ,memoize-bindings)
+                  `(,@more-outer-bindings . ,outer-bindings)
+                  `(,@more-loop-bindings . ,loop-bindings)
+                  `(,@more-loop-guards . ,loop-guards)
+                  `(,@more-inner-bindings . ,inner-bindings)
+                  `(,@more-loop-forms . ,loop-forms)
+                  t groups clauses)))))))
 
 (defmacro for--setq (&rest pairs)
   "Expand to a form equivalent to (`cl-psetq' [ID VALUE]...).
