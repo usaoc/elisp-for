@@ -471,25 +471,25 @@ See Info node `(for)Buffer-Local Variables'.")
 (define-for-special-clause :if (body)
   "Evaluate BODY when all subforms are non-nil.
 
-See Info node `(for)Special-Clause Operators'"
+See Info node `(for)Special-Clause Operators'."
   (`(,_ . ,guards) `((when (and . ,guards) . ,body))) )
 
 (define-for-special-clause :if-not (body)
   "Evaluate BODY unless all subforms are non-nil.
 
-See Info node `(for)Special-Clause Operators'"
+See Info node `(for)Special-Clause Operators'."
   (`(,_ . ,guards) `((unless (and . ,guards) . ,body))) )
 
 (define-for-special-clause :let (body)
   "Evaluate BODY with subforms bound by `for-binder'.
 
-See Info node `(for)Special-Clause Operators'"
+See Info node `(for)Special-Clause Operators'."
   (`(,_ . ,bindings) `((,for-binder ,bindings . ,body))))
 
 (define-for-special-clause :if-let (body)
   "Evaluate BODY with subforms bound by `when-let*'.
 
-See Info node `(for)Special-Clause Operators'"
+See Info node `(for)Special-Clause Operators'."
   (`(,_ . ,bindings) `((when-let* ,bindings . ,body))))
 
 (define-for-special-clause :pcase (body)
@@ -499,7 +499,7 @@ The remaining subforms are the patterns as in `pcase'.  When an
 optional sequence [`:exhaustive'] is present in the remaining
 subforms, match exhaustively, that is, use `pcase-exhaustive'.
 
-See Info node `(for)Special-Clause Operators'"
+See Info node `(for)Special-Clause Operators'."
   ((or (and `(,_ ,expr :exhaustive . ,pats)
             (let head 'pcase-exhaustive))
        (and `(,_ ,expr . ,pats) (let head 'pcase)))
@@ -513,7 +513,7 @@ optional sequence [`:as' AS] is present in the remaining
 subforms, the value of the first subform is bound to AS, and the
 subforms after the sequence are the patterns.
 
-See Info node `(for)Special-Clause Operators'"
+See Info node `(for)Special-Clause Operators'."
   ((or `(,_ ,expr :as ,(and (cl-type symbol) as) . ,pats)
        (and `(,_ ,expr . ,pats) (let as '_)))
    `((pcase ,expr ((and . ,pats) nil) (,as . ,body)))))
@@ -521,7 +521,7 @@ See Info node `(for)Special-Clause Operators'"
 (define-for-special-clause :do (body)
   "Evaluate the subforms before evaluating BODY.
 
-See Info node `(for)Special-Clause Operators'"
+See Info node `(for)Special-Clause Operators'."
   (`(,_ . ,forms) `(,@forms . ,body)))
 
 (for--defmacro for-fold (bindings for-clauses &rest body)
