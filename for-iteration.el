@@ -278,7 +278,7 @@ for clauses and the multiple-value form is returned."
 Split FOR-CLAUSES into ([GROUP...]) where GROUP is (HEAD
 [MEMOIZED-BINDINGS OUTER-BINDINGS LOOP-BINDINGS LOOP-GUARDS
 INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
-[GUARD...]) or (EXPANDER [SUBFORM...])."
+[GUARD...]), (`:final' [GUARD...]), or (EXPANDER [SUBFORM...])."
   (named-let parse
       ((memoize-bindings '()) (outer-bindings '()) (loop-bindings '())
        (loop-guards '()) (inner-bindings '()) (loop-forms '())
@@ -291,7 +291,7 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
       (pcase-exhaustive clauses
         ('() `(((,(lambda (_special-clause body) body)) . ,group)
                . ,groups))
-        (`(,(or (and `(:break . ,_) head)
+        (`(,(or (and (or `(:break . ,_) `(:final . ,_)) head)
                 (and `(,(and (cl-type keyword)
                              (app (lambda (keyword)
                                     (get keyword
@@ -554,8 +554,7 @@ See Info node `(for)Special-Clause Operators'"
                                    `((when ,final-guard
                                        (setq ,final nil))
                                      . ,body)
-                                   `((:let (,final-guard
-                                            (and . ,guards)))
+                                   `((:final ,final-guard . ,guards)
                                      . ,parsed)
                                    clauses)))
                          (_ (parse final-ids body
@@ -632,6 +631,12 @@ See Info node `(for)Special-Clause Operators'"
                  (cl-with-gensyms (break)
                    (expand `(,break . ,break-ids)
                            `((if (and . ,guards) (setq ,break nil)
+                               . ,expanded))
+                           clauses)))
+                (`(:final . ,guards)
+                 (pcase-let ((`(,final-guard . ,guards) guards))
+                   (expand break-ids
+                           `((let ((,final-guard (and . ,guards)))
                                . ,expanded))
                            clauses)))
                 (`(,expander . ,special-clause)
