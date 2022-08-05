@@ -259,7 +259,7 @@ for clauses and the multiple-value form is returned."
                                        `(,value-form
                                          . ,(app nreverse clauses)))))
                       for-clauses))
-           (and (let (or '() `(,_ . ,_)) for-clauses)
+           (and (let (cl-type list) for-clauses)
                 (or (and `(,value-form) (let clauses for-clauses))
                     (and `(,_ . ,_)
                          (app reverse
@@ -570,8 +570,7 @@ See Info node `(for)Special-Clause Operators'"
         ((break-ids '())
          (body `(,(for--parse-value-form
                    value-form length-bindings
-                   (if (zerop length-bindings)
-                       (pcase-lambda (`(:values)) nil)
+                   (if (zerop length-bindings) (lambda (_form) nil)
                      (pcase-lambda (`(:values . ,forms))
                        `(for--setq
                          . ,(cl-mapcar (lambda (id form) `(,id ,form))
@@ -696,10 +695,11 @@ See Info node `(for)Special-Clause Operators'"
          (,@for-clauses
           ,(for--parse-value-form
             value-form length-bindings
-            (pcase-lambda (`(:values . ,forms))
-              `(:values . ,(cl-mapcar (lambda (form id)
-                                        `(cons ,form ,id))
-                                      forms ids))))))))
+            (if (zerop length-bindings) #'identity
+              (pcase-lambda (`(:values . ,forms))
+                `(:values . ,(cl-mapcar (lambda (form id)
+                                          `(cons ,form ,id))
+                                        forms ids)))))))))
 
 (for--defmacro for-vector (for-clauses &rest body)
   "The vector-building iteration macro.
