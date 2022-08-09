@@ -527,9 +527,13 @@ See Info node `(for)Special-Clause Operators'."
 (for--defmacro for-fold (bindings for-clauses &rest body)
   "The fundamental folding iteration macro.
 
+BINDINGS = ([BINDING...] [(:result [EXPRESSION...])])
+
+BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
+
 ...
 
-\(fn ([(IDENTIFIER INITIAL-VALUE)] [(:result EXPRESSION...)]) (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn BINDINGS (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
   (declare (debug for--fold-spec) (indent 2))
   (pcase-let
       ((binder for-binder)
