@@ -323,16 +323,26 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
 (defmacro for--setq (&rest pairs)
   "Expand to a form equivalent to (`cl-psetq' [ID VALUE]...).
 
-When a pair of ID and VALUE in PAIRS is `eq' after
-macro-expansion, eliminate them from the expanded form.
+For a pair of ID and VALUE in PAIRS, when VALUE or the
+first-order symbol macro of VALUE is `eq' to ID, eliminate them
+from the expanded form.
 
 \(fn (ID VALUE)...)"
   (declare (debug (&rest (symbolp form))))
   (cl-reduce (lambda (pair form)
-               (pcase-exhaustive pair
-                 (`(,(for--lit id) ,(for--lit id)) form)
-                 (`(,(for--lit id) ,(for--lit value))
-                  `(setq ,id (prog1 ,value ,form)))))
+               (cl-flet
+                   ((identifier= (id-a id-b)
+                      (or (eq id-a id-b)
+                          (pcase macroexpand-all-environment
+                            ((app (alist-get :cl-symbol-macros)
+                                  (and (pred identity)
+                                       (app (assq id-b) `(,_ ,id-b))))
+                             (eq id-a id-b))
+                            (_ nil)))))
+                 (pcase-exhaustive pair
+                   (`(,id ,value)
+                    (if (identifier= id value) form
+                      `(setq ,id (prog1 ,value ,form)))))))
              pairs :from-end t :initial-value nil))
 
 (eval-when-compile
