@@ -31,42 +31,6 @@
 (require 'cl-lib)
 
 ;;;; Internal
-(defun for--macroexpand (form)
-  "Expand FORM as much as possible.
-
-Repeatedly call `macroexpand' and `cl-compiler-macroexpand' on
-FORM until FORM cannot be further expanded.
-`macroexpand-all-environment' is taken into account.  Vacuous
-quotes are removed."
-  (pcase (named-let expand ((form form))
-           (pcase (cl-compiler-macroexpand
-                   (macroexpand form macroexpand-all-environment))
-             ((pred (eq form)) form) (expanded (expand expanded))))
-    (`(,(or 'quote 'function)
-       ,(and (cl-type atom) (pred macroexp-const-p) quoted))
-     quoted)
-    (form form)))
-
-(pcase-defmacro for--lit (&rest pats)
-  "Pcase pattern that matches expanded object.
-
-Apply `for--macroexpand' to EXPVAL and matches the result against
-PATS."
-  `(app for--macroexpand
-        ,(pcase pats ('() '_) (`(,pat) pat) (_ `(and . ,pats)))))
-
-(pcase-defmacro for--type (type &rest pats)
-  "Pcase pattern that matches the type of expanded object.
-
-Apply `for--macroexpand' to EXPVAL and matches the result against
-TYPE and PATS.  TYPE is transformed to a suitable pattern that
-matches the type of EXPVAL literally.  See Info node `(cl)Type
-Predicates'."
-  `(for--lit ,(pcase type
-                ('list '(or '() `',(cl-type list)))
-                ('symbol '`',(cl-type symbol)) (_ `(cl-type ,type)))
-             . ,pats))
-
 (defvar for--datum-dispatch-alist '()
   "Alist of type specifiers vs generators.")
 
@@ -87,14 +51,15 @@ DATUM."
 (defun for--datum-to-sequence (datum)
   "Transform DATUM to a sequence form.
 
-Currently, literal lists, arrays, and integers after
-macro-expansion are transformed to `for-in-list', `for-in-array',
-and `for-in-range' sequences."
+Currently, literal lists, arrays, and integers are transformed to
+`for-in-list', `for-in-array', and `for-in-range' sequences."
   (declare (side-effect-free t))
   (pcase datum
-    ((for--type list) `(for-in-list ,datum))
-    ((for--type array) `(for-in-array ,datum))
-    ((for--type integer) `(for-in-range ,datum)) (_ nil)))
+    ((or '() `',(cl-type list)) `(for-in-list ,datum))
+    ((or (cl-type array) `',(cl-type array)) `(for-in-array ,datum))
+    ((or (cl-type integer) `',(cl-type integer))
+     `(for-in-range ,datum))
+    (_ nil)))
 
 (defun for--iterator-for-clause (iteration-clause)
   "Transform ITERATION-CLAUSE to iterate over an iterator.
@@ -168,7 +133,7 @@ adjacent iteration clauses."
                  t clauses)))))))
 
 (defun for--parse-value-form (form number make-value)
-  "Parse FORM as a multiple-value form after macro-expansion.
+  "Parse FORM as a multiple-value form.
 
 A tail form of FORM is (`values' [VALUE...]) with as many VALUEs
 as NUMBER.  An expression EXPR as a tail form is normalized
@@ -180,7 +145,10 @@ by (`funcall' MAKE-VALUE FORM)."
                     (reverse body)))
                 `(,@forms ,(for--parse-value-form
                             tail-form number make-value)))))
-    (pcase-exhaustive (for--macroexpand form)
+    (pcase-exhaustive
+        (pcase form
+          ((cl-type symbol) form)
+          (_ (macroexpand form macroexpand-all-environment)))
       (`(cond . ,(and `(,_ . ,_)
                       (pred (cl-every (lambda (form)
                                         (pcase-exhaustive form

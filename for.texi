@@ -514,45 +514,23 @@ A @code{function} dispatched to the application of
 @end example
 
 @concept{sequence form, literal object}
-@concept{terminology, after macro-expansion}
 
 Analogous to dynamic dispatch, certain @dfn{literal
 objects}@footnote{Following
 @url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_l.htm,
 Common Lisp}, a self-evaluating (@pxref{Self-Evaluating Forms,,,elisp})
-literal object can be either quoted or unquoted.} after
-macro-expansion@footnote{@dfn{After macro-expansion} alludes to the fact
-that the forms are expanded ahead of time and inspected during the
-expansion (@pxref{Expansion,,,elisp}) of one of their enclosing forms.
-This involves global macros, compiler macros, local macros, as well as
-symbol macros (@pxref{Macros,,,elisp} and @ref{Macros,,,cl}).} are
-implicitly wrapped in sequence forms when used in iteration clauses.
-Currently, literal lists, arrays (@pxref{Arrays,,,elisp}), and integers
-(@pxref{Integer Basics,,,elisp}) are recognized.
+literal object can be either quoted or unquoted.} are implicitly wrapped
+in sequence forms when used in iteration clauses.  Currently, literal
+lists, arrays (@pxref{Arrays,,,elisp}), and integers (@pxref{Integer
+Basics,,,elisp}) are recognized.
 
 Recognized literal objects are implicitly wrapped in sequence forms:
 
 @example
 @group
-(cl-symbol-macrolet ((literal-number 3))
-  (cl-macrolet ((literal-list (&rest forms) `',forms)
-                (literal-vector (&rest forms) `@optional{,@@forms}))
-    (for-sum ((number1 literal-number)
-              (number2 (literal-list 3 4 5))
-              (number3 (literal-vector 6 7 8))
-              (* number1 number2 number3)))))
-@res{108}
-@end group
-@end example
-
-An equivalent @code{for-sum} form without local macros and symbol
-macros:
-
-@example
-@group
-(for-sum ((number1 (in-range 3))
-          (number2 (in-list '(3 4 5)))
-          (number3 (in-array @optional{6 7 8}))
+(for-sum ((number1 '(3 4 5))
+          (number2 [6 7 8])
+          (number3 3)
           (* number1 number2 number3)))
 @res{108}
 @end group
@@ -617,10 +595,10 @@ An equivalent @code{for-fold} form:
 @end example
 
 Other than where the iteration forms expect a multiple-value form,
-multiple-value forms can appear in certain syntactic positions after
-macro-expansion.  It is an error for a multiple-value form to be in a
-syntactically invalid position.  The formal grammar of multiple-value
-forms in an @acronym{EBNF, Extended Backus--Naur Form} is as follows:
+multiple-value forms can appear in certain syntactic positions.  It is
+an error for a multiple-value form to be in a syntactically invalid
+position.  The formal grammar of multiple-value forms in an
+@acronym{EBNF, Extended Backus--Naur Form} is as follows:
 
 @example
 @group
@@ -652,10 +630,13 @@ forms in an @acronym{EBNF, Extended Backus--Naur Form} is as follows:
 @concept{multiple-value form, tail form}
 @concept{terminology, generalized Boolean}
 
-The form of @var{varlist} is as in normal @code{let} and @code{let*}
-forms.  An @var{expression} and a @var{guard} are both expressions where
-the value of latter is specifically interpreted as a generalized
-Boolean@footnote{Following
+Each @var{multiple-value-form} whose head is a global macro
+(@pxref{Defining Macros,,,elisp}) or a local macro (@pxref{Macro
+Bindings,,,cl}) is expanded (@pxref{Expansion,,,elisp}) ahead of time
+and further inspected.  The form of @var{varlist} is as in normal
+@code{let} and @code{let*} forms.  An @var{expression} and a @var{guard}
+are both expressions where the value of latter is specifically
+interpreted as a generalized Boolean@footnote{Following
 @url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_g.htm,
 Common Lisp}, a @dfn{generalized Boolean} value is an arbitrary Lisp
 object where only @code{nil} is false.} value.  A @var{tail-form} is a
@@ -1332,9 +1313,9 @@ of the initial states.
 
 @deffn @seq{for-in-array, in-array, @var{array}}
 This sequence iterates over the elements of the array @var{array}.  As
-such, @code{array}s are dispatched to it.  Moreover, a literal array
-after macro expansion as a sequence form when used in iteration clauses
-is treated as if this sequence constructor is used.
+such, @code{array}s are dispatched to it.  Moreover, a literal array as
+a sequence form when used in iteration clauses is treated as if this
+sequence constructor is used.
 @end deffn
 
 @deffn @seq{for-in-inclusive-range, in-inclusive-range, @var{start} @var{end} @optional{@var{step}}}
@@ -1348,8 +1329,8 @@ range of @var{start} and @var{end}.
 @deffn @seq{for-in-list, in-list, @var{list}}
 This sequence iterates over the elements of the non-dotted list
 @var{list}.  As such, @code{list}s are dispatched to it.  Moreover, a
-literal list after macro expansion as a sequence form when used in
-iteration clauses is treated as if this sequence constructor is used.
+literal list as a sequence form when used in iteration clauses is
+treated as if this sequence constructor is used.
 @end deffn
 
 @deffn @seq{for-in-naturals, in-naturals, @optional{@var{start}}}
@@ -1381,9 +1362,8 @@ and it is added to the number after each iteration.  The iteration
 terminates when the number is no longer in the range of @var{start} and
 @var{end}.  The range is right half-open when @var{step} is non-negative
 or otherwise left half-open.  @code{integer}s are dispatched to it.
-Moreover, a literal integer after macro expansion as a sequence form
-when used in iteration clauses is as if this sequence constructor is
-used.
+Moreover, a literal integer as a sequence form when used in iteration
+clauses is as if this sequence constructor is used.
 @end deffn
 
 @deffn @seq{for-in-iterator, in-iterator, @var{iterator}}
