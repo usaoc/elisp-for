@@ -123,35 +123,19 @@ Errors</a>).
 </pre></div>
 
 <span id="index-sequence-form-4"></span>
-<span id="index-terminology-11"></span>
 
 <p>Analogous to dynamic dispatch, certain <em>literal
-objects</em><a id="DOCF9" href="#FOOT9"><sup>9</sup></a> after
-macro-expansion<a id="DOCF10" href="#FOOT10"><sup>10</sup></a> are
-implicitly wrapped in sequence forms when used in iteration clauses.
-Currently, literal lists, arrays (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Arrays.html#Arrays">(elisp)Arrays</a>), and integers
-(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Integer-Basics.html#Integer-Basics">(elisp)Integer Basics</a>) are recognized.
+objects</em><a id="DOCF9" href="#FOOT9"><sup>9</sup></a> are implicitly wrapped
+in sequence forms when used in iteration clauses.  Currently, literal
+lists, arrays (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Arrays.html#Arrays">(elisp)Arrays</a>), and integers (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Integer-Basics.html#Integer-Basics">(elisp)Integer
+Basics</a>) are recognized.
 </p>
 <p>Recognized literal objects are implicitly wrapped in sequence forms:
 </p>
 <div class="example">
-<pre class="example">(cl-symbol-macrolet ((literal-number 3))
-  (cl-macrolet ((literal-list (&amp;rest forms) `',forms)
-                (literal-vector (&amp;rest forms) `[,@forms]))
-    (for-sum ((number1 literal-number)
-              (number2 (literal-list 3 4 5))
-              (number3 (literal-vector 6 7 8))
-              (* number1 number2 number3)))))
-     &rArr; 108
-</pre></div>
-
-<p>An equivalent <code>for-sum</code> form without local macros and symbol
-macros:
-</p>
-<div class="example">
-<pre class="example">(for-sum ((number1 (in-range 3))
-          (number2 (in-list '(3 4 5)))
-          (number3 (in-array [6 7 8]))
+<pre class="example">(for-sum ((number1 '(3 4 5))
+          (number2 [6 7 8])
+          (number3 3)
           (* number1 number2 number3)))
      &rArr; 108
 </pre></div>
@@ -165,12 +149,6 @@ macros:
 <p>Following
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_l.htm">Common Lisp</a>, a self-evaluating (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Self_002dEvaluating-Forms.html#Self_002dEvaluating-Forms">(elisp)Self-Evaluating Forms</a>)
 literal object can be either quoted or unquoted.</p>
-<h5><a id="FOOT10" href="#DOCF10">(10)</a></h5>
-<p><em>After macro-expansion</em> alludes to the fact
-that the forms are expanded ahead of time and inspected during the
-expansion (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Expansion.html#Expansion">(elisp)Expansion</a>) of one of their enclosing forms.
-This involves global macros, compiler macros, local macros, as well as
-symbol macros (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Macros.html#Macros">(elisp)Macros</a> and <a data-manual="cl" href="https://www.gnu.org/software/emacs/manual/html_node/cl/Macros.html#Macros">(cl)Macros</a>).</p>
 </div>
 <hr>
 <div class="header">

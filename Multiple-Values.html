@@ -50,7 +50,7 @@ produce multiple values from a single expression where the values are in
 turn consumed by the self-tail-recursive function.  Unfortunately, Emacs
 Lisp does not support multiple values.  To circumvent the limitation, a
 partial support for <em>multiple-value forms</em> is
-implemented<a id="DOCF11" href="#FOOT11"><sup>11</sup></a>.
+implemented<a id="DOCF10" href="#FOOT10"><sup>10</sup></a>.
 </p>
 <p>A <code>cl-loop</code> form involving multiple state variables:
 </p>
@@ -87,10 +87,10 @@ implemented<a id="DOCF11" href="#FOOT11"><sup>11</sup></a>.
 </pre></div>
 
 <p>Other than where the iteration forms expect a multiple-value form,
-multiple-value forms can appear in certain syntactic positions after
-macro-expansion.  It is an error for a multiple-value form to be in a
-syntactically invalid position.  The formal grammar of multiple-value
-forms in an <acronym title="Extended Backus&ndash;Naur Form">EBNF</acronym> (Extended Backus&ndash;Naur Form) is as follows:
+multiple-value forms can appear in certain syntactic positions.  It is
+an error for a multiple-value form to be in a syntactically invalid
+position.  The formal grammar of multiple-value forms in an
+<acronym title="Extended Backus&ndash;Naur Form">EBNF</acronym> (Extended Backus&ndash;Naur Form) is as follows:
 </p>
 <div class="example">
 <pre class="example"><var>multiple-value-form</var> = <var>tail-form</var>
@@ -114,12 +114,15 @@ forms in an <acronym title="Extended Backus&ndash;Naur Form">EBNF</acronym> (Ext
 </pre></div>
 
 <span id="index-multiple_002dvalue-form"></span>
-<span id="index-terminology-12"></span>
+<span id="index-terminology-11"></span>
 
-<p>The form of <var>varlist</var> is as in normal <code>let</code> and <code>let*</code>
-forms.  An <var>expression</var> and a <var>guard</var> are both expressions where
-the value of latter is specifically interpreted as a generalized
-Boolean<a id="DOCF12" href="#FOOT12"><sup>12</sup></a> value.  A <var>tail-form</var> is a
+<p>Each <var>multiple-value-form</var> whose head is a global macro
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Defining-Macros.html#Defining-Macros">(elisp)Defining Macros</a>) or a local macro (see <a data-manual="cl" href="https://www.gnu.org/software/emacs/manual/html_node/cl/Macro-Bindings.html#Macro-Bindings">(cl)Macro
+Bindings</a>) is expanded (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Expansion.html#Expansion">(elisp)Expansion</a>) ahead of time
+and further inspected.  The form of <var>varlist</var> is as in normal
+<code>let</code> and <code>let*</code> forms.  An <var>expression</var> and a <var>guard</var>
+are both expressions where the value of latter is specifically
+interpreted as a generalized Boolean<a id="DOCF11" href="#FOOT11"><sup>11</sup></a> value.  A <var>tail-form</var> is a
 <em>tail form</em> where an <var>expression</var> is equivalent to the form
 <code>(:values <var>expression</var>)</code> and a <code>(:values
 [<var>expression</var>&hellip;])</code> form produces as many values as
@@ -134,14 +137,14 @@ are extended to support multiple-value forms where possible.
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT11" href="#DOCF11">(11)</a></h5>
+<h5><a id="FOOT10" href="#DOCF10">(10)</a></h5>
 <p>In a
 <a href="https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-9.html">standard Scheme</a> implementation, a continuation can receive multiple
 values, and correspondingly a procedure can deliver multiple values to
 its continuation.  This is unfeasible to implement in Emacs Lisp.
 Instead, a multiple-value form is transformed to imperative updates with
 macro-expansion-time checking of the number of values.</p>
-<h5><a id="FOOT12" href="#DOCF12">(12)</a></h5>
+<h5><a id="FOOT11" href="#DOCF11">(11)</a></h5>
 <p>Following
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_g.htm">Common Lisp</a>, a <em>generalized Boolean</em> value is an arbitrary Lisp
 object where only <code>nil</code> is false.</p>

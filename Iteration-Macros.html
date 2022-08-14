@@ -121,10 +121,10 @@ the value.  It is equivalent to the following <code>for-fold</code> form:
 
 <dl class="def">
 <dt id="index-for_002dlist"><span class="category">Macro: </span><span><strong>for-list</strong> <em>([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]</em><a href='#index-for_002dlist' class='copiable-anchor'> &para;</a></span></dt>
-<dd><span id="index-terminology-14"></span>
+<dd><span id="index-terminology-13"></span>
 
 <p>This iteration macro accumulates the values into a
-fresh<a id="DOCF14" href="#FOOT14"><sup>14</sup></a> list and returns
+fresh<a id="DOCF13" href="#FOOT13"><sup>13</sup></a> list and returns
 the list.  It is like <code>for-fold</code>, except:
 </p>
 <ul>
@@ -178,13 +178,13 @@ identifiers in <var>bindings</var>.
 
 <dl class="def">
 <dt id="index-for_002dvector"><span class="category">Macro: </span><span><strong>for-vector</strong> <em>([<var>for-clause</var>&hellip;]) [<code>:length</code> <var>length</var> [<code>:init</code> <var>init</var>]] [<var>body</var>&hellip;]</em><a href='#index-for_002dvector' class='copiable-anchor'> &para;</a></span></dt>
-<dd><span id="index-terminology-15"></span>
+<dd><span id="index-terminology-14"></span>
 
 <p>When neither <var>length</var> nor <var>init</var> is present, this iteration
 macro is equivalent to the sequence <code>(vconcat (for-list
 ([<var>for-clause</var>&hellip;])
 [<var>body</var>&hellip;]))</code>, such that it
-coerces<a id="DOCF15" href="#FOOT15"><sup>15</sup></a> the list returned by <code>for-list</code> to vector.
+coerces<a id="DOCF14" href="#FOOT14"><sup>14</sup></a> the list returned by <code>for-list</code> to vector.
 Otherwise, this iteration macro accumulates the values into a fresh
 vector of length <var>length</var> with each element being <var>init</var> where
 <var>init</var> defaults to <code>nil</code> when omitted.  In such case, it is
@@ -410,10 +410,10 @@ an error for the multiple-value form to produce not exactly one value.
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT14" href="#DOCF14">(14)</a></h5>
+<h5><a id="FOOT13" href="#DOCF13">(13)</a></h5>
 <p>Following
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_f.htm">Common Lisp</a>, a <em>fresh</em> object is newly allocated.</p>
-<h5><a id="FOOT15" href="#DOCF15">(15)</a></h5>
+<h5><a id="FOOT14" href="#DOCF14">(14)</a></h5>
 <p>Following
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_c.htm">Common Lisp</a>, <em>coerce</em> means to non-destructively convert an object
 to another type.</p>

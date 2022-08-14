@@ -74,7 +74,7 @@ into the form <code>(cl-psetq <var>loop-update</var>&hellip;)</code>
 (see <a data-manual="cl" href="https://www.gnu.org/software/emacs/manual/html_node/cl/Assignment.html#Assignment">(cl)Assignment</a>).  It is an error for <var>loop-bindings</var> and
 <var>loop-forms</var> to have unmatched numbers of subforms.  For example, a
 possible implementation of the expander of a sequence constructor that
-iterates over lists is as follows<a id="DOCF16" href="#FOOT16"><sup>16</sup></a>:
+iterates over lists is as follows<a id="DOCF15" href="#FOOT15"><sup>15</sup></a>:
 </p>
 <div class="example">
 <pre class="example">(:expander-case
@@ -101,9 +101,9 @@ of the initial states.
 <dt id="index-for_002din_002darray"><span class="category">Function: </span><span><strong>for-in-array</strong> <em><var>array</var></em><a href='#index-for_002din_002darray' class='copiable-anchor'> &para;</a></span></dt>
 <dt id="index-in_002darray"><span class="category">Auxiliary Operator: </span><span><strong>in-array</strong> <em><var>array</var></em><a href='#index-in_002darray' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the elements of the array <var>array</var>.  As
-such, <code>array</code>s are dispatched to it.  Moreover, a literal array
-after macro expansion as a sequence form when used in iteration clauses
-is treated as if this sequence constructor is used.
+such, <code>array</code>s are dispatched to it.  Moreover, a literal array as
+a sequence form when used in iteration clauses is treated as if this
+sequence constructor is used.
 </p></dd></dl>
 
 <dl class="def">
@@ -121,8 +121,8 @@ range of <var>start</var> and <var>end</var>.
 <dt id="index-in_002dlist"><span class="category">Auxiliary Operator: </span><span><strong>in-list</strong> <em><var>list</var></em><a href='#index-in_002dlist' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the elements of the non-dotted list
 <var>list</var>.  As such, <code>list</code>s are dispatched to it.  Moreover, a
-literal list after macro expansion as a sequence form when used in
-iteration clauses is treated as if this sequence constructor is used.
+literal list as a sequence form when used in iteration clauses is
+treated as if this sequence constructor is used.
 </p></dd></dl>
 
 <dl class="def">
@@ -161,9 +161,8 @@ and it is added to the number after each iteration.  The iteration
 terminates when the number is no longer in the range of <var>start</var> and
 <var>end</var>.  The range is right half-open when <var>step</var> is non-negative
 or otherwise left half-open.  <code>integer</code>s are dispatched to it.
-Moreover, a literal integer after macro expansion as a sequence form
-when used in iteration clauses is as if this sequence constructor is
-used.
+Moreover, a literal integer as a sequence form when used in iteration
+clauses is as if this sequence constructor is used.
 </p></dd></dl>
 
 <dl class="def">
@@ -287,7 +286,7 @@ to <code>nil</code> when omitted.
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT16" href="#DOCF16">(16)</a></h5>
+<h5><a id="FOOT15" href="#DOCF15">(15)</a></h5>
 <p>In this example, it may seem
 unnecessary to &ldquo;memoize&rdquo; the value of <var>list-form</var> at first
 glance.  The actual purpose of doing so in this and many similar cases
