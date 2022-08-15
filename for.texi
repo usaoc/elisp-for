@@ -1320,7 +1320,7 @@ the following @code{while} loop:
       (while (and . @var{loop-guards})
         (@var{for-binder} @var{inner-bindings}
           @optional{@repeated{@var{body}}}
-          @optional{@var{loop-update}}))))
+          @var{loop-update}))))
 @end group
 @end example
 
@@ -1331,7 +1331,7 @@ name.  Moreover, for each form @code{(@var{loop-identifier}
 @var{initial-form})} in @var{loop-bindings} and each form
 @var{loop-form} in @var{loop-forms}, the form @var{loop-update} updates
 @var{loop-identifier} to the value of @var{loop-form} after all
-@var{loop-forms}s are evaluated.  It is an error for @var{loop-bindings}
+@var{loop-form}s are evaluated.  It is an error for @var{loop-bindings}
 and @var{loop-forms} to have unmatched numbers of subforms.  For
 example, a possible implementation of the expander of a sequence
 constructor that iterates over lists is as follows@footnote{In this
