@@ -72,7 +72,8 @@ such as <code>cl-loop</code> (see <a data-manual="cl" href="https://www.gnu.org/
 </p>
 <div class="example">
 <pre class="example">(cl-loop for item in '(a 2 &quot;3&quot;)
-         for number = (or (and (numberp item) item)
+         for number = (or (and (numberp item)
+                               item)
                           (and (stringp item)
                                (string-to-number item)))
          if number collect number)
@@ -84,9 +85,11 @@ clause:
 </p>
 <div class="example">
 <pre class="example">(for-list ((item '(a 2 &quot;3&quot;))
-           (:if-let (number (or (and (numberp item) item)
-                                (and (stringp item)
-                                     (string-to-number item)))))
+           (:if-let
+            (number (or (and (numberp item)
+                             item)
+                        (and (stringp item)
+                             (string-to-number item)))))
            number))
      &rArr; (2 3)
 </pre></div>
@@ -95,10 +98,13 @@ clause:
 </p>
 <div class="example">
 <pre class="example">(for-list ((item '(a 2 &quot;3&quot;))
-           (:pcase item (or (and (cl-type number) number)
-                            (and (cl-type string)
-                                 (app string-to-number number))))
+           (:pcase item
+                   (or (and (cl-type number)
+                            number)
+                       (and (cl-type string)
+                            (app string-to-number number))))
            number))
+
      &rArr; (2 3)
 </pre></div>
 
@@ -113,7 +119,9 @@ generators.
 <p>Aliases and expanders are available in iteration clauses:
 </p>
 <div class="example">
-<pre class="example">(for-list ((item (in-producer #'random)) (5) item))
+<pre class="example">(for-list ((item (in-producer #'random))
+           (5)
+           item))
      &rArr; #&lt;a list of five pseudo-random integers&gt;
 </pre></div>
 
@@ -135,16 +143,22 @@ forms, but this is configurable through the buffer-local variable
 <p>The destructuring capability of <code>cl-loop</code> forms:
 </p>
 <div class="example">
-<pre class="example">(cl-loop for (number . string) in '((1 . &quot;1&quot;) (2 . &quot;b&quot;) (3 . &quot;3&quot;))
-         if (eql number (string-to-number string)) collect number)
+<pre class="example">(cl-loop for (number . string) in '((1 . &quot;1&quot;)
+                                    (2 . &quot;b&quot;)
+                                    (3 . &quot;3&quot;))
+         if (eql number (string-to-number string))
+           collect number)
      &rArr; (1 3)
 </pre></div>
 
 <p><code>for-list</code> forms use <code>pcase-let</code> forms by default:
 </p>
 <div class="example">
-<pre class="example">(for-list ((`(,number . ,string) '((1 . &quot;1&quot;) (2 . &quot;b&quot;) (3 . &quot;3&quot;)))
-           (:if (eql number (string-to-number string))) number))
+<pre class="example">(for-list ((`(,number . ,string) '((1 . &quot;1&quot;)
+                                   (2 . &quot;b&quot;)
+                                   (3 . &quot;3&quot;)))
+           (:if (eql number (string-to-number string)))
+           number))
      &rArr; (1 3)
 </pre></div>
 

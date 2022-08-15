@@ -66,7 +66,8 @@ store any other value.  The default value is <code>pcase-let</code>.
 </pre><pre class="example">
 
 </pre><pre class="example">(let ((list (list 1 2 3)))
-  (for-do ((reference (in-list list)) (:do (setf reference nil))))
+  (for-do ((reference (in-list list))
+           (:do (setf reference nil))))
   list)
      &rArr; (nil nil nil)
 </pre></div>

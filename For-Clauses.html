@@ -67,7 +67,9 @@ expanded form is skipped unless <code>item</code> is <code>numberp</code>
 </p>
 <div class="example">
 <pre class="example">(for-fold ((sum 0))
-    ((item '(a 2 &quot;3&quot;)) (:if (numberp item)) (+ item sum)))
+    ((item '(a 2 &quot;3&quot;))
+     (:if (numberp item))
+     (+ item sum)))
      &rArr; 2
 </pre></div>
 
@@ -75,10 +77,16 @@ expanded form is skipped unless <code>item</code> is <code>numberp</code>
 </p>
 <div class="example">
 <pre class="example">(let ((sum 0))
-  (named-let loop ((sum sum) (tail '(a 2 &quot;3&quot;)))
-    (if (null tail) sum
+  (named-let loop ((sum sum)
+                   (tail '(a 2 &quot;3&quot;)))
+    (if (null tail)
+        sum
       (let ((item (car tail)))
-        (loop (if (numberp item) (+ item sum) sum) (cdr tail))))))
+        (loop (if (numberp item)
+                  (+ item sum)
+                sum)
+              (cdr tail))))))
+
      &rArr; 2
 </pre></div>
 
@@ -93,7 +101,8 @@ rise to the usefulness of infinite sequences.
 infinite sequence:
 </p>
 <div class="example">
-<pre class="example">(for-list ((natural (in-naturals)) (item '(a b c))
+<pre class="example">(for-list ((natural (in-naturals))
+           (item '(a b c))
            (cons natural item)))
      &rArr; ((0 . a) (1 . b) (2 . c))
 </pre></div>
@@ -110,7 +119,9 @@ special clause.
 presence of <code>(:do)</code>:
 </p>
 <div class="example">
-<pre class="example">(for-list ((item1 '(1 2)) (:do) (item2 '(2 3 4))
+<pre class="example">(for-list ((item1 '(1 2))
+           (:do)
+           (item2 '(2 3 4))
            (cons item1 item2)))
      &rArr; ((1 . 2) (1 . 3) (1 . 4) (2 . 2) (2 . 3) (2 . 4))
 </pre></div>
@@ -118,7 +129,8 @@ presence of <code>(:do)</code>:
 <p>An equivalent <code>for-list*</code> form:
 </p>
 <div class="example">
-<pre class="example">(for-list* ((item1 '(1 2)) (item2 '(2 3 4))
+<pre class="example">(for-list* ((item1 '(1 2))
+            (item2 '(2 3 4))
             (cons item1 item2)))
      &rArr; ((1 . 2) (1 . 3) (1 . 4) (2 . 2) (2 . 3) (2 . 4))
 </pre></div>

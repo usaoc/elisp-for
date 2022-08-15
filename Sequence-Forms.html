@@ -59,14 +59,16 @@ the values of it:
 </p>
 <div class="example">
 <pre class="example">(let ((iterator (for-in-list '(1 2 3))))
-  (for-vector ((item (for-in-iterator iterator)) item)))
+  (for-vector ((item (for-in-iterator iterator))
+               item)))
      &rArr; [1 2 3]
 </pre></div>
 
 <p>Directly iterate over the list:
 </p>
 <div class="example">
-<pre class="example">(for-vector ((item (for-in-list '(1 2 3))) item))
+<pre class="example">(for-vector ((item (for-in-list '(1 2 3)))
+             item))
      &rArr; [1 2 3]
 </pre></div>
 
@@ -79,7 +81,8 @@ in iteration clauses to avoid the need of shorthands
 <p><code>for-in-list</code> and <code>for-in-range</code> have aliases:
 </p>
 <div class="example">
-<pre class="example">(for-list ((item (in-list '(a b c))) (number (in-range 1 5 2))
+<pre class="example">(for-list ((item (in-list '(a b c)))
+           (number (in-range 1 5 2))
            (cons item number)))
      &rArr; ((a . 1) (b . 3))
 </pre></div>
@@ -100,7 +103,8 @@ Errors</a>).
 </p>
 <div class="example">
 <pre class="example">(let ((list '(1 2 3)))
-  (for-list ((item list) item)))
+  (for-list ((item list)
+             item)))
      &rArr; (1 2 3)
 </pre></div>
 
@@ -109,7 +113,8 @@ Errors</a>).
 </p>
 <div class="example">
 <pre class="example">(let ((iterator (for-in-list '(1 2 3))))
-  (for-list ((item iterator) item)))
+  (for-list ((item iterator)
+             item)))
      &rArr; (1 2 3)
 </pre></div>
 
@@ -118,7 +123,8 @@ Errors</a>).
 </p>
 <div class="example">
 <pre class="example">(let ((some-object (make-record 'some-type 0 nil)))
-  (for-list ((item some-object) item)))
+  (for-list ((item some-object)
+             item)))
      error&rarr; Unhandled type: #s(some-type)
 </pre></div>
 

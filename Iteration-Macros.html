@@ -110,7 +110,10 @@ with a vacuous special clause such as <code>(:do)</code>.
 the value.  It is equivalent to the following <code>for-fold</code> form:
 </p>
 <div class="example">
-<pre class="example">(for-fold () ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;] (:values))
+<pre class="example">(for-fold ()
+    ([<var>for-clause</var>&hellip;])
+  [<var>body</var>&hellip;]
+  (:values))
 </pre></div>
 </dd></dl>
 
@@ -199,7 +202,8 @@ evaluation order:
 <div class="example">
 <pre class="example">(let ((<var>vector</var> (make-vector <var>length</var> <var>init</var>)))
   (let ((<var>index</var> 0))
-    (for-do ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;]))
+    (for-do ([<var>for-clause</var>&hellip;])
+      [<var>body</var>&hellip;]))
   <var>vector</var>)
 </pre></div>
 
@@ -233,7 +237,8 @@ inserted after the above-mentioned <code>:do</code> clause.
 
 <div class="example">
 <pre class="example">(let ((<var>value</var> t))
-  (for-do ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;])
+  (for-do ([<var>for-clause</var>&hellip;])
+    [<var>body</var>&hellip;])
   <var>value</var>)
 </pre></div>
 
@@ -264,7 +269,8 @@ after the above-mentioned <code>:do</code> clause.
 
 <div class="example">
 <pre class="example">(let ((<var>value</var> nil))
-  (for-do ([<var>for-clause</var>&hellip;]) [<var>body</var>&hellip;])
+  (for-do ([<var>for-clause</var>&hellip;])
+    [<var>body</var>&hellip;])
   <var>value</var>)
 </pre></div>
 

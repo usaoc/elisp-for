@@ -55,34 +55,48 @@ implemented<a id="DOCF10" href="#FOOT10"><sup>10</sup></a>.
 <p>A <code>cl-loop</code> form involving multiple state variables:
 </p>
 <div class="example">
-<pre class="example">(cl-loop with value1 = 0 and value2 = '() and value3 = -1.0e+INF
-         for number below 5 do
-         (cl-incf value1 number)
-         (push number value2)
-         (cl-callf max value3 number)
-         finally return (list value1 (nreverse value2) value3))
+<pre class="example">(cl-loop with value1 = 0
+           and value2 = '()
+           and value3 = -1.0e+INF
+         for number below 5
+         do (cl-incf value1 number)
+            (push number value2)
+            (cl-callf max value3 number)
+         finally return (list value1
+                              (nreverse value2)
+                              value3))
      &rArr; (10 (0 1 2 3 4) 4)
 </pre></div>
 
 <p>An equivalent <code>for-do</code> form:
 </p>
 <div class="example">
-<pre class="example">(let ((value1 0) (value2 '()) (value3 -1.0e+INF))
-  (for-do ((number 5) (:do (cl-incf value1 number)
-                           (push number value2)
-                           (cl-callf max value3 number))))
-  (list value1 (nreverse value2) value3))
+<pre class="example">(let ((value1 0)
+      (value2 '())
+      (value3 -1.0e+INF))
+  (for-do ((number 5)
+           (:do (cl-incf value1 number)
+                (push number value2)
+                (cl-callf max value3 number))))
+  (list value1
+        (nreverse value2)
+        value3))
      &rArr; (10 (0 1 2 3 4) 4)
 </pre></div>
 
 <p>An equivalent <code>for-fold</code> form:
 </p>
 <div class="example">
-<pre class="example">(for-fold ((value1 0) (value2 '()) (value3 -1.0e+INF)
-           (:result (list value1 (nreverse value2) value3)))
-    ((number 5) (:values (+ number value1)
-                         (cons number value2)
-                         (max number value3))))
+<pre class="example">(for-fold ((value1 0)
+           (value2 '())
+           (value3 -1.0e+INF)
+           (:result (list value1
+                          (nreverse value2)
+                          value3)))
+    ((number 5)
+     (:values (+ number value1)
+              (cons number value2)
+              (max number value3))))
      &rArr; (10 (0 1 2 3 4) 4)
 </pre></div>
 

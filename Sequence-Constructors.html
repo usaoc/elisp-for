@@ -60,7 +60,8 @@ the following <code>while</code> loop:
     (let <var>loop-bindings</var>
       (while (and . <var>loop-guards</var>)
         (<var>for-binder</var> <var>inner-bindings</var>
-          [<var>body</var>&hellip;] [(cl-psetq <var>loop-update</var>&hellip;)]))))
+          [<var>body</var>&hellip;]
+          [<var>loop-update</var>]))))
 </pre></div>
 
 <p>Above, <var>for-binder</var> is the value of <code>for-binder</code> and
@@ -68,13 +69,12 @@ the following <code>while</code> loop:
 encountered, the relevant forms are appended to subforms of the same
 name.  Moreover, for each form <code>(<var>loop-identifier</var>
 <var>initial-form</var>)</code> in <var>loop-bindings</var> and each form
-<var>loop-form</var> in <var>loop-forms</var>, a <var>loop-update</var> sequence
-&lsquo;<samp><var>loop-identifier</var> <var>loop-form</var></samp>&rsquo; is produced and spliced
-into the form <code>(cl-psetq <var>loop-update</var>&hellip;)</code>
-(see <a data-manual="cl" href="https://www.gnu.org/software/emacs/manual/html_node/cl/Assignment.html#Assignment">(cl)Assignment</a>).  It is an error for <var>loop-bindings</var> and
-<var>loop-forms</var> to have unmatched numbers of subforms.  For example, a
-possible implementation of the expander of a sequence constructor that
-iterates over lists is as follows<a id="DOCF15" href="#FOOT15"><sup>15</sup></a>:
+<var>loop-form</var> in <var>loop-forms</var>, the form <var>loop-update</var> updates
+<var>loop-identifier</var> to the value of <var>loop-form</var> after all
+<var>loop-forms</var>s are evaluated.  It is an error for <var>loop-bindings</var>
+and <var>loop-forms</var> to have unmatched numbers of subforms.  For
+example, a possible implementation of the expander of a sequence
+constructor that iterates over lists is as follows<a id="DOCF15" href="#FOOT15"><sup>15</sup></a>:
 </p>
 <div class="example">
 <pre class="example">(:expander-case
@@ -263,7 +263,8 @@ omitted:
 </p>
 <div class="example">
 <pre class="example">(for-in-list (with-current-buffer <var>buffer</var>
-               (overlays-in (point-min) (point-max))))
+               (overlays-in (point-min)
+                            (point-max))))
 </pre></div>
 </dd></dl>
 
@@ -287,12 +288,13 @@ to <code>nil</code> when omitted.
 <h4 class="footnotes-heading">Footnotes</h4>
 
 <h5><a id="FOOT15" href="#DOCF15">(15)</a></h5>
-<p>In this example, it may seem
-unnecessary to &ldquo;memoize&rdquo; the value of <var>list-form</var> at first
-glance.  The actual purpose of doing so in this and many similar cases
-is to preserve the apparent evaluation order, although sometimes
-memoization is indeed necessary to guarantee that the subexpressions are
-evaluated exactly once (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-Evaluation.html#Argument-Evaluation">(elisp)Argument Evaluation</a>).</p>
+<p>In this
+example, it may seem unnecessary to &ldquo;memoize&rdquo; the value of
+<var>list-form</var> at first glance.  The actual purpose of doing so in this
+and many similar cases is to preserve the apparent evaluation order,
+although sometimes memoization is indeed necessary to guarantee that the
+subexpressions are evaluated exactly once (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-Evaluation.html#Argument-Evaluation">(elisp)Argument
+Evaluation</a>).</p>
 </div>
 <hr>
 <div class="header">
