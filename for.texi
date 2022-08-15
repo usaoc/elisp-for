@@ -186,7 +186,8 @@ A simple yet contrived @code{cl-loop} form:
 @example
 @group
 (cl-loop for item in '(a 2 "3")
-         for number = (or (and (numberp item) item)
+         for number = (or (and (numberp item)
+                               item)
                           (and (stringp item)
                                (string-to-number item)))
          if number collect number)
@@ -200,9 +201,11 @@ clause:
 @example
 @group
 (for-list ((item '(a 2 "3"))
-           (:if-let (number (or (and (numberp item) item)
-                                (and (stringp item)
-                                     (string-to-number item)))))
+           (:if-let
+            (number (or (and (numberp item)
+                             item)
+                        (and (stringp item)
+                             (string-to-number item)))))
            number))
 @res{(2 3)}
 @end group
@@ -213,10 +216,13 @@ An equivalent @code{for-list} form with a @code{:pcase} special clause:
 @example
 @group
 (for-list ((item '(a 2 "3"))
-           (:pcase item (or (and (cl-type number) number)
-                            (and (cl-type string)
-                                 (app string-to-number number))))
+           (:pcase item
+                   (or (and (cl-type number)
+                            number)
+                       (and (cl-type string)
+                            (app string-to-number number))))
            number))
+
 @res{(2 3)}
 @end group
 @end example
@@ -233,7 +239,9 @@ Aliases and expanders are available in iteration clauses:
 
 @example
 @group
-(for-list ((item (in-producer #'random)) (5) item))
+(for-list ((item (in-producer #'random))
+           (5)
+           item))
 @res{#<a list of five pseudo-random integers>}
 @end group
 @end example
@@ -259,8 +267,11 @@ The destructuring capability of @code{cl-loop} forms:
 
 @example
 @group
-(cl-loop for (number . string) in '((1 . "1") (2 . "b") (3 . "3"))
-         if (eql number (string-to-number string)) collect number)
+(cl-loop for (number . string) in '((1 . "1")
+                                    (2 . "b")
+                                    (3 . "3"))
+         if (eql number (string-to-number string))
+           collect number)
 @res{(1 3)}
 @end group
 @end example
@@ -269,8 +280,11 @@ The destructuring capability of @code{cl-loop} forms:
 
 @example
 @group
-(for-list ((`(,number . ,string) '((1 . "1") (2 . "b") (3 . "3")))
-           (:if (eql number (string-to-number string))) number))
+(for-list ((`(,number . ,string) '((1 . "1")
+                                   (2 . "b")
+                                   (3 . "3")))
+           (:if (eql number (string-to-number string)))
+           number))
 @res{(1 3)}
 @end group
 @end example
@@ -332,7 +346,9 @@ expanded form is skipped unless @code{item} is @code{numberp}
 @example
 @group
 (for-fold ((sum 0))
-    ((item '(a 2 "3")) (:if (numberp item)) (+ item sum)))
+    ((item '(a 2 "3"))
+     (:if (numberp item))
+     (+ item sum)))
 @res{2}
 @end group
 @end example
@@ -342,10 +358,16 @@ An equivalent @code{named-let} form:
 @example
 @group
 (let ((sum 0))
-  (named-let loop ((sum sum) (tail '(a 2 "3")))
-    (if (null tail) sum
+  (named-let loop ((sum sum)
+                   (tail '(a 2 "3")))
+    (if (null tail)
+        sum
       (let ((item (car tail)))
-        (loop (if (numberp item) (+ item sum) sum) (cdr tail))))))
+        (loop (if (numberp item)
+                  (+ item sum)
+                sum)
+              (cdr tail))))))
+
 @res{2}
 @end group
 @end example
@@ -367,7 +389,8 @@ infinite sequence:
 
 @example
 @group
-(for-list ((natural (in-naturals)) (item '(a b c))
+(for-list ((natural (in-naturals))
+           (item '(a b c))
            (cons natural item)))
 @res{((0 . a) (1 . b) (2 . c))}
 @end group
@@ -386,7 +409,9 @@ presence of @code{(:do)}:
 
 @example
 @group
-(for-list ((item1 '(1 2)) (:do) (item2 '(2 3 4))
+(for-list ((item1 '(1 2))
+           (:do)
+           (item2 '(2 3 4))
            (cons item1 item2)))
 @res{((1 . 2) (1 . 3) (1 . 4) (2 . 2) (2 . 3) (2 . 4))}
 @end group
@@ -396,7 +421,8 @@ An equivalent @code{for-list*} form:
 
 @example
 @group
-(for-list* ((item1 '(1 2)) (item2 '(2 3 4))
+(for-list* ((item1 '(1 2))
+            (item2 '(2 3 4))
             (cons item1 item2)))
 @res{((1 . 2) (1 . 3) (1 . 4) (2 . 2) (2 . 3) (2 . 4))}
 @end group
@@ -439,8 +465,9 @@ the values of it:
 @example
 @group
 (let ((iterator (for-in-list '(1 2 3))))
-  (for-vector ((item (for-in-iterator iterator)) item)))
-@res{@optional{1 2 3}}
+  (for-vector ((item (for-in-iterator iterator))
+               item)))
+@res{[1 2 3]}
 @end group
 @end example
 
@@ -448,8 +475,9 @@ Directly iterate over the list:
 
 @example
 @group
-(for-vector ((item (for-in-list '(1 2 3))) item))
-@res{@optional{1 2 3}}
+(for-vector ((item (for-in-list '(1 2 3)))
+             item))
+@res{[1 2 3]}
 @end group
 @end example
 
@@ -463,7 +491,8 @@ in iteration clauses to avoid the need of shorthands
 
 @example
 @group
-(for-list ((item (in-list '(a b c))) (number (in-range 1 5 2))
+(for-list ((item (in-list '(a b c)))
+           (number (in-range 1 5 2))
            (cons item number)))
 @res{((a . 1) (b . 3))}
 @end group
@@ -486,7 +515,8 @@ A @code{list} dispatched to the application of @code{for-in-list} to it:
 @example
 @group
 (let ((list '(1 2 3)))
-  (for-list ((item list) item)))
+  (for-list ((item list)
+             item)))
 @res{(1 2 3)}
 @end group
 @end example
@@ -497,7 +527,8 @@ A @code{function} dispatched to the application of
 @example
 @group
 (let ((iterator (for-in-list '(1 2 3))))
-  (for-list ((item iterator) item)))
+  (for-list ((item iterator)
+             item)))
 @res{(1 2 3)}
 @end group
 @end example
@@ -508,7 +539,8 @@ A @code{function} dispatched to the application of
 @example
 @group
 (let ((some-object (make-record 'some-type 0 nil)))
-  (for-list ((item some-object) item)))
+  (for-list ((item some-object)
+             item)))
 @err{Unhandled type: #s(some-type)}
 @end group
 @end example
@@ -558,12 +590,16 @@ A @code{cl-loop} form involving multiple state variables:
 
 @example
 @group
-(cl-loop with value1 = 0 and value2 = '() and value3 = -1.0e+INF
-         for number below 5 do
-         (cl-incf value1 number)
-         (push number value2)
-         (cl-callf max value3 number)
-         finally return (list value1 (nreverse value2) value3))
+(cl-loop with value1 = 0
+           and value2 = '()
+           and value3 = -1.0e+INF
+         for number below 5
+         do (cl-incf value1 number)
+            (push number value2)
+            (cl-callf max value3 number)
+         finally return (list value1
+                              (nreverse value2)
+                              value3))
 @res{(10 (0 1 2 3 4) 4)}
 @end group
 @end example
@@ -572,11 +608,16 @@ An equivalent @code{for-do} form:
 
 @example
 @group
-(let ((value1 0) (value2 '()) (value3 -1.0e+INF))
-  (for-do ((number 5) (:do (cl-incf value1 number)
-                           (push number value2)
-                           (cl-callf max value3 number))))
-  (list value1 (nreverse value2) value3))
+(let ((value1 0)
+      (value2 '())
+      (value3 -1.0e+INF))
+  (for-do ((number 5)
+           (:do (cl-incf value1 number)
+                (push number value2)
+                (cl-callf max value3 number))))
+  (list value1
+        (nreverse value2)
+        value3))
 @res{(10 (0 1 2 3 4) 4)}
 @end group
 @end example
@@ -585,11 +626,16 @@ An equivalent @code{for-fold} form:
 
 @example
 @group
-(for-fold ((value1 0) (value2 '()) (value3 -1.0e+INF)
-           (:result (list value1 (nreverse value2) value3)))
-    ((number 5) (:values (+ number value1)
-                         (cons number value2)
-                         (max number value3))))
+(for-fold ((value1 0)
+           (value2 '())
+           (value3 -1.0e+INF)
+           (:result (list value1
+                          (nreverse value2)
+                          value3)))
+    ((number 5)
+     (:values (+ number value1)
+              (cons number value2)
+              (max number value3))))
 @res{(10 (0 1 2 3 4) 4)}
 @end group
 @end example
@@ -675,7 +721,8 @@ for-binder
 
 @group
 (let ((list (list 1 2 3)))
-  (for-do ((reference (in-list list)) (:do (setf reference nil))))
+  (for-do ((reference (in-list list))
+           (:do (setf reference nil))))
   list)
 @res{(nil nil nil)}
 @end group
@@ -857,7 +904,10 @@ the value.  It is equivalent to the following @code{for-fold} form:
 
 @example
 @group
-(for-fold () (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}} (:values))
+(for-fold ()
+    (@optional{@repeated{@var{for-clause}}})
+  @optional{@repeated{@var{body}}}
+  (:values))
 @end group
 @end example
 @end defmac
@@ -953,7 +1003,8 @@ evaluation order:
 @group
 (let ((@var{vector} (make-vector @var{length} @var{init})))
   (let ((@var{index} 0))
-    (for-do (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}))
+    (for-do (@optional{@repeated{@var{for-clause}}})
+      @optional{@repeated{@var{body}}}))
   @var{vector})
 @end group
 @end example
@@ -990,7 +1041,8 @@ The iteration form is first transformed to the following form where
 @example
 @group
 (let ((@var{value} t))
-  (for-do (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}})
+  (for-do (@optional{@repeated{@var{for-clause}}})
+    @optional{@repeated{@var{body}}})
   @var{value})
 @end group
 @end example
@@ -1024,7 +1076,8 @@ The iteration form is first transformed to the following form where
 @example
 @group
 (let ((@var{value} nil))
-  (for-do (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}})
+  (for-do (@optional{@repeated{@var{for-clause}}})
+    @optional{@repeated{@var{body}}})
   @var{value})
 @end group
 @end example
@@ -1266,7 +1319,8 @@ the following @code{while} loop:
     (let @var{loop-bindings}
       (while (and . @var{loop-guards})
         (@var{for-binder} @var{inner-bindings}
-          @optional{@repeated{@var{body}}} @optional{(cl-psetq @repeated{@var{loop-update}})}))))
+          @optional{@repeated{@var{body}}}
+          @optional{@var{loop-update}}))))
 @end group
 @end example
 
@@ -1275,18 +1329,18 @@ Above, @var{for-binder} is the value of @code{for-binder} and
 encountered, the relevant forms are appended to subforms of the same
 name.  Moreover, for each form @code{(@var{loop-identifier}
 @var{initial-form})} in @var{loop-bindings} and each form
-@var{loop-form} in @var{loop-forms}, a @var{loop-update} sequence
-@samp{@var{loop-identifier} @var{loop-form}} is produced and spliced
-into the form @code{(cl-psetq @repeated{@var{loop-update}})}
-(@pxref{Assignment,,,cl}).  It is an error for @var{loop-bindings} and
-@var{loop-forms} to have unmatched numbers of subforms.  For example, a
-possible implementation of the expander of a sequence constructor that
-iterates over lists is as follows@footnote{In this example, it may seem
-unnecessary to @enquote{memoize} the value of @var{list-form} at first
-glance.  The actual purpose of doing so in this and many similar cases
-is to preserve the apparent evaluation order, although sometimes
-memoization is indeed necessary to guarantee that the subexpressions are
-evaluated exactly once (@pxref{Argument Evaluation,,,elisp}).}:
+@var{loop-form} in @var{loop-forms}, the form @var{loop-update} updates
+@var{loop-identifier} to the value of @var{loop-form} after all
+@var{loop-forms}s are evaluated.  It is an error for @var{loop-bindings}
+and @var{loop-forms} to have unmatched numbers of subforms.  For
+example, a possible implementation of the expander of a sequence
+constructor that iterates over lists is as follows@footnote{In this
+example, it may seem unnecessary to @enquote{memoize} the value of
+@var{list-form} at first glance.  The actual purpose of doing so in this
+and many similar cases is to preserve the apparent evaluation order,
+although sometimes memoization is indeed necessary to guarantee that the
+subexpressions are evaluated exactly once (@pxref{Argument
+Evaluation,,,elisp}).}:
 
 @example
 @group
@@ -1449,7 +1503,8 @@ omitted:
 @example
 @group
 (for-in-list (with-current-buffer @var{buffer}
-               (overlays-in (point-min) (point-max))))
+               (overlays-in (point-min)
+                            (point-max))))
 @end group
 @end example
 @end deffn
