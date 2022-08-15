@@ -61,7 +61,7 @@ the following <code>while</code> loop:
       (while (and . <var>loop-guards</var>)
         (<var>for-binder</var> <var>inner-bindings</var>
           [<var>body</var>&hellip;]
-          [<var>loop-update</var>]))))
+          <var>loop-update</var>))))
 </pre></div>
 
 <p>Above, <var>for-binder</var> is the value of <code>for-binder</code> and
@@ -71,7 +71,7 @@ name.  Moreover, for each form <code>(<var>loop-identifier</var>
 <var>initial-form</var>)</code> in <var>loop-bindings</var> and each form
 <var>loop-form</var> in <var>loop-forms</var>, the form <var>loop-update</var> updates
 <var>loop-identifier</var> to the value of <var>loop-form</var> after all
-<var>loop-forms</var>s are evaluated.  It is an error for <var>loop-bindings</var>
+<var>loop-form</var>s are evaluated.  It is an error for <var>loop-bindings</var>
 and <var>loop-forms</var> to have unmatched numbers of subforms.  For
 example, a possible implementation of the expander of a sequence
 constructor that iterates over lists is as follows<a id="DOCF15" href="#FOOT15"><sup>15</sup></a>:
