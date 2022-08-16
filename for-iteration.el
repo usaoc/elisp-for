@@ -41,12 +41,11 @@
 
 Find the generator in `for--datum-dispatch-alist' and apply it to
 DATUM."
-  (let ((missing '#:missing))
-    (pcase (alist-get datum for--datum-dispatch-alist
-                      missing nil (lambda (type datum)
-                                    (cl-typep datum type)))
-      ((pred (eq missing)) (signal 'for-unhandled-type (list datum)))
-      (generator (funcall generator datum)))))
+  (pcase (alist-get datum for--datum-dispatch-alist
+                    nil nil (lambda (type datum)
+                              (cl-typep datum type)))
+    ('nil (signal 'for-unhandled-type (list datum)))
+    (generator (funcall generator datum))))
 
 (defun for--datum-to-sequence (datum)
   "Transform DATUM to a sequence form.
