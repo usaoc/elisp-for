@@ -34,8 +34,6 @@
 (defvar for--datum-dispatch-alist '()
   "Alist of type specifiers vs generators.")
 
-(define-error 'for-unhandled-type "Unhandled type")
-
 (defun for--datum-to-iterator (datum)
   "Dispatch on DATUM and return an iterator.
 
@@ -406,6 +404,8 @@ See Info node `(for)Iteration Macros'." docstring)))
   (for--lists-bindings-spec for--for-clauses-spec for--body-spec))
 
 ;;;; Interface
+(define-error 'for-unhandled-type "Unhandled type")
+
 (defmacro define-for-special-clause (name arglist &rest cases-or-body)
   "Define the special clause operator NAME.
 
