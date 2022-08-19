@@ -184,11 +184,16 @@ identifiers in <var>bindings</var>.
 <dd><span id="index-terminology-14"></span>
 
 <p>When neither <var>length</var> nor <var>init</var> is present, this iteration
-macro is equivalent to the sequence <code>(vconcat (for-list
-([<var>for-clause</var>&hellip;])
-[<var>body</var>&hellip;]))</code>, such that it
+macro is equivalent to the following form (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Calling-Functions.html#Calling-Functions">(elisp)Calling
+Functions</a> and <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Vector-Functions.html#Vector-Functions">(elisp)Vector Functions</a>), such that it
 coerces<a id="DOCF14" href="#FOOT14"><sup>14</sup></a> the list returned by <code>for-list</code> to vector.
-Otherwise, this iteration macro accumulates the values into a fresh
+</p>
+<div class="example">
+<pre class="example">(apply #'vector (for-list ([<var>for-clause</var>&hellip;])
+                  [<var>body</var>&hellip;]))
+</pre></div>
+
+<p>Otherwise, this iteration macro accumulates the values into a fresh
 vector of length <var>length</var> with each element being <var>init</var> where
 <var>init</var> defaults to <code>nil</code> when omitted.  In such case, it is
 like <code>for-fold</code>, except:
@@ -221,9 +226,63 @@ inserted after the above-mentioned <code>:do</code> clause.
 </dd></dl>
 
 <dl class="def">
-<dt id="index-for_002dvector_002a"><span class="category">Macro: </span><span><strong>for-vector*</strong> <em>([<var>for-clause</var>&hellip;]) [:length <var>length</var> [:init <var>init</var>]] [<var>body</var>&hellip;]</em><a href='#index-for_002dvector_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-for_002dvector_002a"><span class="category">Macro: </span><span><strong>for-vector*</strong> <em>([<var>for-clause</var>&hellip;]) [<code>:length</code> <var>length</var> [<code>:init</code> <var>init</var>]] [<var>body</var>&hellip;]</em><a href='#index-for_002dvector_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-vector</code>.
+</p></dd></dl>
+
+<dl class="def">
+<dt id="index-for_002dstring"><span class="category">Macro: </span><span><strong>for-string</strong> <em>([<var>for-clause</var>&hellip;]) [<code>:length</code> <var>length</var> [<code>:init</code> <var>init</var> [<code>:multibyte</code> <var>multibyte</var>]]] [<var>body</var>&hellip;]</em><a href='#index-for_002dstring' class='copiable-anchor'> &para;</a></span></dt>
+<dd><span id="index-terminology-15"></span>
+
+<p>When neither <var>length</var>, <var>init</var>, nor <var>multibyte</var> is present,
+this iteration macro is equivalent to the following form
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Strings.html#Creating-Strings">(elisp)Creating Strings</a>), such that it coerces the list
+returned by <code>for-list</code> to string.
+</p>
+<div class="example">
+<pre class="example">(apply #'string (for-list ([<var>for-clause</var>&hellip;])
+                  [<var>body</var>&hellip;]))
+</pre></div>
+
+<p>Otherwise, this iteration macro accumulates the values into a fresh
+string of length <var>length</var> with each element being <var>init</var> where
+<var>init</var> defaults to <code>0</code> when when it is <code>nil</code> or omitted.
+The string is always a multibyte string when <var>multibyte</var> is true.
+In such case, it is like <code>for-fold</code>, except:
+</p>
+<ul>
+<li> The iteration form is first transformed to the following form where
+<var>string</var> and <var>index</var> are generated identifiers provided that
+<var>length</var>, <var>init</var>, and <var>multibyte</var> are evaluated exactly once
+in the apparent evaluation order:
+
+<div class="example">
+<pre class="example">(let ((<var>string</var> (make-string <var>length</var>
+                           (or <var>init</var> 0)
+                           <var>multibyte</var>)))
+  (let ((<var>index</var> 0))
+    (for-do ([<var>for-clause</var>&hellip;])
+      [<var>body</var>&hellip;]))
+  <var>string</var>)
+</pre></div>
+
+</li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
+form is transformed to <code>(setf (aref <var>string</var> <var>index</var>)
+<var>expression</var>)</code>, and the transformed multiple-value form <var>form</var>
+is inserted into the <code>:do</code> clause <code>(:do <var>form</var> (cl-incf
+<var>index</var>))</code> .  It is an error for the multiple-value form to produce
+not exactly one value;
+
+</li><li> A <code>:break</code> clause <code>(:break (= <var>index</var> <var>length</var>))</code> is
+inserted after the above-mentioned <code>:do</code> clause.
+</li></ul>
+</dd></dl>
+
+<dl class="def">
+<dt id="index-for_002dstring_002a"><span class="category">Macro: </span><span><strong>for-string*</strong> <em>([<var>for-clause</var>&hellip;]) [<code>:length</code> <var>length</var> [<code>:init</code> <var>init</var> [<code>:multibyte</code> <var>multibyte</var>]]] [<var>body</var>&hellip;]</em><a href='#index-for_002dstring_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dd><p>This iteration macro is the implicitly nesting version of
+<code>for-string</code>.
 </p></dd></dl>
 
 <dl class="def">
