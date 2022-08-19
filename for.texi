@@ -976,17 +976,24 @@ This iteration macro is the implicitly nesting version of
 @code{for-lists}.
 @end defmac
 
-@defmac for-vector (@optional{@repeated{@var{for-clause}}}) [@code{:length} @var{length} @optional{@code{:init} @var{init}]} @optional{@repeated{@var{body}}}
+@defmac for-vector (@optional{@repeated{@var{for-clause}}}) @optional{@code{:length} @var{length} @optional{@code{:init} @var{init}}} @optional{@repeated{@var{body}}}
 @concept{terminology, coerce}
 
 When neither @var{length} nor @var{init} is present, this iteration
-macro is equivalent to the sequence @code{(vconcat (for-list
-(@optional{@repeated{@var{for-clause}}})
-@optional{@repeated{@var{body}}}))}, such that it
+macro is equivalent to the following form (@pxref{Calling
+Functions,,,elisp} and @ref{Vector Functions,,,elisp}), such that it
 coerces@footnote{Following
 @url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_c.htm,
 Common Lisp}, @dfn{coerce} means to non-destructively convert an object
 to another type.} the list returned by @code{for-list} to vector.
+
+@example
+@group
+(apply #'vector (for-list (@optional{@repeated{@var{for-clause}}})
+                  @optional{@repeated{@var{body}}}))
+@end group
+@end example
+
 Otherwise, this iteration macro accumulates the values into a fresh
 vector of length @var{length} with each element being @var{init} where
 @var{init} defaults to @code{nil} when omitted.  In such case, it is
@@ -1024,7 +1031,7 @@ inserted after the above-mentioned @code{:do} clause.
 @end itemize
 @end defmac
 
-@defmac for-vector* (@optional{@repeated{@var{for-clause}}}) [:length @var{length} @optional{:init @var{init}]} @optional{@repeated{@var{body}}}
+@defmac for-vector* (@optional{@repeated{@var{for-clause}}}) @optional{@code{:length} @var{length} @optional{@code{:init} @var{init}}} @optional{@repeated{@var{body}}}
 This iteration macro is the implicitly nesting version of
 @code{for-vector}.
 @end defmac

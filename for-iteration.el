@@ -694,7 +694,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 \(fn (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [:length LENGTH [:init INIT]] [BODY... MULTIPLE-VALUE-FORM])"
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase body
-    ((or (and `(:length ,length-form :init ,init-form . ,body))
+    ((or `(:length ,length-form :init ,init-form . ,body)
          (and `(:length ,length-form . ,body) (let init-form nil)))
      (pcase-let ((`(,for-clauses . ,value-form)
                   (for--parse-body for-clauses body)))
@@ -711,7 +711,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
                               (cl-incf ,index))
                          (:break (= ,index ,length)))))
               ,vector)))))
-    (_ `(vconcat (for-list ,for-clauses . ,body)))))
+    (_ `(apply #'vector (for-list ,for-clauses . ,body)))))
 
 (for--defmacro for-and (for-clauses &rest body)
   "The `and'-folding iteration macro.
