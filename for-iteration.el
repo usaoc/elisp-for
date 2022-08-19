@@ -364,10 +364,10 @@ See Info node `(for)Iteration Macros'." docstring)))
                   ,(list '\` `(,name ,@forms ,'(,@for-clauses
                                                 ,value-form)))))))))))
 
-(def-edebug-spec for--result-clauses-spec (":result" body))
+(def-edebug-spec for--result-clause-spec (":result" body))
 
 (def-edebug-spec for--bindings-spec
-  (&rest [&or for--result-clauses-spec (symbolp form)]))
+  ([&rest [&or symbolp (symbolp form)]] for--result-clause-spec))
 
 (def-edebug-spec for--iteration-clauses-spec (sexp form))
 
@@ -376,15 +376,16 @@ See Info node `(for)Iteration Macros'." docstring)))
        ([&or ":let" ":if-let"] &rest (sexp form))
        ([&or ":pcase" ":pcase-not"] &rest pcase-PAT) (keywordp sexp)])
 
-(def-edebug-spec for--value-clauses-spec (":values" &rest form))
+(def-edebug-spec for--value-clause-spec
+  [&or (":values" &rest form) sexp])
 
 (def-edebug-spec for--for-clauses-spec
-  (&rest [&or for--value-clauses-spec for--special-clauses-spec
-              for--iteration-clauses-spec]))
+  ([&rest [&or for--special-clauses-spec for--iteration-clauses-spec]]
+   for--value-clause-spec))
 
 (def-edebug-spec for--body-spec
-  (&rest [&or for--value-clauses-spec for--special-clauses-spec
-              form]))
+  [[&rest [&or for--special-clauses-spec form]]
+   for--value-clause-spec])
 
 (def-edebug-spec for--fold-spec
   (for--fold-bindings-spec for--for-clauses-spec for--body-spec))
@@ -393,7 +394,7 @@ See Info node `(for)Iteration Macros'." docstring)))
   (&rest [&or for--special-clauses-spec for--iteration-clauses-spec]))
 
 (def-edebug-spec for--do-body-spec
-  (&rest [&or for--special-clauses-spec form]))
+  [&rest [&or for--special-clauses-spec form]])
 
 (def-edebug-spec for--do-spec
   (for--do-for-clauses-spec for--do-body-spec))
@@ -401,8 +402,24 @@ See Info node `(for)Iteration Macros'." docstring)))
 (def-edebug-spec for--accumulator-spec
   (for--for-clauses-spec for--body-spec))
 
+(def-edebug-spec for--vector-body-spec
+  [[&optional ":length" form [&optional ":init" form]]
+   for--body-spec])
+
+(def-edebug-spec for--vector-spec
+  (for--for-clauses-spec for--vector-body-spec))
+
+(def-edebug-spec for--string-body-spec
+  [[&optional ":length" form
+              [&optional ":init" form
+                         [&optional ":multibyte" form]]]
+   for--body-spec])
+
+(def-edebug-spec for--string-spec
+  (for--for-clauses-spec for--string-body-spec))
+
 (def-edebug-spec for--lists-bindings-spec
-  (&rest [&or symbolp for--result-clauses-spec]))
+  ([&rest symbolp] for--result-clause-spec))
 
 (def-edebug-spec for--lists-spec
   (for--lists-bindings-spec for--for-clauses-spec for--body-spec))
@@ -698,7 +715,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
 ...
 
 \(fn FOR-CLAUSES [:length LENGTH [:init INIT]] BODY)"
-  (declare (debug for--accumulator-spec) (indent 1))
+  (declare (debug for--vector-spec) (indent 1))
   (pcase body
     ((or `(:length ,length-form :init ,init-form . ,body)
          (and `(:length ,length-form . ,body) (let init-form nil)))
@@ -725,7 +742,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
 ...
 
 \(fn FOR-CLAUSES [:length LENGTH [:init INIT [:multibyte MULTIBYTE]]] BODY)"
-  (declare (debug for--accumulator-spec) (indent 1))
+  (declare (debug for--string-spec) (indent 1))
   (pcase body
     ((or `(:length ,length-form :init ,init-form
                    :multibyte ,multibyte-form . ,body)
