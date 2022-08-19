@@ -331,7 +331,11 @@ forms.
                          (app (lambda (docstring)
                                 `(,(replace-regexp-in-string
                                     (rx bol "..." eol) "\
-BODY = SPECIAL-CLAUSE | EXPRESSION
+BODY = [[BODY-FORM...] MULTIPLE-VALUE-FORM]
+
+BODY-FORM = SPECIAL-CLAUSE | EXPRESSION
+
+FOR-CLAUSES = ([[FOR-CLAUSE...] MULTIPLE-VALUE-FORM])
 
 FOR-CLAUSE = SPECIAL-CLAUSE | ITERATION-CLAUSE
 
@@ -510,7 +514,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn BINDINGS (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn BINDINGS FOR-CLAUSES BODY)"
   (declare (debug for--fold-spec) (indent 2))
   (pcase-let
       ((binder for-binder)
@@ -630,7 +634,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn (FOR-CLAUSE...) [BODY...])"
+\(fn FOR-CLAUSES BODY)"
   (declare (debug for--do-spec) (indent 1))
   `(for-fold () ,for-clauses ,@body (:values)))
 
@@ -639,7 +643,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn FOR-CLAUSES BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -653,9 +657,11 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 (for--defmacro for-lists (bindings for-clauses &rest body)
   "The multiple-list-building iteration macro.
 
+BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
+
 ...
 
-\(fn ([IDENTIFIER...] [(:result EXPRESSION...)]) (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn BINDINGS FOR-CLAUSES BODY)"
   (declare (debug for--lists-spec) (indent 2))
   (pcase-let
       ((`(,(and bindings
@@ -691,7 +697,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [:length LENGTH [:init INIT]] [BODY... MULTIPLE-VALUE-FORM])"
+\(fn FOR-CLAUSES [:length LENGTH [:init INIT]] BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase body
     ((or `(:length ,length-form :init ,init-form . ,body)
@@ -718,7 +724,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn FOR-CLAUSES BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -737,7 +743,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn FOR-CLAUSES BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -756,7 +762,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn FOR-CLAUSES BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -772,7 +778,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn FOR-CLAUSES BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -788,7 +794,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn FOR-CLAUSES BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -801,7 +807,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn FOR-CLAUSES BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
   (cl-with-gensyms (value)
     `(for-fold ((,value nil)) ,for-clauses . ,body)))
@@ -811,7 +817,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn FOR-CLAUSES BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -827,7 +833,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 ...
 
-\(fn (FOR-CLAUSE... [MULTIPLE-VALUE-FORM]) [BODY... MULTIPLE-VALUE-FORM])"
+\(fn FOR-CLAUSES BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
