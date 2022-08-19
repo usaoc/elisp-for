@@ -1036,6 +1036,65 @@ This iteration macro is the implicitly nesting version of
 @code{for-vector}.
 @end defmac
 
+@defmac for-string (@optional{@repeated{@var{for-clause}}}) @optional{@code{:length} @var{length} @optional{@code{:init} @var{init} @optional{@code{:multibyte} @var{multibyte}}}} @optional{@repeated{@var{body}}}
+@concept{terminology, coerce}
+
+When neither @var{length}, @var{init}, nor @var{multibyte} is present,
+this iteration macro is equivalent to the following form
+(@pxref{Creating Strings,,,elisp}), such that it coerces the list
+returned by @code{for-list} to string.
+
+@example
+@group
+(apply #'string (for-list (@optional{@repeated{@var{for-clause}}})
+                  @optional{@repeated{@var{body}}}))
+@end group
+@end example
+
+Otherwise, this iteration macro accumulates the values into a fresh
+string of length @var{length} with each element being @var{init} where
+@var{init} defaults to @code{0} when when it is @code{nil} or omitted.
+The string is always a multibyte string when @var{multibyte} is true.
+In such case, it is like @code{for-fold}, except:
+
+@itemize
+@item
+The iteration form is first transformed to the following form where
+@var{string} and @var{index} are generated identifiers provided that
+@var{length}, @var{init}, and @var{multibyte} are evaluated exactly once
+in the apparent evaluation order:
+
+@example
+@group
+(let ((@var{string} (make-string @var{length}
+                           (or @var{init} 0)
+                           @var{multibyte})))
+  (let ((@var{index} 0))
+    (for-do (@optional{@repeated{@var{for-clause}}})
+      @optional{@repeated{@var{body}}}))
+  @var{string})
+@end group
+@end example
+
+@item
+Each expression @var{expression} in the tail forms of the multiple-value
+form is transformed to @code{(setf (aref @var{string} @var{index})
+@var{expression})}, and the transformed multiple-value form @var{form}
+is inserted into the @code{:do} clause @code{(:do @var{form} (cl-incf
+@var{index}))} .  It is an error for the multiple-value form to produce
+not exactly one value;
+
+@item
+A @code{:break} clause @code{(:break (= @var{index} @var{length}))} is
+inserted after the above-mentioned @code{:do} clause.
+@end itemize
+@end defmac
+
+@defmac for-string* (@optional{@repeated{@var{for-clause}}}) @optional{@code{:length} @var{length} @optional{@code{:init} @var{init} @optional{@code{:multibyte} @var{multibyte}}}} @optional{@repeated{@var{body}}}
+This iteration macro is the implicitly nesting version of
+@code{for-string}.
+@end defmac
+
 @defmac for-and (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
 This iteration macro performs @code{and} on the values.  It is like
 @code{for-fold}, except:

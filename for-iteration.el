@@ -719,6 +719,39 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
               ,vector)))))
     (_ `(apply #'vector (for-list ,for-clauses . ,body)))))
 
+(for--defmacro for-string (for-clauses &rest body)
+  "The string-building iteration macro.
+
+...
+
+\(fn FOR-CLAUSES [:length LENGTH [:init INIT [:multibyte MULTIBYTE]]] BODY)"
+  (declare (debug for--accumulator-spec) (indent 1))
+  (pcase body
+    ((or `(:length ,length-form :init ,init-form
+                   :multibyte ,multibyte-form . ,body)
+         (and (or `(:length ,length-form :init ,init-form . ,body)
+                  (and `(:length ,length-form . ,body)
+                       (let init-form nil)))
+              (let multibyte-form nil)))
+     (pcase-let ((`(,for-clauses . ,value-form)
+                  (for--parse-body for-clauses body)))
+       (cl-with-gensyms (length init multibyte index string)
+         `(let ((,length ,length-form)
+                (,init (or ,init-form 0))
+                (,multibyte ,multibyte-form))
+            (let ((,string (make-string ,length ,init ,multibyte)))
+              (let ((,index 0))
+                (for-do (,@for-clauses
+                         (:do ,(for--parse-value-form
+                                value-form 1
+                                (pcase-lambda (`(:values ,form))
+                                  `(setf (aref ,string ,index)
+                                         ,form)))
+                              (cl-incf ,index))
+                         (:break (= ,index ,length)))))
+              ,string)))))
+    (_ `(apply #'string (for-list ,for-clauses . ,body)))))
+
 (for--defmacro for-and (for-clauses &rest body)
   "The `and'-folding iteration macro.
 
