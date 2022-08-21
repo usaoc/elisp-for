@@ -1053,9 +1053,11 @@ returned by @code{for-list} to string.
 
 Otherwise, this iteration macro accumulates the values into a fresh
 string of length @var{length} with each element being @var{init} where
-@var{init} defaults to @code{?\0} when when it is @code{nil} or omitted.
-The string is always a multibyte string when @var{multibyte} is true.
-In such case, it is like @code{for-fold}, except:
+@var{init} defaults to @code{?\0} (@pxref{General Escape
+Syntax,,,elisp}) when it is @code{nil} or omitted.  The string is always
+a multibyte string (@pxref{Non-ASCII Characters,,,elisp}) when
+@var{multibyte} is true where @var{multibyte} defaults to @code{nil}
+when omitted.  In such case, it is like @code{for-fold}, except:
 
 @itemize
 @item
