@@ -247,9 +247,11 @@ returned by <code>for-list</code> to string.
 
 <p>Otherwise, this iteration macro accumulates the values into a fresh
 string of length <var>length</var> with each element being <var>init</var> where
-<var>init</var> defaults to <code>0</code> when when it is <code>nil</code> or omitted.
-The string is always a multibyte string when <var>multibyte</var> is true.
-In such case, it is like <code>for-fold</code>, except:
+<var>init</var> defaults to <code>?\0</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/General-Escape-Syntax.html#General-Escape-Syntax">(elisp)General Escape
+Syntax</a>) when it is <code>nil</code> or omitted.  The string is always
+a multibyte string (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Non_002dASCII-Characters.html#Non_002dASCII-Characters">(elisp)Non-ASCII Characters</a>) when
+<var>multibyte</var> is true where <var>multibyte</var> defaults to <code>nil</code>
+when omitted.  In such case, it is like <code>for-fold</code>, except:
 </p>
 <ul>
 <li> The iteration form is first transformed to the following form where
@@ -259,7 +261,7 @@ in the apparent evaluation order:
 
 <div class="example">
 <pre class="example">(let ((<var>string</var> (make-string <var>length</var>
-                           (or <var>init</var> 0)
+                           (or <var>init</var> ?\0)
                            <var>multibyte</var>)))
   (let ((<var>index</var> 0))
     (for-do ([<var>for-clause</var>&hellip;])
