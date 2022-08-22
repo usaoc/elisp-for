@@ -79,7 +79,8 @@ constructor that iterates over lists is as follows<a id="DOCF15" href="#FOOT15">
 <div class="example">
 <pre class="example">(:expander-case
  (`(,identifier (,_ ,list-form))
-  (cl-with-gensyms (list tail)
+  (let ((list (gensym &quot;list&quot;))
+        (tail (gensym &quot;tail&quot;)))
     `(,identifier (:do-in ((,list ,list-form))
                           ()
                           ((,tail ,list))
