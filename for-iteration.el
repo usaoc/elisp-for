@@ -5,7 +5,6 @@
 ;; Author: Wing Hei Chan <whmunkchan@outlook.com>
 ;; URL: https://github.com/usaoc/elisp-for
 ;; Keywords: extensions
-;; Package-Requires: ((emacs "28.1"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -270,11 +269,11 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
                . ,groups))
         (`(,(or (and (or `(:break . ,_) `(:final . ,_)) head)
                 (and `(,(and (cl-type keyword)
-                             (app (lambda (keyword)
-                                    (get keyword
-                                         'for--special-clause-expander
-                                         ))
-                                  (and (pred identity) expander)))
+                             (app
+                              (lambda (keyword)
+                                (get keyword
+                                     'for--special-clause-expander))
+                              (and (pred identity) expander)))
                        . ,_)
                      (app (lambda (special-clause)
                             `(,expander . ,special-clause))
