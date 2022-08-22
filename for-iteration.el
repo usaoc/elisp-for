@@ -58,6 +58,18 @@ Currently, literal lists, arrays, and integers are transformed to
      `(for-in-range ,datum))
     (_ nil)))
 
+(defmacro for--with-gensyms (names &rest body)
+  "Bind NAMEs in NAMES to generated identifiers and evaluate BODY.
+
+\(fn (NAME...) BODY...)"
+  (declare (debug ((&rest symbolp) body)) (indent 1))
+  (pcase-exhaustive names
+    ((and `(,_ . ,_) (let `(,_ . ,_) body)
+          (app (mapcar (lambda (name)
+                         `(,name (gensym ,(symbol-name name)))))
+               bindings))
+     `(let ,bindings . ,body))))
+
 (defun for--iterator-for-clause (iteration-clause)
   "Transform ITERATION-CLAUSE to iterate over an iterator.
 
@@ -66,7 +78,7 @@ form and ITERATOR is an expression that produces an iterator."
   (declare (side-effect-free t))
   (pcase-exhaustive iteration-clause
     (`(,id ,form)
-     (cl-with-gensyms (iterator next)
+     (for--with-gensyms (iterator next)
        (let* ((returned '#:returned)
               (next* `(condition-case nil (iter-next ,iterator)
                         (iter-end-of-sequence ',returned))))
@@ -551,7 +563,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
                       (`(,clause . ,clauses)
                        (pcase clause
                          (`(:final . ,guards)
-                          (cl-with-gensyms (final final-guard)
+                          (for--with-gensyms (final final-guard)
                             (parse `(,final . ,final-ids)
                                    `((when ,final-guard
                                        (setq ,final nil))
@@ -630,7 +642,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
                                     body iteration-forms))))
               (pcase-exhaustive head
                 (`(:break . ,guards)
-                 (cl-with-gensyms (break)
+                 (for--with-gensyms (break)
                    (expand `(,break . ,break-ids)
                            `((if (and . ,guards) (setq ,break nil)
                                . ,expanded))
@@ -664,7 +676,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
-    (cl-with-gensyms (list)
+    (for--with-gensyms (list)
       `(for-fold ((,list '()) (:result (nreverse ,list)))
            (,@for-clauses ,(for--parse-value-form
                             value-form 1
@@ -721,7 +733,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
          (and `(:length ,length-form . ,body) (let init-form nil)))
      (pcase-let ((`(,for-clauses . ,value-form)
                   (for--parse-body for-clauses body)))
-       (cl-with-gensyms (length init index vector)
+       (for--with-gensyms (length init index vector)
          `(let ((,length ,length-form) (,init ,init-form))
             (let ((,vector (make-vector ,length ,init)))
               (let ((,index 0))
@@ -752,7 +764,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
               (let multibyte-form nil)))
      (pcase-let ((`(,for-clauses . ,value-form)
                   (for--parse-body for-clauses body)))
-       (cl-with-gensyms (length init multibyte index string)
+       (for--with-gensyms (length init multibyte index string)
          `(let ((,length ,length-form)
                 (,init (or ,init-form ?\0))
                 (,multibyte ,multibyte-form))
@@ -778,7 +790,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
-    (cl-with-gensyms (value)
+    (for--with-gensyms (value)
       `(let ((,value t))
          (for-do (,@for-clauses
                   (:do ,(for--parse-value-form
@@ -797,7 +809,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
-    (cl-with-gensyms (value)
+    (for--with-gensyms (value)
       `(let ((,value nil))
          (for-do (,@for-clauses
                   (:do ,(for--parse-value-form
@@ -816,7 +828,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
-    (cl-with-gensyms (sum)
+    (for--with-gensyms (sum)
       `(for-fold ((,sum 0))
            (,@for-clauses ,(for--parse-value-form
                             value-form 1
@@ -832,7 +844,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
-    (cl-with-gensyms (product)
+    (for--with-gensyms (product)
       `(for-fold ((,product 1))
            (,@for-clauses ,(for--parse-value-form
                             value-form 1
@@ -848,7 +860,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
-    (cl-with-gensyms (value)
+    (for--with-gensyms (value)
       `(for-fold ((,value nil))
            (,@for-clauses (:final) ,value-form)))))
 
@@ -859,7 +871,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
 
 \(fn FOR-CLAUSES BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
-  (cl-with-gensyms (value)
+  (for--with-gensyms (value)
     `(for-fold ((,value nil)) ,for-clauses . ,body)))
 
 (for--defmacro for-max (for-clauses &rest body)
@@ -871,7 +883,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
-    (cl-with-gensyms (max)
+    (for--with-gensyms (max)
       `(for-fold ((,max -1.0e+INF))
            (,@for-clauses ,(for--parse-value-form
                             value-form 1
@@ -887,7 +899,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
-    (cl-with-gensyms (min)
+    (for--with-gensyms (min)
       `(for-fold ((,min 1.0e+INF))
            (,@for-clauses ,(for--parse-value-form
                             value-form 1

@@ -1414,7 +1414,8 @@ Evaluation,,,elisp}).}:
 @group
 (:expander-case
  (`(,identifier (,_ ,list-form))
-  (cl-with-gensyms (list tail)
+  (let ((list (gensym "list"))
+        (tail (gensym "tail")))
     `(,identifier (:do-in ((,list ,list-form))
                           ()
                           ((,tail ,list))
