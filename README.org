@@ -27,8 +27,8 @@ to [[https://usaoc.github.io/elisp-for/][the manual]].
   This package can be installed through the user's package manager of
   choice, such as the built-in [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Packages.html][package manager]] or [[https://github.com/radian-software/straight.el][Straight]].  A
   [[file:Makefile][=Makefile=]] is provided for those who manually install the package,
-  where targets are available for compiling the Emacs Lisp files as
-  well as building the documentation.
+  where targets are available for compiling the Emacs Lisp files,
+  building the documentation, as well as running the test suites.
 
   If only the iteration forms and sequence expanders are used, it is
   recommended that the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Named-Features.html][named feature]] ~for~ be available only [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Eval-During-Compile.html][at

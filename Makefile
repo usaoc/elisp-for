@@ -11,6 +11,8 @@ EMACS = emacs --batch --quick --directory=.
 MAKEINFO = makeinfo
 EL = for.el for-iteration.el for-sequence.el
 ELC = $(EL:.el=.elc)
+TEST = for-tests.el
+TESTC = $(TEST:.el=.elc)
 TEXI = for.texi
 INFO = $(TEXI:.texi=.info)
 INFOD = dir
@@ -25,7 +27,7 @@ HTML = docs
 .texi.info:
 	$(MAKEINFO) --no-split $< --output=$@
 
-all: compile info
+all: compile info check
 
 compile: $(ELC)
 
@@ -34,5 +36,8 @@ info: $(INFO)
 html: $(CSS)
 	$(MAKEINFO) --html $(CSS_OPT) $(TEXI) --output=$(HTML)
 
+check: compile $(TESTC)
+	$(EMACS) --load=$(TEST:.el=) --funcall=ert-run-tests-batch-and-exit
+
 clean:
-	rm -rf $(ELC) $(INFO) $(INFOD) $(HTML)
+	rm -rf $(ELC) $(TESTC) $(INFO) $(INFOD) $(HTML)
