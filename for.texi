@@ -376,6 +376,7 @@ Adjacent iteration clauses are considered parallel and thus iterated at
 the same time.  When one of them ends, the iteration ends.  This gives
 rise to the usefulness of infinite sequences.
 
+@concept{convention, metavariable}
 @concept{convention, optional form}
 @concept{convention, repeated form}
 
