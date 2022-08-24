@@ -3,7 +3,7 @@
 <!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!-- This manual documents For (version 0.2).
+<!-- This manual documents For (version 1.0).
 
 Copyright (C) 2022 Wing Hei Chan
 
@@ -47,7 +47,7 @@ Next: <a href="Iteration-Forms.html" accesskey="n" rel="next">Iteration Forms</a
 special-clause operators.  This chapter specifies them.
 </p>
 <dl class="def">
-<dt id="index-define_002dfor_002dsequence"><span class="category">Macro: </span><span><strong>define-for-sequence</strong> <em><var>name</var> <var>arglist</var> [<var>docstring</var>] [<var>subform</var>&hellip;] [<var>body</var>&hellip;]</em><a href='#index-define_002dfor_002dsequence' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-define_002dfor_002dsequence"><span class="category">Macro: </span><span><strong>define-for-sequence</strong> <em>name arglist [docstring] [subform&hellip;] [body&hellip;]</em><a href='#index-define_002dfor_002dsequence' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This definer defines the sequence constructor <var>name</var> as a generator
 with <var>arglist</var> as the argument list, an optional <var>docstring</var> as
 the documentation string, and optional <var>body</var>s as the body.  When no
@@ -101,7 +101,7 @@ of generator.
 </p></dd></dl>
 
 <dl class="def">
-<dt id="index-define_002dfor_002dspecial_002dclause"><span class="category">Macro: </span><span><strong>define-for-special-clause</strong> <em><var>name</var> <var>arglist</var> [<var>docstring</var>] [<var>subform</var>&hellip;]</em><a href='#index-define_002dfor_002dspecial_002dclause' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-define_002dfor_002dspecial_002dclause"><span class="category">Macro: </span><span><strong>define-for-special-clause</strong> <em>name arglist [docstring] [subform&hellip;]</em><a href='#index-define_002dfor_002dspecial_002dclause' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This definer defines the special-clause operator <var>name</var> as an
 expander with an optional <var>docstring</var> as the documentation string.
 It is an error for <var>name</var> to be a non-keyword.  When a special
