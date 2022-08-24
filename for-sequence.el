@@ -491,7 +491,8 @@ See Info node `(for)Sequence Constructors'.
                `(,_ ,frame-form ,minibuf-form)))
     (for--with-gensyms (frame minibuf current original visited)
       `(,id (:do-in ((,frame ,frame-form) (,minibuf ,minibuf-form))
-                    ((,original (and (framep ,frame) ,frame))
+                    ((,original (frame-selected-window
+                                 (and (framep ,frame) ,frame)))
                      (,visited nil))
                     ((,current ,original))
                     ((or (not (eq ,current ,original))
