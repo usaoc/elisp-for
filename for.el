@@ -6,7 +6,7 @@
 ;; URL: https://github.com/usaoc/elisp-for
 ;; Keywords: extensions
 ;; Package-Requires: ((emacs "28.1"))
-;; Version: 0.2
+;; Version: 1.0
 
 ;; This file is not part of GNU Emacs.
 
