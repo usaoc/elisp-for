@@ -266,12 +266,19 @@
 (ert-deftest for-nesting-sequences ()
   "Nesting sequences."
   (let* ((start (random 5)) (end (+ (1+ start) (random 5))))
-    (should (equal (for-list* ((i (in-inclusive-range start end))
-                               (j (in-inclusive-range start i))
-                               (+ i j)))
-                   (cl-loop for i from start to end
-                            nconc (cl-loop for j from start to i
-                                           collect (+ i j)))))
+    (let* ((tail-length (1+ (random 5)))
+           (vector-length (let ((end (1+ (- end start))))
+                            (+ (/ (* end (1+ end)) 2) tail-length)))
+           (init (random 5)))
+      (should (equal (for-vector* ((i (in-inclusive-range start end))
+                                   (j (in-inclusive-range start i))
+                                   (+ i j))
+                       :length vector-length :init init)
+                     (vconcat
+                      (cl-loop for i from start to end
+                               vconcat (cl-loop for j from start to i
+                                                collect (+ i j)))
+                      (make-vector tail-length init)))))
     (should (eql (for-sum ((i (in-inclusive-range start end))
                            (:if-not (< i 5))
                            (j (in-inclusive-range start i))

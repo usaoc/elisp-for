@@ -333,15 +333,10 @@ forms.
                              [&optional ("declare" def-declarations)]
                              def-body))
              (doc-string 3) (indent 2))
-    (pcase-exhaustive (reverse arglist)
-      (`(,body-form &rest ,for-clause-form
-                    . ,(app (mapcar (lambda (form) (list '\, form)))
-                            (app nreverse forms)))
-       (pcase-let*
-           (((or `(,(and (cl-type string)
-                         (app (lambda (docstring)
-                                `(,(replace-regexp-in-string
-                                    (rx bol "..." eol) "\
+    (pcase-let* (((or `(,(and (cl-type string)
+                              (app (lambda (docstring)
+                                     `(,(replace-regexp-in-string
+                                         (rx bol "..." eol) "\
 BODY = [[BODY-FORM...] MULTIPLE-VALUE-FORM]
 
 BODY-FORM = SPECIAL-CLAUSE | EXPRESSION
@@ -355,25 +350,33 @@ SPECIAL-CLAUSE = (KEYWORD [SUBFORM...])
 ITERATION-CLAUSE = ([IDENTIFIER] SEQUENCE-FORM)
 
 See Info node `(for)Iteration Macros'." docstring)))
-                              docstring))
-                   . ,body)
-                 (and body (let docstring '())))
-             body)
-            ((or `(,(and `(declare . ,_)
-                         (app (lambda (form) `(,form)) declaration))
-                   . ,body)
-                 (and body (let declaration '())))
-             body))
-         `(prog1 (defmacro ,name ,arglist
-                   ,@docstring ,@declaration . ,body)
-            (defmacro ,(intern (concat (symbol-name name) "*"))
-                ,arglist ,@docstring ,@declaration
-                (pcase-let
-                    ((`(,(app for--nest-for-clauses for-clauses)
-                        . ,value-form)
-                      (for--parse-body ,for-clause-form ,body-form)))
-                  ,(list '\` `(,name ,@forms ,'(,@for-clauses
-                                                ,value-form)))))))))))
+                                   docstring))
+                        . ,body)
+                      (and body (let docstring '())))
+                  body)
+                 ((or `(,(and `(declare . ,_)
+                              (app (lambda (form) `(,form))
+                                   declaration))
+                        . ,body)
+                      (and body (let declaration '())))
+                  body))
+      `(prog1 (defmacro ,name ,arglist
+                ,@docstring ,@declaration . ,body)
+         (defmacro ,(intern (concat (symbol-name name) "*")) ,arglist
+           ,@docstring ,@declaration
+           ,(pcase name
+              ('for-fold `(cl-flet
+                              ((for--parse-for-clauses (for-clauses)
+                                 (for--parse-for-clauses
+                                  (for--nest-for-clauses
+                                   for-clauses))))
+                            . ,body))
+              (_ `(let ((form (progn . ,body)))
+                    `(cl-macrolet
+                         ((for-fold (bindings for-clauses &rest body)
+                            `(for-fold* ,bindings ,for-clauses
+                               . ,body)))
+                       ,form)))))))))
 
 (def-edebug-spec for--result-clause-spec (":result" body))
 
