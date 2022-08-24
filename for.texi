@@ -734,7 +734,7 @@ for-binder
 Two definers are available for defining sequence constructors and
 special-clause operators.  This chapter specifies them.
 
-@defmac define-for-sequence @var{name} @var{arglist} @optional{@var{docstring}} @optional{@repeated{@var{subform}}} @optional{@repeated{@var{body}}}
+@defmac define-for-sequence name arglist @optional{docstring} @optional{@repeated{subform}} @optional{@repeated{body}}
 This definer defines the sequence constructor @var{name} as a generator
 with @var{arglist} as the argument list, an optional @var{docstring} as
 the documentation string, and optional @var{body}s as the body.  When no
@@ -795,7 +795,7 @@ defined.  Therefore, the aliases and expander are available in the body
 of generator.
 @end defmac
 
-@defmac define-for-special-clause @var{name} @var{arglist} @optional{@var{docstring}} @optional{@repeated{@var{subform}}}
+@defmac define-for-special-clause name arglist @optional{docstring} @optional{@repeated{subform}}
 This definer defines the special-clause operator @var{name} as an
 expander with an optional @var{docstring} as the documentation string.
 It is an error for @var{name} to be a non-keyword.  When a special
@@ -839,7 +839,7 @@ later chapters.
 Iteration macros are global macros acting as the entry points of this
 package.
 
-@defmac for-fold @var{bindings} (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-fold bindings (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the fundamental building block of other
 iteration macros.  The form of @var{bindings} is the same as the
 @var{varlist} subforms of @code{let} forms, that is, a @var{binding} in
@@ -889,7 +889,7 @@ multiple-value form, @var{identifier} is first bound to the value of
 later updated to @var{value} after each iteration.
 @end defmac
 
-@defmac for-fold* @var{bindings} (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-fold* bindings (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 @concept{iteration form, implicitly nesting}
 
 This iteration macro is the @dfn{implicitly nesting} version of
@@ -898,7 +898,7 @@ This is achieved by separating each pair of adjacent iteration clauses
 with a vacuous special clause such as @code{(:do)}.
 @end defmac
 
-@defmac for-do (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-do (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro performs side effects and produces @code{nil} as
 the value.  It is equivalent to the following @code{for-fold} form:
 
@@ -912,11 +912,11 @@ the value.  It is equivalent to the following @code{for-fold} form:
 @end example
 @end defmac
 
-@defmac for-do* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-do* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of @code{for-do}.
 @end defmac
 
-@defmac for-list (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-list (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 @concept{terminology, fresh}
 
 This iteration macro accumulates the values into a
@@ -937,12 +937,12 @@ an error for the multiple-value form to produce not exactly one value.
 @end itemize
 @end defmac
 
-@defmac for-list* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-list* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-list}.
 @end defmac
 
-@defmac for-lists @var{bindings} (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-lists bindings (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro accumulates the values into fresh lists and
 sequentially evaluates the expressions in the @code{:result} form with
 the identifiers in @var{bindings} bound to the lists.  It is like
@@ -971,12 +971,12 @@ identifiers in @var{bindings}.
 The values of @var{identifier}s during the iteration are unspecified.
 @end defmac
 
-@defmac for-lists* @var{bindings} (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-lists* bindings (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-lists}.
 @end defmac
 
-@defmac for-vector (@optional{@repeated{@var{for-clause}}}) @optional{@code{:length} @var{length} @optional{@code{:init} @var{init}}} @optional{@repeated{@var{body}}}
+@defmac for-vector (@optional{@repeated{for-clause}}) @optional{@code{:length} length @optional{@code{:init} init}} @optional{@repeated{body}}
 @concept{terminology, coerce}
 
 When neither @var{length} nor @var{init} is present, this iteration
@@ -1031,12 +1031,12 @@ inserted after the above-mentioned @code{:do} clause.
 @end itemize
 @end defmac
 
-@defmac for-vector* (@optional{@repeated{@var{for-clause}}}) @optional{@code{:length} @var{length} @optional{@code{:init} @var{init}}} @optional{@repeated{@var{body}}}
+@defmac for-vector* (@optional{@repeated{for-clause}}) @optional{@code{:length} length @optional{@code{:init} init}} @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-vector}.
 @end defmac
 
-@defmac for-string (@optional{@repeated{@var{for-clause}}}) @optional{@code{:length} @var{length} @optional{@code{:init} @var{init} @optional{@code{:multibyte} @var{multibyte}}}} @optional{@repeated{@var{body}}}
+@defmac for-string (@optional{@repeated{for-clause}}) @optional{@code{:length} length @optional{@code{:init} init @optional{@code{:multibyte} multibyte}}} @optional{@repeated{body}}
 @concept{terminology, coerce}
 
 When neither @var{length}, @var{init}, nor @var{multibyte} is present,
@@ -1092,12 +1092,12 @@ inserted after the above-mentioned @code{:do} clause.
 @end itemize
 @end defmac
 
-@defmac for-string* (@optional{@repeated{@var{for-clause}}}) @optional{@code{:length} @var{length} @optional{@code{:init} @var{init} @optional{@code{:multibyte} @var{multibyte}}}} @optional{@repeated{@var{body}}}
+@defmac for-string* (@optional{@repeated{for-clause}}) @optional{@code{:length} length @optional{@code{:init} init @optional{@code{:multibyte} multibyte}}} @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-string}.
 @end defmac
 
-@defmac for-and (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-and (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro performs @code{and} on the values.  It is like
 @code{for-fold}, except:
 
@@ -1127,12 +1127,12 @@ after the above-mentioned @code{:do} clause.
 @end itemize
 @end defmac
 
-@defmac for-and* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-and* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-and}.
 @end defmac
 
-@defmac for-or (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-or (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro performs @code{or} on the values.  It is like
 @code{for-fold}, except:
 
@@ -1162,11 +1162,11 @@ above-mentioned @code{:do} clause.
 @end itemize
 @end defmac
 
-@defmac for-or* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-or* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of @code{for-or}.
 @end defmac
 
-@defmac for-sum (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-sum (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro accumulates the values into a sum.  It is like
 @code{for-fold}, except:
 
@@ -1182,12 +1182,12 @@ error for the multiple-value form to produce not exactly one value.
 @end itemize
 @end defmac
 
-@defmac for-sum* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-sum* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-sum}.
 @end defmac
 
-@defmac for-product (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-product (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro accumulates the values into a product.  It is like
 @code{for-fold}, except:
 
@@ -1203,12 +1203,12 @@ an error for the multiple-value form to produce not exactly one value.
 @end itemize
 @end defmac
 
-@defmac for-product* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-product* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-product}.
 @end defmac
 
-@defmac for-first (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-first (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro returns the first value or @code{nil} if the
 iteration never begins.  It is like @code{for-fold}, except:
 
@@ -1224,12 +1224,12 @@ after the first iteration.
 @end itemize
 @end defmac
 
-@defmac for-first* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-first* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-first}.
 @end defmac
 
-@defmac for-last (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-last (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro returns the last value or @code{nil} if the
 iteration never begins.  It is like @code{for-fold}, except:
 
@@ -1240,12 +1240,12 @@ generated identifier.
 @end itemize
 @end defmac
 
-@defmac for-last* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-last* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-last}.
 @end defmac
 
-@defmac for-max (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-max (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro performs @code{max} (@pxref{Comparison of
 Numbers,,,elisp}) on the values.  It is like @code{for-fold}, except:
 
@@ -1261,12 +1261,12 @@ an error for the multiple-value form to produce not exactly one value.
 @end itemize
 @end defmac
 
-@defmac for-max* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-max* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-max}.
 @end defmac
 
-@defmac for-min (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-min (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro performs @code{min} on the values.  It is like
 @code{for-fold}, except:
 
@@ -1282,7 +1282,7 @@ an error for the multiple-value form to produce not exactly one value.
 @end itemize
 @end defmac
 
-@defmac for-min* (@optional{@repeated{@var{for-clause}}}) @optional{@repeated{@var{body}}}
+@defmac for-min* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-min}.
 @end defmac
@@ -1312,43 +1312,43 @@ non-local transformation in order to terminate the whole iteration.  As
 a result, they cannot be implemented by
 @code{define-for-special-clause}.
 
-@deffn @aux{:break, @optional{@repeated{@var{guard}}}}
+@deffn @aux{:break, @optional{@repeated{guard}}}
 This special-clause operator immediately terminates the whole iteration
 when @code{(and @optional{@repeated{@var{guard}}})} is true before the
 iteration.
 @end deffn
 
-@deffn @aux{:final, @optional{@repeated{@var{guard}}}}
+@deffn @aux{:final, @optional{@repeated{guard}}}
 This special-clause operator terminates the whole iteration after one
 more iteration when @code{(and @optional{@repeated{@var{guard}}})} is
 true before the iteration.
 @end deffn
 
-@deffn @aux{:if, @optional{@repeated{@var{guard}}}}
+@deffn @aux{:if, @optional{@repeated{guard}}}
 This special-clause operator skips the iteration unless @code{(and
 @optional{@repeated{@var{guard}}})} is true.
 @end deffn
 
-@deffn @aux{:if-not, @optional{@repeated{@var{guard}}}}
+@deffn @aux{:if-not, @optional{@repeated{guard}}}
 This special-clause operator skips the iteration unless @code{(and
 @optional{@repeated{@var{guard}}})} is false.
 @end deffn
 
-@deffn @aux{:let, @optional{@repeated{@var{binding}}}}
+@deffn @aux{:let, @optional{@repeated{binding}}}
 This special-clause operator wraps the iteration in the form
 @code{(@var{for-binder} (@optional{@repeated{@var{binding}}})
 @optional{@repeated{@var{body}}})} where @var{for-binder} is the value
 of @code{for-binder} and @var{body}s are the body expanded so far.
 @end deffn
 
-@deffn @aux{:if-let, @optional{@repeated{@var{binding}}}}
+@deffn @aux{:if-let, @optional{@repeated{binding}}}
 This special-clause operator wraps the iteration in the form
 @code{(when-let* (@optional{@repeated{@var{binding}}})
 @optional{@repeated{@var{body}}})} where @var{body}s are the body
 expanded so far.
 @end deffn
 
-@deffn @aux{:pcase, @var{expression} @optional{@code{:exhaustive}} @optional{@repeated{@var{pattern}}}}
+@deffn @aux{:pcase, expression @optional{@code{:exhaustive}} @optional{@repeated{pattern}}}
 This special-clause operator skips the iteration unless @code{(and
 @optional{@repeated{@var{pattern}}})} matches @var{expression} as in
 @code{pcase} (@pxref{Pattern-Matching Conditional,,,elisp}).  The match
@@ -1356,14 +1356,14 @@ is exhaustive as in @code{pcase-exhaustive} when @code{:exhaustive} is
 present.
 @end deffn
 
-@deffn @aux{:pcase-not, @var{expression} @optional{@code{:as} @var{as}} @optional{@repeated{@var{pattern}}}}
+@deffn @aux{:pcase-not, expression @optional{@code{:as} as} @optional{@repeated{pattern}}}
 This special-clause operator skips the iteration unless @code{(and
 @optional{@repeated{@var{pattern}}})} does not match @var{expression} as
 in @code{pcase}.  When the identifier @var{as} is present, it is bound
 to the value of @var{expression} in the iteration.
 @end deffn
 
-@deffn @aux{:do, @optional{@repeated{@var{expression}}}}
+@deffn @aux{:do, @optional{@repeated{expression}}}
 This special-clause operator sequentially evaluates @var{expression}s
 before the iteration.
 @end deffn
@@ -1375,7 +1375,7 @@ the sequence constructor @code{:do-in} is designed for use in expanders
 of other sequence constructors and is thus an auxiliary operator.  Other
 sequence constructors can act as expanders as well as generators.
 
-@deffn @aux{:do-in, @var{memoize-bindings} @var{outer-bindings} @var{loop-bindings} @var{loop-guards} @var{inner-bindings} @var{loop-forms}}
+@deffn @aux{:do-in, memoize-bindings outer-bindings loop-bindings loop-guards inner-bindings loop-forms}
 This sequence constructor declares the forms to be appended to subforms
 in expanded iteration forms.  An iteration form essentially expands to
 the following @code{while} loop:
@@ -1434,14 +1434,14 @@ constructor.  All sequence constructors when used as generators are
 guaranteed to delay the computation as much as possible, including that
 of the initial states.
 
-@deffn @seq{for-in-array, in-array, @var{array}}
+@deffn @seq{for-in-array, in-array, array}
 This sequence iterates over the elements of the array @var{array}.  As
 such, @code{array}s are dispatched to it.  Moreover, a literal array as
 a sequence form when used in iteration clauses is treated as if this
 sequence constructor is used.
 @end deffn
 
-@deffn @seq{for-in-inclusive-range, in-inclusive-range, @var{start} @var{end} @optional{@var{step}}}
+@deffn @seq{for-in-inclusive-range, in-inclusive-range, start end @optional{step}}
 This sequence iterates over the numbers between @var{start} and
 @var{end}.  The step size @var{step} defaults to @code{1} when it is
 @code{nil} or omitted and is added to the number after each iteration.
@@ -1449,14 +1449,14 @@ The iteration terminates when the number is no longer in the closed
 range of @var{start} and @var{end}.
 @end deffn
 
-@deffn @seq{for-in-list, in-list, @var{list}}
+@deffn @seq{for-in-list, in-list, list}
 This sequence iterates over the elements of the non-dotted list
 @var{list}.  As such, @code{list}s are dispatched to it.  Moreover, a
 literal list as a sequence form when used in iteration clauses is
 treated as if this sequence constructor is used.
 @end deffn
 
-@deffn @seq{for-in-naturals, in-naturals, @optional{@var{start}}}
+@deffn @seq{for-in-naturals, in-naturals, @optional{start}}
 This sequence iterates over the natural numbers (non-negative integers)
 from @var{start} where @var{start} defaults to @code{0} when it is
 @code{nil} or omitted and is checked to be of type @code{(integer 0)} by
@@ -1466,7 +1466,7 @@ since the type checking is done at compile time when @var{start} is a
 literal object anyway.
 @end deffn
 
-@deffn @seq{for-in-producer, in-producer, @var{producer} @optional{@var{continuep} @optional{@repeated{@var{arg}}}}}
+@deffn @seq{for-in-producer, in-producer, producer @optional{continuep @optional{@repeated{arg}}}}
 This sequence iterates over the values produced by repeated evaluations
 of the function form @code{(funcall @var{producer}
 @optional{@repeated{@var{arg}}})}.  The iteration is infinite when
@@ -1475,7 +1475,7 @@ of the function form @code{(funcall @var{producer}
 is the value of the function form,
 @end deffn
 
-@deffn @seq{for-in-range, in-range, @var{end}}
+@deffn @seq{for-in-range, in-range, end}
 @seqx{for-in-range, in-range, @var{start} @var{end} @optional{@var{step}}}
 
 This sequence iterates over the numbers between @var{start} and
@@ -1489,7 +1489,7 @@ Moreover, a literal integer as a sequence form when used in iteration
 clauses is as if this sequence constructor is used.
 @end deffn
 
-@deffn @seq{for-in-iterator, in-iterator, @var{iterator}}
+@deffn @seq{for-in-iterator, in-iterator, iterator}
 This sequence is equivalent to the sequence @var{iterator}.  When used
 as a function, this sequence constructor checks @var{iterator} to be of
 type @code{function} and returns @var{iterator} as is.  @code{function}s
@@ -1497,27 +1497,27 @@ are dispatched to it.  It is mainly useful for its expander to avoid the
 dynamic dispatch.
 @end deffn
 
-@deffn @seq{for-in-repeat, in-repeat, @repeated{@var{value}}}
+@deffn @seq{for-in-repeat, in-repeat, @repeated{value}}
 This sequence repeatedly returns each @var{value} from left to right.
 It is equivalent to the sequence @code{(for-in-list (@var{make-circular}
 @repeated{@var{value}}))} where @var{make-circular} is a function that
 makes a circular list of the arguments.
 @end deffn
 
-@deffn @seq{for-in-value, in-value, @var{value}}
+@deffn @seq{for-in-value, in-value, value}
 This sequence returns @var{value} once.
 @end deffn
 
-@deffn @seq{for-on-array, on-array, @var{array}}
+@deffn @seq{for-on-array, on-array, array}
 This sequence iterates over the indexes of the array @var{array}.
 @end deffn
 
-@deffn @seq{for-on-list, on-list, @var{list}}
+@deffn @seq{for-on-list, on-list, list}
 This sequence iterates over the @code{cons}es of the non-dotted list
 @var{list}.
 @end deffn
 
-@deffn @seq{for-in-directory, in-directory, @var{directory} @optional{@var{full} @optional{@var{match} @optional{@var{nosort} @optional{@var{count}}}}}}
+@deffn @seq{for-in-directory, in-directory, directory @optional{full @optional{match @optional{nosort @optional{count}}}}}
 This sequence iterates over the files in the directory named by the
 string @var{directory}.  It is equivalent to the following sequence
 (@pxref{Contents of Directories,,,elisp}) where @var{full},
@@ -1533,7 +1533,7 @@ it is @code{nil} or omitted:
 @end example
 @end deffn
 
-@deffn @seq{for-in-directory-recursively, in-directory-recursively, @var{dir} @var{regexp} @optional{@var{include-directories} @optional{@var{predicate} @optional{@var{follow-symlinks}}}}}
+@deffn @seq{for-in-directory-recursively, in-directory-recursively, dir regexp @optional{include-directories @optional{predicate @optional{follow-symlinks}}}}
 This sequence iterates over the files under the directory named by the
 string @var{dir}.  It is equivalent to the following sequence where
 @var{include-directories}, @var{predicate}, and @var{follow-symlinks}
@@ -1548,7 +1548,7 @@ default to @code{nil} when omitted:
 @end example
 @end deffn
 
-@deffn @seq{for-the-buffers, the-buffers, @optional{@var{frame}}}
+@deffn @seq{for-the-buffers, the-buffers, @optional{frame}}
 This sequence iterates over the buffers of the frame @var{frame}.  It is
 equivalent to the sequence @code{(for-in-list (buffer-list
 @var{frame}))} (@pxref{Buffer List,,,elisp}) where @var{frame} defaults
@@ -1562,7 +1562,7 @@ visited from the selected frame in @code{next-frame} order
 (@pxref{Finding All Frames,,,elisp}).
 @end deffn
 
-@deffn @seq{for-the-overlays, the-overlays, @optional{@var{buffer}}}
+@deffn @seq{for-the-overlays, the-overlays, @optional{buffer}}
 This sequence iterates over the overlays of the buffer @var{buffer}.  It
 is equivalent to the following sequence (@pxref{Current Buffer,,,elisp},
 @ref{Finding Overlays,,,elisp}, and @ref{Point,,,elisp}) where
@@ -1578,7 +1578,7 @@ omitted:
 @end example
 @end deffn
 
-@deffn @seq{for-the-windows, the-windows, @optional{@var{frame} @optional{@var{minibuf}}}}
+@deffn @seq{for-the-windows, the-windows, @optional{frame @optional{minibuf}}}
 This sequence iterates over the windows of the frame @var{frame}.  It is
 @emph{not} equivalent to the sequence @code{(for-in-list (window-list))}
 (@pxref{Windows and Frames,,,elisp}) since the windows are visited from
