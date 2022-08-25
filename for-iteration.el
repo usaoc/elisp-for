@@ -364,19 +364,13 @@ See Info node `(for)Iteration Macros'." docstring)))
                 ,@docstring ,@declaration . ,body)
          (defmacro ,(intern (concat (symbol-name name) "*")) ,arglist
            ,@docstring ,@declaration
-           ,(pcase name
-              ('for-fold `(cl-flet
-                              ((for--parse-for-clauses (for-clauses)
-                                 (for--parse-for-clauses
-                                  (for--nest-for-clauses
-                                   for-clauses))))
-                            . ,body))
-              (_ `(let ((form (progn . ,body)))
-                    `(cl-macrolet
-                         ((for-fold (bindings for-clauses &rest body)
-                            `(for-fold* ,bindings ,for-clauses
-                               . ,body)))
-                       ,form)))))))))
+           (cl-flet
+               ((for--parse-body (for-clauses body)
+                  (pcase-let ((`(,for-clauses . ,value-form)
+                               (for--parse-body for-clauses body)))
+                    `(,(for--nest-for-clauses for-clauses)
+                      . ,value-form))))
+             . ,body))))))
 
 (def-edebug-spec for--result-clause-spec (":result" body))
 
@@ -667,7 +661,9 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 
 \(fn FOR-CLAUSES BODY)"
   (declare (debug for--do-spec) (indent 1))
-  `(for-fold () ,for-clauses ,@body (:values)))
+  (pcase-let ((`(,for-clauses . ,value-form)
+               (for--parse-body for-clauses `(,@body (:values)))))
+    `(for-fold () (,@for-clauses ,value-form))))
 
 (for--defmacro for-list (for-clauses &rest body)
   "The list-building iteration macro.
@@ -748,7 +744,9 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
                               (cl-incf ,index))
                          (:break (= ,index ,length)))))
               ,vector)))))
-    (_ `(apply #'vector (for-list ,for-clauses . ,body)))))
+    (_ (pcase-let ((`(,for-clauses . ,value-form)
+                    (for--parse-body for-clauses body)))
+         `(apply #'vector (for-list (,@for-clauses ,value-form)))))))
 
 (for--defmacro for-string (for-clauses &rest body)
   "The string-building iteration macro.
@@ -781,7 +779,9 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
                               (cl-incf ,index))
                          (:break (= ,index ,length)))))
               ,string)))))
-    (_ `(apply #'string (for-list ,for-clauses . ,body)))))
+    (_ (pcase-let ((`(,for-clauses . ,value-form)
+                    (for--parse-body for-clauses body)))
+         `(apply #'string (for-list (,@for-clauses ,value-form)))))))
 
 (for--defmacro for-and (for-clauses &rest body)
   "The `and'-folding iteration macro.
@@ -873,8 +873,10 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
 
 \(fn FOR-CLAUSES BODY)"
   (declare (debug for--accumulator-spec) (indent 1))
-  (for--with-gensyms (value)
-    `(for-fold ((,value nil)) ,for-clauses . ,body)))
+  (pcase-let ((`(,for-clauses . ,value-form)
+               (for--parse-body for-clauses body)))
+    (for--with-gensyms (value)
+      `(for-fold ((,value nil)) (,@for-clauses ,value-form)))))
 
 (for--defmacro for-max (for-clauses &rest body)
   "The `max'-folding iteration macro.
