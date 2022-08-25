@@ -35,7 +35,7 @@
 (defun for--make-test-list ()
   "Make a list suitable for test."
   (declare (side-effect-free error-free))
-  (cl-loop repeat (+ (1+ 5) (random 5)) collect (random 10)))
+  (cl-loop repeat (+ 5 (random 5)) collect (random 10)))
 
 (eval-when-compile
   (defmacro for--eval (form &optional dynamic)
@@ -94,7 +94,7 @@
                    (cl-reduce #'+ list :initial-value init))))
     (should (equal (for-list ((i (in-list list)) (1+ i)))
                    (mapcar #'1+ list)))
-    (let* ((tail-length (1+ (random 5)))
+    (let* ((tail-length (+ 5 (random 5)))
            (length (+ list-length tail-length)))
       (let ((init-default nil) (init-test (random 10)))
         (should (equal (for-vector ((i (in-list list)) (1+ i)))
@@ -265,15 +265,15 @@
 
 (ert-deftest for-nesting-sequences ()
   "Nesting sequences."
-  (let* ((start (random 5)) (end (+ (1+ start) (random 5))))
-    (let* ((tail-length (1+ (random 5)))
-           (vector-length (let ((end (1+ (- end start))))
-                            (+ (/ (* end (1+ end)) 2) tail-length)))
-           (init (random 5)))
+  (let* ((start (random 5)) (end (+ start 5 (random 5))))
+    (let ((tail-length (+ 5 (random 5))) (init (random 5)))
       (should (equal (for-vector* ((i (in-inclusive-range start end))
                                    (j (in-inclusive-range start i))
                                    (+ i j))
-                       :length vector-length :init init)
+                       :length (let ((end (1+ (- end start))))
+                                 (+ (/ (* end (1+ end)) 2)
+                                    tail-length))
+                       :init init)
                      (vconcat
                       (cl-loop for i from start to end
                                vconcat (cl-loop for j from start to i
@@ -318,7 +318,7 @@
       (should (equal (for-list ((i vector) (1+ i))) result)))
     (let ((string (concat list)))
       (should (equal (for-list ((i string) (1+ i))) result))))
-  (let ((end (1+ (random 10))))
+  (let ((end (+ 5 (random 5))))
     (should (equal (for-list ((i end) (1+ i)))
                    (cl-loop for i below end collect (1+ i)))))
   (let ((some-object (make-record 'some-type 0 nil)))
@@ -359,24 +359,24 @@
                               collect (1+ i))))
       (should-error (seq (i (in-naturals (float int))) i)
                     :type 'wrong-type-argument))
-    (pcase-let
-        ((`(,(and (app 1+ (app (+ (random 5)) end)) start) . ,_) list)
-         (step (1+ (random 2))))
+    (pcase-let*
+        ((`(,(and (app (+ 5 (random 5)) end) start) . ,_) list)
+         (step (+ (/ (random 15) 10.0) 0.5)) (step* (- step)))
       (should (equal (seq (i (in-inclusive-range start end))
                           (1+ i))
                      (cl-loop for i from start to end
                               collect (1+ i))))
-      (should (equal (seq (i (in-inclusive-range start end step))
+      (should (equal (seq (i (in-inclusive-range end start step*))
                           (1+ i))
-                     (cl-loop for i from start to end by step
+                     (cl-loop for i from end downto start by step
                               collect (1+ i))))
       (should (equal (seq (i (in-range end)) (1+ i))
                      (cl-loop for i below end collect (1+ i))))
       (should (equal (seq (i (in-range start end)) (1+ i))
                      (cl-loop for i from start below end
                               collect (1+ i))))
-      (should (equal (seq (i (in-range start end step)) (1+ i))
-                     (cl-loop for i from start below end by step
+      (should (equal (seq (i (in-range end start step*)) (1+ i))
+                     (cl-loop for i from end above start by step
                               collect (1+ i)))))
     (should (equal (seq* (i (in-repeat . ,list)) ((in-range 10)) i)
                    (cl-loop for i in (apply #'for--make-circular list)
@@ -447,6 +447,8 @@
       ((iter (iter-make (dotimes (n 10) (iter-yield n)))))
     (should (equal (seq (i (in-iterator iter)) (1+ i))
                    (cl-loop for i iter-by iter collect (1+ i)))))
+  (should-error (seq (i (in-iterator '#:not-a-function)) i)
+                :type '(void-function wrong-type-argument))
   (should (equal (seq (i (the-buffers)) i) (buffer-list)))
   (should (null (cl-nset-difference (seq (i (the-frames)) i)
                                     (frame-list))))
