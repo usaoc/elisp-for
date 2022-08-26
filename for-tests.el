@@ -32,15 +32,15 @@
 (require 'for)
 
 ;;;; Internal
-(defun for--make-test-list ()
-  "Make a list suitable for test."
-  (declare (side-effect-free error-free))
-  (cl-loop repeat (+ 5 (random 5)) collect (random 10)))
-
 (eval-when-compile
+  (defmacro for--make-test-list (&optional length item)
+    "Make a list of LENGTH and ITEM suitable for test."
+    (declare (debug (&optional form form)))
+    `(cl-loop repeat (or ,length (+ 5 (random 5)))
+              collect (or ,item (random 10))))
   (defmacro for--eval (form &optional dynamic)
     "Evaluate implicitly quasiquoted FORM under DYNAMIC binding."
-    (declare (debug (backquote-form)))
+    (declare (debug (backquote-form &optional form)))
     (if (macroexp-compiling-p)
         `(funcall (byte-compile
                    (eval ,(macroexpand (list '\` `#'(lambda () ,form))
@@ -84,88 +84,223 @@
            . ,body)))))
 
 ;;;; Iteration
-(ert-deftest for-iteration-macros ()
-  "Iteration macros."
-  (let* ((list (for--make-test-list))
-         (list-length (length list)))
+(ert-deftest for-plain-iteration-macros ()
+  "Plain iteration macros."
+  (let* ((list (for--make-test-list)) (result (mapcar #'1+ list)))
     (let ((init (random 10)))
-      (should (eql (for-fold ((value init))
-                       ((i (in-list list)) (+ value i)))
-                   (cl-reduce #'+ list :initial-value init))))
-    (should (equal (for-list ((i (in-list list)) (1+ i)))
-                   (mapcar #'1+ list)))
+      (should (equal (for-fold ((value init))
+                         ((i (in-list list)) (cons (1+ i) value)))
+                     (cl-reduce (lambda (car cdr) (cons cdr car))
+                                result :initial-value init))))
+    (should (string= (with-output-to-string
+                       (for-do ((i (in-list list))
+                                (:do (prin1 (1+ i))))))
+                     (with-output-to-string (mapc #'prin1 result))))
+    (should (equal (for-list ((i (in-list list)) (1+ i))) result))
+    (should (equal (for-lists (list1 list2)
+                       ((i (in-list list)) (:values (1+ i) (1- i))))
+                   (cons result (mapcar #'1- list))))
     (let* ((tail-length (+ 5 (random 5)))
-           (length (+ list-length tail-length)))
+           (length (+ (length list) tail-length)))
       (let ((init-default nil) (init-test (random 10)))
         (should (equal (for-vector ((i (in-list list)) (1+ i)))
-                       (cl-map 'vector #'1+ list)))
+                       (vconcat result)))
         (should (equal (for-vector ((i (in-list list)) (1+ i))
                          :length length)
-                       (vconcat
-                        (cl-map 'vector #'1+ list)
-                        (make-vector tail-length init-default))))
+                       (vconcat result
+                                (make-vector tail-length
+                                             init-default))))
         (should (equal (for-vector ((i (in-list list)) (1+ i))
                          :length length :init init-test)
-                       (vconcat
-                        (cl-map 'vector #'1+ list)
-                        (make-vector tail-length init-test)))))
+                       (vconcat result
+                                (make-vector tail-length
+                                             init-test)))))
       (let ((init-default ?\0) (init-test (random 10)))
-        (should (string= (for-string ((i (in-list list)) (1+ i)))
-                         (cl-map 'string #'1+ list)))
-        (should (string= (for-string ((i (in-list list)) (1+ i))
-                           :length length)
-                         (concat
-                          (cl-map 'string #'1+ list)
-                          (make-string tail-length init-default))))
-        (let ((string (for-string ((i (in-list list)) (1+ i))
-                        :length length :init init-test)))
-          (should (string= string
-                           (concat
-                            (cl-map 'string #'1+ list)
-                            (make-string tail-length init-test))))
+        (let ((string (for-string ((i (in-list list)) (1+ i)))))
+          (should (string= string (concat result)))
           (should-not (multibyte-string-p string)))
-        (should (multibyte-string-p
-                 (for-string ((i (in-list list)) (1+ i))
-                   :length length :init init-test
-                   :multibyte t)))))
+        (let ((string (for-string ((i (in-list list)) (1+ i))
+                        :length length)))
+          (should (string= string
+                           (concat result
+                                   (make-string tail-length
+                                                init-default))))
+          (should-not (multibyte-string-p string)))
+        (let ((string* (concat result
+                               (make-string tail-length init-test))))
+          (let ((string (for-string ((i (in-list list)) (1+ i))
+                          :length length :init init-test)))
+            (should (string= string string*))
+            (should-not (multibyte-string-p string)))
+          (let ((string (for-string ((i (in-list list)) (1+ i))
+                          :length length :init init-test
+                          :multibyte t)))
+            (should (string= string string*))
+            (should (multibyte-string-p string))))))
     (should (eq (for-and ((i (in-list list)) (< i 5)))
                 (cl-every (lambda (i) (< i 5)) list)))
     (should (eq (for-or ((i (in-list list)) (< i 5)))
                 (cl-some (lambda (i) (< i 5)) list)))
     (should (eql (for-sum ((i (in-list list)) (1+ i)))
-                 (cl-reduce (lambda (sum i) (+ (1+ i) sum))
-                            list :initial-value (+))))
+                 (cl-reduce #'+ result :initial-value (+))))
     (should (eql (for-product ((i (in-list list)) (1+ i)))
-                 (cl-reduce (lambda (product i) (* (1+ i) product))
-                            list :initial-value (*))))
+                 (cl-reduce #'* result :initial-value (*))))
     (should (eql (for-first ((i (in-list list)) (1+ i)))
-                 (1+ (cl-first list))))
+                 (pcase-let ((`(,i . ,_) result)) i)))
     (should (eql (for-last ((i (in-list list)) (1+ i)))
-                 (1+ (cl-first (last list)))))
+                 (pcase-let ((`(,i) (last result))) i)))
     (should (eql (for-max ((i (in-list list)) (1+ i)))
-                 (cl-reduce (lambda (max i) (max (1+ i) max))
-                            list :initial-value -1.0e+INF)))
+                 (cl-reduce #'max result :initial-value -1.0e+INF)))
     (should (eql (for-min ((i (in-list list)) (1+ i)))
-                 (cl-reduce (lambda (min i) (min (1+ i) min))
-                            list :initial-value 1.0e+INF)))))
+                 (cl-reduce #'min result :initial-value 1.0e+INF)))))
 
-(ert-deftest for-multiple-values ()
+(ert-deftest for-implicitly-nesting-iteration-macros ()
+  "Implicitly nesting iteration macros."
+  (let* ((list1 (for--make-test-list)) (list2 (for--make-test-list))
+         (zipped-list (mapcan (lambda (i)
+                                (mapcar (lambda (j) `(,i . ,j))
+                                        list2))
+                              list1))
+         (result (mapcar (pcase-lambda (`(,i . ,j)) (+ i j))
+                         zipped-list)))
+    (let ((init (random 10)))
+      (should (eql (for-fold* ((value init))
+                       (((in-list list1)) ((in-list list2))
+                        (1+ value)))
+                   (cl-reduce #'+ (mapcar (lambda (_) 1) zipped-list)
+                              :initial-value init))))
+    (should (string= (with-output-to-string
+                       (for-do* ((i (in-list list1))
+                                 (j (in-list list2))
+                                 (:do (prin1 i) (terpri) (prin1 j)))))
+                     (with-output-to-string
+                       (mapc (pcase-lambda (`(,i . ,j))
+                               (prin1 i) (terpri) (prin1 j))
+                             zipped-list))))
+    (should (equal (for-list* ((i (in-list list1)) (j (in-list list2))
+                               (+ i j)))
+                   result))
+    (should (equal (for-lists* (list3 list4)
+                       ((i (in-list list1)) (j (in-list list2))
+                        (:values (+ i j) (- i j))))
+                   (cons result
+                         (mapcar (pcase-lambda (`(,i . ,j)) (- i j))
+                                 zipped-list))))
+    (let* ((tail-length (+ 5 (random 5)))
+           (length (+ (* (length list1) (length list2)) tail-length)))
+      (let ((init-default nil) (init-test (random 10)))
+        (should (equal (for-vector* ((i (in-list list1))
+                                     (j (in-list list2))
+                                     (+ i j)))
+                       (vconcat result)))
+        (should (equal (for-vector* ((i (in-list list1))
+                                     (j (in-list list2))
+                                     (+ i j))
+                         :length length)
+                       (vconcat result
+                                (make-vector tail-length
+                                             init-default))))
+        (should (equal (for-vector* ((i (in-list list1))
+                                     (j (in-list list2))
+                                     (+ i j))
+                         :length length :init init-test)
+                       (vconcat result
+                                (make-vector tail-length
+                                             init-test)))))
+      (let ((init-default ?\0) (init-test (random 10)))
+        (let ((string (for-string* ((i (in-list list1))
+                                    (j (in-list list2))
+                                    (+ i j)))))
+          (should (string= string (concat result)))
+          (should-not (multibyte-string-p string)))
+        (let ((string (for-string* ((i (in-list list1))
+                                    (j (in-list list2))
+                                    (+ i j))
+                        :length length)))
+          (should (string= string
+                           (concat result
+                                   (make-string tail-length
+                                                init-default))))
+          (should-not (multibyte-string-p string)))
+        (let ((string* (concat result
+                               (make-string tail-length init-test))))
+          (let ((string (for-string* ((i (in-list list1))
+                                      (j (in-list list2))
+                                      (+ i j))
+                          :length length :init init-test)))
+            (should (string= string string*))
+            (should-not (multibyte-string-p string)))
+          (let ((string (for-string* ((i (in-list list1))
+                                      (j (in-list list2))
+                                      (+ i j))
+                          :length length :init init-test
+                          :multibyte t)))
+            (should (string= string string*))
+            (should (multibyte-string-p string))))))
+    (should (eq (for-and* ((i (in-list list1)) (j (in-list list2))
+                           (< (+ i j) 10)))
+                (cl-every (pcase-lambda (`(,i . ,j)) (< (+ i j) 10))
+                          zipped-list)))
+    (should (eq (for-or* ((i (in-list list1)) (j (in-list list2))
+                          (< (+ i j) 10)))
+                (cl-some (pcase-lambda (`(,i . ,j)) (< (+ i j) 10))
+                         zipped-list)))
+    (should (eql (for-sum* ((i (in-list list1))
+                            (j (in-list list2))
+                            (+ i j)))
+                 (cl-reduce #'+ result :initial-value (+))))
+    (should (eql (for-product* ((i (in-list list1))
+                                (j (in-list list2))
+                                (+ i j)))
+                 (cl-reduce #'* result :initial-value (*))))
+    (let ((n (+ 2 (random 2))))
+      (should (equal (for-first* ((i (in-naturals n))
+                                  (j (in-value i))
+                                  (k (in-value j))
+                                  (list i j k)))
+                     (list n n n)))
+      (should (equal (for-last* ((i (in-range n))
+                                 (j (in-list list1))
+                                 (k (in-list list2))
+                                 (list i j k)))
+                     (pcase-let ((`(,j) (last list1))
+                                 (`(,k) (last list2)))
+                       (list (1- n) j k)))))
+    (should (eql (for-max* ((i (in-list list1)) (j (in-list list2))
+                            (+ i j)))
+                 (cl-reduce #'max result :initial-value -1.0e+INF)))
+    (should (eql (for-min* ((i (in-list list1)) (j (in-list list2))
+                            (+ i j)))
+                 (cl-reduce #'min result :initial-value 1.0e+INF)))))
+
+(ert-deftest for-multiple-value-forms ()
   "Multiple-value forms."
   (let ((list (for--make-test-list)))
-    (should (string= (with-output-to-string
-                       (for-do ((i (in-list list)) (:do (prin1 i)))))
-                     (with-output-to-string (mapc #'prin1 list))))
     (let ((init1 (append)) (init2 (+)) (init3 (*)))
-      (should (equal (for-lists (list1 list2)
-                         ((i (in-list list)) (:values (1+ i) (1- i))))
-                     (cons (mapcar #'1+ list) (mapcar #'1- list))))
       (should (equal (for-fold ((value1 init1)
                                 (value2 init2)
                                 (value3 init3))
                          ((i (in-list list))
-                          (:values (cons i value1)
-                                   (+ i value2)
-                                   (* i value3))))
+                          (cond ((cl-oddp i)
+                                 (let ((i i))
+                                   (progn
+                                     nil
+                                     (save-current-buffer
+                                       nil
+                                       (:values (cons i value1)
+                                                (+ i value2)
+                                                (* i value3))))))
+                                ((cl-evenp i)
+                                 (let* ((i i))
+                                   (save-excursion
+                                     nil
+                                     (save-restriction
+                                       nil
+                                       (:values (cons i value1)
+                                                (+ i value2)
+                                                (* i value3))))))
+                                (t (if i (:values i i i)
+                                     (:values init1 init2 init3))))))
                      (list (cl-reduce (lambda (cdr car)
                                         (cons car cdr))
                                       list :initial-value init1)
@@ -173,23 +308,32 @@
                                       :initial-value init2)
                            (cl-reduce #'* list
                                       :initial-value init3)))))
+    (should (eql (for-fold ((value nil))
+                     ((i (in-list list))
+                      (if (cl-oddp i) (1+ i) (:values i))))
+                 (pcase-let ((`(,i) (last list)))
+                   (if (cl-oddp i) (1+ i) i))))
     (should-error (for-fold ((value1 nil) (value2 nil) (value3 nil))
                       ((i (in-list list))
                        (pcase (1+ i)
                          ((and (cl-type integer) j)
-                          (save-excursion (:values i j (1- i))))
+                          (:values i j (1- i)))
                          (_ (:values nil nil))))))))
 
 (ert-deftest for-named-let-semantics ()
   "Named `let' semantics."
   (let ((list (for--make-test-list)))
-    (let ((item (random 10)) (length (length list)))
+    (let ((item (random 10)))
       (should (equal (for-list
-                         ((i list)
+                         ((i (in-list list))
                           (progn (ignore i) (let ((i item)) i))))
-                     (cl-loop repeat length collect item))))
+                     (mapcar (lambda (_) item) list)))
+      (should (eql (for-fold ((value nil))
+                       (((in-list list))
+                        (let ((value item)) value)))
+                   item)))
     (should (equal (for-fold ((value1 nil) (value2 nil) (value3 nil))
-                       ((i list) (:values i value1 value2)))
+                       ((i (in-list list)) (:values i value1 value2)))
                    (pcase-let ((`(,value1 ,value2 ,value3)
                                 (reverse list)))
                      (list value1 value2 value3))))))
@@ -204,37 +348,49 @@
     (should (equal (for-lists
                        (list1 list2 (:result (nconc list1 list2)))
                        ((i (in-list list)) (:values (1- i) (1+ i))))
-                   (nconc (mapcar #'1- list) (mapcar #'1+ list))))))
+                   (nconc (mapcar #'1- list) (mapcar #'1+ list))))
+    (should (string= (with-output-to-string
+                       (for-lists (list1
+                                   list2
+                                   (:result (prin1 list1) (terpri)
+                                            (prin1 list2)))
+                           ((i (in-list list))
+                            (:values (1- i) (1+ i)))))
+                     (with-output-to-string
+                       (prin1 (mapcar #'1- list)) (terpri)
+                       (prin1 (mapcar #'1+ list)))))))
 
 (ert-deftest for-special-clauses ()
   "Special clauses."
-  (let ((list (for--make-test-list)))
+  (let ((list (for--make-test-list nil (- (random 10) 5))))
     (should (equal (for-list ((i (in-list list))
-                              (:if (< i 2)) (:if-not (> i 8)) (1+ i)))
-                   (thread-last
-                     list
-                     (cl-remove-if-not (lambda (i) (< i 2)))
-                     (cl-remove-if (lambda (i) (> i 8)))
-                     (mapcar #'1+))))
+                              (:if (cl-evenp i))
+                              (:if-not (cl-plusp i))
+                              (1+ i)))
+                   (thread-last list
+                                (cl-remove-if-not #'cl-evenp)
+                                (cl-remove-if #'cl-plusp)
+                                (mapcar #'1+))))
     (let ((list (mapcar (lambda (i) `(,(1- i) . ,(1+ i))) list)))
       (should (equal (for-list
                          ((i (in-list list))
                           (:let (`(,j . ,k) i))
-                          (:if-let (l (and (> j 2) (1+ j))))
+                          (:if-let (l (and (cl-evenp j) (1+ j))))
                           (list j k l)))
                      (thread-last
                        list
                        (mapcar (pcase-lambda (`(,j . ,k))
-                                 (and-let* ((l (and (> j 2) (1+ j)))
+                                 (and-let* (((cl-evenp j)) (l (1+ j))
                                             ((list j k l))))))
                        (delq nil)))))
-    (let ((list (apply #'for--make-circular list)))
+    (let ((list (apply #'for--make-circular list))
+          (length (- (length list) (+ 2 (random 2)))))
       (should (string= (with-output-to-string
                          (for-do ((i (in-list list)) (j (in-naturals))
-                                  (:break (not (< j 5)))
+                                  (:break (= j length))
                                   (:do (prin1 i) (terpri)))))
                        (with-output-to-string
-                         (cl-loop for i in list repeat 5
+                         (cl-loop for i in list repeat length
                                   do (prin1 i) (terpri))))))
     (should (equal (for-last (((and `(,_ . ,rest) i) (on-list list))
                               (:final (null rest)) i))
@@ -262,30 +418,6 @@
                      (delq nil))))
     (should-error (for-do ((i (in-list tree))
                            (:pcase i :exhaustive `(,_)))))))
-
-(ert-deftest for-nesting-sequences ()
-  "Nesting sequences."
-  (let* ((start (random 5)) (end (+ start 5 (random 5))))
-    (let ((tail-length (+ 5 (random 5))) (init (random 5)))
-      (should (equal (for-vector* ((i (in-inclusive-range start end))
-                                   (j (in-inclusive-range start i))
-                                   (+ i j))
-                       :length (let ((end (1+ (- end start))))
-                                 (+ (/ (* end (1+ end)) 2)
-                                    tail-length))
-                       :init init)
-                     (vconcat
-                      (cl-loop for i from start to end
-                               vconcat (cl-loop for j from start to i
-                                                collect (+ i j)))
-                      (make-vector tail-length init)))))
-    (should (eql (for-sum ((i (in-inclusive-range start end))
-                           (:if-not (< i 5))
-                           (j (in-inclusive-range start i))
-                           (+ i j)))
-                 (cl-loop for i from start to end if (not (< i 5))
-                          sum (cl-loop for j from start to i
-                                       sum (+ i j)))))))
 
 (ert-deftest for-buffer-local-variables ()
   "Buffer-local variables."
