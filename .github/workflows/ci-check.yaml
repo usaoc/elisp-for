@@ -1,0 +1,38 @@
+name: CI Check
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    strategy:
+      matrix:
+        version:
+          - 28.1
+          - snapshot
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: ${{ matrix.version }}
+
+      - name: Lint
+        uses: leotaku/elisp-check@master
+        with:
+          file: for.el
+
+      - name: Test
+        uses: leotaku/elisp-check@master
+        with:
+          check: ert
+          file: for-tests.el
