@@ -135,7 +135,7 @@ adjacent iteration clauses."
        (pcase-exhaustive clause
          (`(,(cl-type keyword) . ,_)
           (parse `(,clause . ,nested) nil clauses))
-         (`(,_ ,_)
+         ((or `(,_) `(,_ ,_))
           (parse (if iteration `(,clause (:do) . ,nested)
                    `(,clause . ,nested))
                  t clauses)))))))
