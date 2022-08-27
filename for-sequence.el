@@ -30,7 +30,7 @@
 (require 'for-iteration)
 (require 'generator)
 
-;;;; Definer
+;;;; Interface
 (defmacro define-for-sequence (name arglist &rest subforms)
   "Define a sequence constructor NAME with ARGLIST and DOCSTRING.
 
@@ -117,7 +117,6 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                                   (:do (iter-yield value)))))))
                      (`(,_ . ,_) subforms)))))))))
 
-;;;; Constructor
 (define-for-sequence for-in-array (array)
   "Return an iterator that returns each item in ARRAY.
 

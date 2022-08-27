@@ -435,6 +435,12 @@ See Info node `(for)Iteration Macros'." docstring)))
 ;;;; Interface
 (define-error 'for-unhandled-type "Unhandled type")
 
+;;;###autoload(define-symbol-prop 'for-binder 'safe-local-variable #'symbolp)
+(defvar-local for-binder 'pcase-let
+  "The head of certain `let'-like forms in iteration forms.
+
+See Info node `(for)Buffer-Local Variables'.")
+
 (defmacro define-for-special-clause (name arglist &rest cases-or-body)
   "Define the special clause operator NAME.
 
@@ -467,12 +473,6 @@ node `(for)Definers'.
                    (defun ,id ,arglist ,@docstring . ,body))
             (define-symbol-prop
              ',name 'for--special-clause-expander ',id)))))))
-
-;;;###autoload(define-symbol-prop 'for-binder 'safe-local-variable #'symbolp)
-(defvar-local for-binder 'pcase-let
-  "The head of certain `let'-like forms in iteration forms.
-
-See Info node `(for)Buffer-Local Variables'.")
 
 (define-for-special-clause :if (body)
   "Evaluate BODY when all subforms are non-nil.
