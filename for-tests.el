@@ -51,7 +51,7 @@
              (or ,dynamic 'lexical))))
   (defmacro for--deftest-seq (&rest body)
     "Define test for sequence constructor."
-    (declare (debug body) (indent 0))
+    (declare (debug (def-body)) (indent 0))
     `(cl-macrolet
          ((seq* (&rest subforms)
             `(for--eval ,(macroexpand `(seq . ,subforms)
