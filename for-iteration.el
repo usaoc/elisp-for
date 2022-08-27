@@ -322,6 +322,23 @@ from the expanded form.
              pairs :from-end t :initial-value nil))
 
 (eval-when-compile
+  (defmacro for--defspecial
+      (name arglist docstring &rest cases-or-body)
+    "Define the special clause operator NAME.
+
+ARGLIST, DOCSTRING, and CASES-OR-BODY are as in
+`define-for-special-clause' forms.
+
+\(fn NAME ARGLIST DOCSTRING [CASES-OR-BODY...])"
+    (declare (debug (&define [&name keywordp]
+                             [&or [(arg arg) lambda-doc def-body]
+                                  [(arg) lambda-doc
+                                   &rest [pcase-PAT body]]]))
+             (doc-string 3) (indent 2))
+    `(define-for-special-clause ,name ,arglist
+       ,(concat docstring "\n\n"
+                "See Info node `(for)Special-Clause Operators'.")
+       . ,cases-or-body))
   (defmacro for--defmacro (name arglist &rest body)
     "Define the iteration macro NAME with the star version.
 
@@ -474,60 +491,46 @@ node `(for)Definers'.
             (define-symbol-prop
              ',name 'for--special-clause-expander ',id)))))))
 
-(define-for-special-clause :if (body)
-  "Evaluate BODY when all subforms are non-nil.
-
-See Info node `(for)Special-Clause Operators'."
+(for--defspecial :if (body)
+  "Evaluate BODY when all subforms are non-nil."
   (`(,_ . ,guards) `((when (and . ,guards) . ,body))) )
 
-(define-for-special-clause :if-not (body)
-  "Evaluate BODY unless all subforms are non-nil.
-
-See Info node `(for)Special-Clause Operators'."
+(for--defspecial :if-not (body)
+  "Evaluate BODY unless all subforms are non-nil."
   (`(,_ . ,guards) `((unless (and . ,guards) . ,body))) )
 
-(define-for-special-clause :let (body)
-  "Evaluate BODY with subforms bound by `for-binder'.
-
-See Info node `(for)Special-Clause Operators'."
+(for--defspecial :let (body)
+  "Evaluate BODY with subforms bound by `for-binder'."
   (`(,_ . ,bindings) `((,for-binder ,bindings . ,body))))
 
-(define-for-special-clause :if-let (body)
-  "Evaluate BODY with subforms bound by `when-let*'.
-
-See Info node `(for)Special-Clause Operators'."
+(for--defspecial :if-let (body)
+  "Evaluate BODY with subforms bound by `when-let*'."
   (`(,_ . ,bindings) `((when-let* ,bindings . ,body))))
 
-(define-for-special-clause :pcase (body)
+(for--defspecial :pcase (body)
   "Evaluate BODY when the first subform is matched.
 
 The remaining subforms are the patterns as in `pcase'.  When an
 optional sequence [`:exhaustive'] is present in the remaining
-subforms, match exhaustively, that is, use `pcase-exhaustive'.
-
-See Info node `(for)Special-Clause Operators'."
+subforms, match exhaustively, that is, use `pcase-exhaustive'."
   ((or (and `(,_ ,expr :exhaustive . ,pats)
             (let head 'pcase-exhaustive))
        (and `(,_ ,expr . ,pats) (let head 'pcase)))
    `((,head ,expr ((and . ,pats) . ,body)))))
 
-(define-for-special-clause :pcase-not (body)
+(for--defspecial :pcase-not (body)
   "Evaluate BODY when the first subform is not matched.
 
 The remaining subforms are the patterns as in `pcase'.  When an
 optional sequence [`:as' AS] is present in the remaining
 subforms, the value of the first subform is bound to AS, and the
-subforms after the sequence are the patterns.
-
-See Info node `(for)Special-Clause Operators'."
+subforms after the sequence are the patterns."
   ((or `(,_ ,expr :as ,(and (cl-type symbol) as) . ,pats)
        (and `(,_ ,expr . ,pats) (let as '_)))
    `((pcase ,expr ((and . ,pats) nil) (,as . ,body)))))
 
-(define-for-special-clause :do (body)
-  "Evaluate the subforms before evaluating BODY.
-
-See Info node `(for)Special-Clause Operators'."
+(for--defspecial :do (body)
+  "Evaluate the subforms before evaluating BODY."
   (`(,_ . ,forms) `(,@forms . ,body)))
 
 (for--defmacro for-fold (bindings for-clauses &rest body)

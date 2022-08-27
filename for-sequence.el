@@ -27,8 +27,80 @@
 
 ;;; Code:
 ;;;; Require
+(eval-when-compile (require 'subr-x))
 (require 'for-iteration)
 (require 'generator)
+
+;;;; Internal
+(eval-when-compile
+  (defmacro for--defseq (name arglist docstring &rest subforms)
+    "Define a sequence constructor NAME with ARGLIST and DOCSTRING.
+
+A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
+`:expander-case' form as in `define-for-sequence' forms.
+
+\(fn NAME ARGLIST DOCSTRING [DECLARATION] [SUBFORM...] [BODY...])"
+    (declare (debug (&define name lambda-list lambda-doc
+                             [&optional ("declare" def-declarations)]
+                             [&optional
+                              [&or (":type" &rest cl-type-spec)
+                                   (&define ":expander" (arg)
+                                            def-body)
+                                   (&define ":expander-case"
+                                            &rest (pcase-PAT body))]]
+                             def-body))
+             (doc-string 3) (indent 2))
+    (let ((ellipsis (rx bol "..." eol))
+          (node "See Info node `(for)Sequence Constructors'."))
+      (cl-flet* ((make-arg (arg) (upcase (symbol-name arg)))
+                 (make-rest (arg) (concat "[" (make-arg arg) "...]"))
+                 (make-docstring (args)
+                   (string-join (list docstring node
+                                      (concat "(fn "
+                                              (string-join args " ")
+                                              ")"))
+                                "\n\n")))
+        `(define-for-sequence ,name ,arglist
+           ,(cond ((string-match-p ellipsis docstring)
+                   (replace-regexp-in-string ellipsis node docstring))
+                  ((memq '&rest arglist)
+                   (make-docstring
+                    (named-let parse ((arglist arglist))
+                      (pcase-exhaustive arglist
+                        ('() '())
+                        (`(&rest ,arg) `(,(make-rest arg)))
+                        (`(,arg . ,arglist)
+                         `(,(make-arg arg) . ,(parse arglist)))))))
+                  ((memq '&optional arglist)
+                   (make-docstring
+                    (named-let parse ((arglist arglist))
+                      (pcase-exhaustive arglist
+                        ('() '())
+                        (`(&optional . ,arglist)
+                         (named-let parse ((arglist arglist))
+                           (pcase-exhaustive arglist
+                             ('() '())
+                             (`(&rest ,arg) `(,(make-rest arg)))
+                             (`(,arg . ,arglist)
+                              `(,(concat "[" (string-join
+                                              `(,(make-arg arg)
+                                                . ,(parse arglist))
+                                              " ")
+                                         "]"))))))
+                        (`(,arg . ,arglist)
+                         `(,(make-arg arg) . ,(parse arglist)))))))
+                  (t (concat docstring "\n\n" node)))
+           . ,(pcase-let
+                  (((or `(,(and `(declare . ,_) declaration)
+                          . ,subforms)
+                        (and subforms
+                             (let declaration
+                               '(declare (side-effect-free t)))))
+                    subforms))
+                `(,declaration
+                  (:alias ,(intern (string-remove-prefix
+                                    "for-" (symbol-name name))))
+                  . ,subforms)))))))
 
 ;;;; Interface
 (defmacro define-for-sequence (name arglist &rest subforms)
@@ -117,30 +189,22 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                                   (:do (iter-yield value)))))))
                      (`(,_ . ,_) subforms)))))))))
 
-(define-for-sequence for-in-array (array)
-  "Return an iterator that returns each item in ARRAY.
-
-See Info node `(for)Sequence Constructors'."
-  (:alias in-array) (:type array)
+(for--defseq for-in-array (array)
+  "Return an iterator that returns each item in ARRAY."
+  (:type array)
   (:expander-case
    (`(,id (,_ ,array-form))
     (for--with-gensyms (array length index)
       `(,id (:do-in ((,array ,array-form)) ((,length (length ,array)))
                     ((,index 0)) ((< ,index ,length))
-                    ((,id (aref ,array ,index))) ((1+ ,index)))))))
-  (declare (side-effect-free t)))
+                    ((,id (aref ,array ,index))) ((1+ ,index))))))))
 
-(define-for-sequence for-in-inclusive-range (start end &optional step)
+(for--defseq for-in-inclusive-range (start end &optional step)
   "Return an iterator that returns each number in inclusive range.
 
 START is the start of range, and END is the end of range.  STEP
 defaults to 1 when it is nil or omitted.  Unlike `for-in-range',
-the range is closed.
-
-See Info node `(for)Sequence Constructors'.
-
-\(fn START END [STEP])"
-  (:alias in-inclusive-range)
+the range is closed."
   (:expander-case
    (`(,id ,(or (and `(,_ ,start-form ,end-form)
                     (let step-form nil))
@@ -151,40 +215,30 @@ See Info node `(for)Sequence Constructors'.
                     ((,continuep (if (< ,step 0) #'>= #'<=)))
                     ((,number ,start))
                     ((funcall ,continuep ,number ,end))
-                    ((,id ,number)) ((+ ,number ,step)))))))
-  (declare (side-effect-free t)))
+                    ((,id ,number)) ((+ ,number ,step))))))))
 
-(define-for-sequence for-in-list (list)
-  "Return an iterator that returns each element in LIST.
-
-See Info node `(for)Sequence Constructors'."
-  (:alias in-list) (:type list)
+(for--defseq for-in-list (list)
+  "Return an iterator that returns each element in LIST."
+  (:type list)
   (:expander-case
    (`(,id (,_ ,list-form))
     (for--with-gensyms (list tail)
       `(,id (:do-in ((,list ,list-form)) () ((,tail ,list))
-                    (,tail) ((,id (car ,tail))) ((cdr ,tail)))))))
-  (declare (side-effect-free t)))
+                    (,tail) ((,id (car ,tail))) ((cdr ,tail))))))))
 
-(define-for-sequence for-in-naturals (&optional start)
+(for--defseq for-in-naturals (&optional start)
   "Return an iterator that returns each natural number from START.
 
-START defaults to 0 when it is nil or omitted.
-
-See Info node `(for)Sequence Constructors'.
-
-\(fn [START])"
-  (:alias in-naturals)
+START defaults to 0 when it is nil or omitted."
   (:expander-case
    (`(,id ,(or (and `(,_) (let start-form 0))
                `(,_ ,start-form)))
     (for--with-gensyms (start number)
       `(,id (:do-in ((,start ,start-form)) ()
                     ((,number (cl-the (integer 0) ,start))) ()
-                    ((,id ,number)) ((1+ ,number)))))))
-  (declare (side-effect-free t)))
+                    ((,id ,number)) ((1+ ,number))))))))
 
-(define-for-sequence for-in-producer (producer &rest args)
+(for--defseq for-in-producer (producer &rest args)
   "Return an iterator that returns each call to PRODUCER.
 
 When CONTINUEP is omitted, the iterator is infinite.  Otherwise,
@@ -192,10 +246,9 @@ CONTINUEP is a unary predicate.  PRODUCER is applied to ARGS in
 each iteration, and the produced value is tested by CONTINUEP.
 When CONTINUEP returns nil, the iterator stops.
 
-See Info node `(for)Sequence Constructors'.
+...
 
 \(fn PRODUCER [CONTINUEP [ARG...]])"
-  (:alias in-producer)
   (:expander-case
    (`(,id (,_ ,producer-form))
     (for--with-gensyms (producer value)
@@ -217,7 +270,6 @@ See Info node `(for)Sequence Constructors'.
                         () ((,value ,value-form))
                         ((funcall ,continuep ,value))
                         ((,id ,value)) (,value-form))))))))
-  (declare (side-effect-free t))
   (if (null args)
       (iter-make (let ((value (funcall producer)))
                    (cl-loop (iter-yield value)
@@ -233,7 +285,7 @@ See Info node `(for)Sequence Constructors'.
                        (iter-yield value)
                        (setq value (apply producer args)))))))))
 
-(define-for-sequence for-in-range (start-or-end &optional end step)
+(for--defseq for-in-range (start-or-end &optional end step)
   "Return an iterator that returns each number in range.
 
 When both END and STEP is nil, START-OR-END is the end of range,
@@ -241,12 +293,8 @@ and the start of range is 0.  Otherwise, START-OR-END is the
 start of range, and END is the end of range.  STEP defaults to 1
 when it is nil or omitted.  Unlike `for-in-inclusive-range', the
 range is right half-open when STEP is non-negative, or left
-half-open when STEP is negative.
-
-See Info node `(for)Sequence Constructors'.
-
-\(fn START-OR-END [END [STEP]])"
-  (:alias in-range) (:type integer)
+half-open when STEP is negative."
+  (:type integer)
   (:expander-case
    (`(,id ,(or (and (or (and `(,_ ,start-or-end-form)
                              (let end-form nil))
@@ -262,18 +310,15 @@ See Info node `(for)Sequence Constructors'.
                      (,continuep (if (< ,step 0) #'> #'<)))
                     ((,number ,start))
                     ((funcall ,continuep ,number ,end))
-                    ((,id ,number)) ((+ ,number ,step)))))))
-  (declare (side-effect-free t)))
+                    ((,id ,number)) ((+ ,number ,step))))))))
 
-(define-for-sequence for-in-iterator (iterator)
-  "Return the function ITERATOR as is.
-
-See Info node `(for)Sequence Constructors'."
-  (:alias in-iterator) (:type function)
+(for--defseq for-in-iterator (iterator)
+  "Return the function ITERATOR as is."
+  (declare (pure t) (side-effect-free t))
+  (:type function)
   (:expander-case
    (`(,id (,_ ,iterator-form))
     (for--iterator-for-clause `(,id ,iterator-form))))
-  (declare (pure t) (side-effect-free t))
   (cl-the function iterator))
 
 (defsubst for--make-circular (&rest values)
@@ -284,20 +329,18 @@ See Info node `(for)Sequence Constructors'."
       (while tail (cl-shiftf last tail (cdr tail))))
     (setf (cdr last) values)))
 
-(define-for-sequence for-in-repeat (value &rest values)
+(for--defseq for-in-repeat (value &rest values)
   "Return an iterator that repeatedly returns each VALUE.
 
-See Info node `(for)Sequence Constructors'.
+...
 
 \(fn VALUE...)"
-  (:alias in-repeat)
   (:expander-case
    (`(,id (,_ . ,(and `(,_ . ,_) value-forms)))
     (for--with-gensyms (values tail)
       `(,id (:do-in ((,values (for--make-circular . ,value-forms))) ()
                     ((,tail ,values)) () ((,id (car ,tail)))
                     ((cdr ,tail)))))))
-  (declare (side-effect-free t))
   (iter-make (iter-yield value)
              (let ((last nil))
                (let ((values values))
@@ -307,11 +350,8 @@ See Info node `(for)Sequence Constructors'.
                (setf (cdr last) (push value values)))
              (cl-loop (iter-yield (pop values)))))
 
-(define-for-sequence for-in-value (value)
-  "Return an iterator that returns VALUE once.
-
-See Info node `(for)Sequence Constructors'."
-  (:alias in-value)
+(for--defseq for-in-value (value)
+  "Return an iterator that returns VALUE once."
   (:expander-case
    (`(,id (,_ ,value-form))
     (for--with-gensyms (value)
@@ -319,47 +359,33 @@ See Info node `(for)Sequence Constructors'."
         `(,id (:do-in ((,value ,value-form)) () ((,value ,value))
                       ((not (eq ,value ',returned)))
                       ((,id ,value)) (',returned)))))))
-  (declare (side-effect-free t))
   (iter-make (iter-yield value)))
 
-(define-for-sequence for-on-array (array)
-  "Return an iterator that returns each index on ARRAY.
-
-See Info node `(for)Sequence Constructors'."
-  (:alias on-array)
+(for--defseq for-on-array (array)
+  "Return an iterator that returns each index on ARRAY."
   (:expander-case
    (`(,id (,_ ,array-form))
     (for--with-gensyms (array length index)
       `(,id (:do-in ((,array ,array-form)) ((,length (length ,array)))
                     ((,index 0)) ((< ,index ,length))
-                    ((,id ,index)) ((1+ ,index)))))))
-  (declare (side-effect-free t)))
+                    ((,id ,index)) ((1+ ,index))))))))
 
-(define-for-sequence for-on-list (list)
-  "Return an iterator that returns each cons on LIST.
-
-See Info node `(for)Sequence Constructors'."
-  (:alias on-list)
+(for--defseq for-on-list (list)
+  "Return an iterator that returns each cons on LIST."
   (:expander-case
    (`(,id (,_ ,list-form))
     (for--with-gensyms (list tail)
       `(,id (:do-in ((,list ,list-form)) () ((,tail ,list))
-                    (,tail) ((,id ,tail)) ((cdr ,tail)))))))
-  (declare (side-effect-free t)))
+                    (,tail) ((,id ,tail)) ((cdr ,tail))))))))
 
-(define-for-sequence for-in-directory
+(for--defseq for-in-directory
     (directory &optional full match nosort count)
   "Return an iterator that returns each file in DIRECTORY.
 
 Equivalent to (`for-in-list' (`directory-files' DIRECTORY FULL
 MATCH NOSORT COUNT)), where FULL, NOSORT, and COUNT defaults to
 nil when omitted, and MATCH defaults to
-`directory-files-no-dot-files-regexp' when it is nil or omitted.
-
-See Info node `(for)Sequence Constructors'.
-
-\(fn DIRECTORY [FULL [MATCH [NOSORT [COUNT]]]])"
-  (:alias in-directory)
+`directory-files-no-dot-files-regexp' when it is nil or omitted."
   (:expander-case
    (`(,id ,(or (and (or (and (or (and (or (and `(,_ ,directory)
                                                (let full nil))
@@ -374,10 +400,9 @@ See Info node `(for)Sequence Constructors'.
            (directory-files
             ,directory ,full
             (or ,match directory-files-no-dot-files-regexp)
-            ,nosort ,count)))))
-  (declare (side-effect-free t)))
+            ,nosort ,count))))))
 
-(define-for-sequence for-in-directory-recursively
+(for--defseq for-in-directory-recursively
     (dir regexp
          &optional include-directories predicate follow-symlinks)
   "Return an iterator that returns each file under DIRECTORY.
@@ -385,12 +410,7 @@ See Info node `(for)Sequence Constructors'.
 Equivalent to (`for-in-list' (`directory-files-recursively' DIR
 REGEXP INCLUDE-DIRECTORIES PREDICATE FOLLOW-SYMLINKS)) where
 INCLUDE-DIRECTORIES, PREDICATE, and FOLLOW-SYMLINKS defaults to
-nil when omitted.
-
-See Info node `(for)Sequence Constructors'.
-
-\(fn DIR REGEXP [INCLUDE-DIRECTORIES [PREDICATE [FOLLOW-SYMLINKS]]])"
-  (:alias in-directory-recursively)
+nil when omitted."
   (:expander-case
    (`(,id ,(or (and (or (and (or (and `(,_ ,dir ,regexp)
                                       (let include-directories nil))
@@ -406,25 +426,18 @@ See Info node `(for)Sequence Constructors'.
     `(,id (for-in-list
            (directory-files-recursively
             ,dir ,regexp
-            ,include-directories ,predicate ,follow-symlinks)))))
-  (declare (side-effect-free t)))
+            ,include-directories ,predicate ,follow-symlinks))))))
 
-(define-for-sequence for-the-buffers (&optional frame)
+(for--defseq for-the-buffers (&optional frame)
   "Return an iterator that returns each buffer in FRAME.
 
 Equivalent to (`for-in-list' (`buffer-list' FRAME)) where FRAME
-defaults to nil when omitted.
-
-See Info node `(for)Sequence Constructors'.
-
-\(fn [FRAME])"
-  (:alias the-buffers)
+defaults to nil when omitted."
   (:expander-case
    (`(,id ,(or (and `(,_) (let frame nil)) `(,_ ,frame)))
-    `(,id (for-in-list (buffer-list ,frame)))))
-  (declare (side-effect-free t)))
+    `(,id (for-in-list (buffer-list ,frame))))))
 
-(define-for-sequence for-the-frames ()
+(for--defseq for-the-frames ()
   "Return an iterator that returns each frame.
 
 Not equivalent to (`for-in-list' (`frame-list')), since the
@@ -432,7 +445,6 @@ frames are visited from the selected frame in `next-frame'
 order.
 
 See Info node `(for)Sequence Constructors'."
-  (:alias the-frames)
   (:expander-case
    (`(,id (,_))
     (for--with-gensyms (current original visited)
@@ -441,7 +453,6 @@ See Info node `(for)Sequence Constructors'."
                     ((eq ,current ,original)
                      (if ,visited nil (setq ,visited t)))
                     ((,id ,current)) ((next-frame ,current)))))))
-  (declare (side-effect-free t))
   (iter-make (let ((original (selected-frame)))
                (iter-yield original)
                (let ((current (next-frame original)))
@@ -449,27 +460,21 @@ See Info node `(for)Sequence Constructors'."
                    (iter-yield current)
                    (cl-callf next-frame current))))))
 
-(define-for-sequence for-the-overlays (&optional buffer)
+(for--defseq for-the-overlays (&optional buffer)
   "Return an iterator that returns each overlay in BUFFER.
 
 Equivalent
 to (`for-in-list' (`overlays-in' (`point-min') (`point-max')))
 with BUFFER as the current buffer.  BUFFER defaults to the
-current buffer when it is nil or omitted.
-
-See Info node `(for)Sequence Constructors'.
-
-\(fn [BUFFER])"
-  (:alias the-overlays)
+current buffer when it is nil or omitted."
   (:expander-case
    (`(,id ,(or (and `(,_) (let buffer-form nil)) `(,_ ,buffer-form)))
     `(,id (for-in-list (if-let ((buffer ,buffer-form))
                            (with-current-buffer buffer
                              (overlays-in (point-min) (point-max)))
-                         (overlays-in (point-min) (point-max)))))))
-  (declare (side-effect-free t)))
+                         (overlays-in (point-min) (point-max))))))))
 
-(define-for-sequence for-the-windows (&optional frame minibuf)
+(for--defseq for-the-windows (&optional frame minibuf)
   "Return an iterator that returns each window in FRAME.
 
 Not equivalent to (`for-in-list' (`window-list')), since the
@@ -477,12 +482,7 @@ frames are visited from the selected window of FRAME in
 `next-window' order.  FRAME defaults to the selected frame when
 it is not a frame or omitted.  MINIBUF and FRAME are passed to
 `next-window' as the MINIBUF and ALL-FRAMES arguments where
-MINIBUF defaults to nil when it is omitted.
-
-See Info node `(for)Sequence Constructors'.
-
-\(fn [FRAME [MINIBUF]])"
-  (:alias the-windows)
+MINIBUF defaults to nil when it is omitted."
   (:expander-case
    (`(,id ,(or (and (or (and `(,_) (let frame-form nil))
                         `(,_ ,frame-form))
@@ -498,7 +498,6 @@ See Info node `(for)Sequence Constructors'.
                          (and (not ,visited) (setq ,visited t))))
                     ((,id ,current))
                     ((next-window ,current ,minibuf ,frame)))))))
-  (declare (side-effect-free t))
   (iter-make (let ((original (frame-selected-window
                               (and (framep frame) frame))))
                (iter-yield original)
