@@ -8,7 +8,7 @@
 @set subtitle Iteration and Sequence
 @set author Wing Hei Chan
 @set year 2022
-@set version 1.0
+@set version 1.0.1
 
 @macro enquote{phrase}
 ``\phrase\''
