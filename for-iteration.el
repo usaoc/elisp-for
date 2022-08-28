@@ -27,6 +27,7 @@
 
 ;;; Code:
 ;;;; Require
+(eval-when-compile (require 'subr-x))
 (require 'cl-lib)
 
 ;;;; Internal
@@ -339,22 +340,19 @@ ARGLIST, DOCSTRING, and CASES-OR-BODY are as in
        ,(concat docstring "\n\n"
                 "See Info node `(for)Special-Clause Operators'.")
        . ,cases-or-body))
-  (defmacro for--defmacro (name arglist &rest body)
-    "Define the iteration macro NAME with the star version.
+  (defmacro for--defmacro
+      (name arglist docstring declaration &rest body)
+    "Define the iteration macro NAME with the starred version.
 
 ARGLIST, DOCSTRING, DECL, and BODY are as in normal `defmacro'
 forms.
 
-\(fn NAME ARGLIST [DOCSTRING] [DECL] BODY...)"
+\(fn NAME ARGLIST DOCSTRING DECL BODY...)"
     (declare (debug (&define name lambda-list lambda-doc
-                             [&optional ("declare" def-declarations)]
-                             def-body))
+                             ("declare" def-declarations) def-body))
              (doc-string 3) (indent 2))
-    (pcase-let* (((or `(,(and (cl-type string)
-                              (app (lambda (docstring)
-                                     `(,(replace-regexp-in-string
-                                         (rx bol "..." eol) "\
-BODY = [[BODY-FORM...] MULTIPLE-VALUE-FORM]
+    (let ((docstring
+           (let ((extra "BODY = [[BODY-FORM...] MULTIPLE-VALUE-FORM]
 
 BODY-FORM = SPECIAL-CLAUSE | EXPRESSION
 
@@ -366,21 +364,24 @@ SPECIAL-CLAUSE = (KEYWORD [SUBFORM...])
 
 ITERATION-CLAUSE = ([IDENTIFIER] SEQUENCE-FORM)
 
-See Info node `(for)Iteration Macros'." docstring)))
-                                   docstring))
-                        . ,body)
-                      (and body (let docstring '())))
-                  body)
-                 ((or `(,(and `(declare . ,_)
-                              (app (lambda (form) `(,form))
-                                   declaration))
-                        . ,body)
-                      (and body (let declaration '())))
-                  body))
+See Info node `(for)Iteration Macros'."))
+             (save-match-data
+               (if (string-match (rx bol "..." eol) docstring)
+                   (replace-match extra 'fixedcase 'literal docstring)
+                 (string-join
+                  (list docstring extra
+                        (concat "(fn "
+                                (mapconcat
+                                 (lambda (symbol)
+                                   (upcase (symbol-name symbol)))
+                                 (remq '&rest arglist)
+                                 " ")
+                                ")"))
+                  "\n\n"))))))
       `(prog1 (defmacro ,name ,arglist
-                ,@docstring ,@declaration . ,body)
+                ,docstring ,declaration . ,body)
          (defmacro ,(intern (concat (symbol-name name) "*")) ,arglist
-           ,@docstring ,@declaration
+           ,docstring ,declaration
            (cl-flet
                ((for--parse-body (for-clauses body)
                   (pcase-let ((`(,for-clauses . ,value-form)
@@ -538,11 +539,7 @@ subforms after the sequence are the patterns."
 
 BINDINGS = ([BINDING...] [(:result [EXPRESSION...])])
 
-BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
-
-...
-
-\(fn BINDINGS FOR-CLAUSES BODY)"
+BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)"
   (declare (debug for--fold-spec) (indent 2))
   (pcase-let
       ((binder for-binder)
@@ -658,22 +655,14 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
                          clauses))))))))))
 
 (for--defmacro for-do (for-clauses &rest body)
-  "The side-effecting iteration macro.
-
-...
-
-\(fn FOR-CLAUSES BODY)"
+  "The side-effecting iteration macro."
   (declare (debug for--do-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses `(,@body (:values)))))
     `(for-fold () (,@for-clauses ,value-form))))
 
 (for--defmacro for-list (for-clauses &rest body)
-  "The list-building iteration macro.
-
-...
-
-\(fn FOR-CLAUSES BODY)"
+  "The list-building iteration macro."
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -687,11 +676,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)
 (for--defmacro for-lists (bindings for-clauses &rest body)
   "The multiple-list-building iteration macro.
 
-BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
-
-...
-
-\(fn BINDINGS FOR-CLAUSES BODY)"
+BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])"
   (declare (debug for--lists-spec) (indent 2))
   (pcase-let
       ((`(,(and bindings
@@ -787,11 +772,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
          `(apply #'string (for-list (,@for-clauses ,value-form)))))))
 
 (for--defmacro for-and (for-clauses &rest body)
-  "The `and'-folding iteration macro.
-
-...
-
-\(fn FOR-CLAUSES BODY)"
+  "The `and'-folding iteration macro."
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -806,11 +787,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
          ,value))))
 
 (for--defmacro for-or (for-clauses &rest body)
-  "The `or'-folding iteration macro.
-
-...
-
-\(fn FOR-CLAUSES BODY)"
+  "The `or'-folding iteration macro."
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -825,11 +802,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
          ,value))))
 
 (for--defmacro for-sum (for-clauses &rest body)
-  "The sum-accumulating iteration macro.
-
-...
-
-\(fn FOR-CLAUSES BODY)"
+  "The sum-accumulating iteration macro."
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -841,11 +814,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
                               `(+ ,form ,sum))))))))
 
 (for--defmacro for-product (for-clauses &rest body)
-  "The product-accumulating iteration macro.
-
-...
-
-\(fn FOR-CLAUSES BODY)"
+  "The product-accumulating iteration macro."
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -857,11 +826,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
                               `(* ,form ,product))))))))
 
 (for--defmacro for-first (for-clauses &rest body)
-  "The first-value-returning iteration macro.
-
-...
-
-\(fn FOR-CLAUSES BODY)"
+  "The first-value-returning iteration macro."
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -870,11 +835,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
            (,@for-clauses (:final) ,value-form)))))
 
 (for--defmacro for-last (for-clauses &rest body)
-  "The last-value-returning iteration macro.
-
-...
-
-\(fn FOR-CLAUSES BODY)"
+  "The last-value-returning iteration macro."
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -882,11 +843,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
       `(for-fold ((,value nil)) (,@for-clauses ,value-form)))))
 
 (for--defmacro for-max (for-clauses &rest body)
-  "The `max'-folding iteration macro.
-
-...
-
-\(fn FOR-CLAUSES BODY)"
+  "The `max'-folding iteration macro."
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
@@ -898,11 +855,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])
                               `(max ,form ,max))))))))
 
 (for--defmacro for-min (for-clauses &rest body)
-  "The `min'-folding iteration macro.
-
-...
-
-\(fn FOR-CLAUSES BODY)"
+  "The `min'-folding iteration macro."
   (declare (debug for--accumulator-spec) (indent 1))
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))

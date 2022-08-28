@@ -51,46 +51,47 @@ A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
                                             &rest (pcase-PAT body))]]
                              def-body))
              (doc-string 3) (indent 2))
-    (let ((ellipsis (rx bol "..." eol))
-          (node "See Info node `(for)Sequence Constructors'."))
+    (let ((extra "See Info node `(for)Sequence Constructors'."))
       (cl-flet* ((make-arg (arg) (upcase (symbol-name arg)))
                  (make-rest (arg) (concat "[" (make-arg arg) "...]"))
                  (make-docstring (args)
-                   (string-join (list docstring node
+                   (string-join (list docstring extra
                                       (concat "(fn "
                                               (string-join args " ")
                                               ")"))
                                 "\n\n")))
         `(define-for-sequence ,name ,arglist
-           ,(cond ((string-match-p ellipsis docstring)
-                   (replace-regexp-in-string ellipsis node docstring))
-                  ((memq '&rest arglist)
-                   (make-docstring
-                    (named-let parse ((arglist arglist))
-                      (pcase-exhaustive arglist
-                        ('() '())
-                        (`(&rest ,arg) `(,(make-rest arg)))
-                        (`(,arg . ,arglist)
-                         `(,(make-arg arg) . ,(parse arglist)))))))
-                  ((memq '&optional arglist)
-                   (make-docstring
-                    (named-let parse ((arglist arglist))
-                      (pcase-exhaustive arglist
-                        ('() '())
-                        (`(&optional . ,arglist)
-                         (named-let parse ((arglist arglist))
-                           (pcase-exhaustive arglist
-                             ('() '())
-                             (`(&rest ,arg) `(,(make-rest arg)))
-                             (`(,arg . ,arglist)
-                              `(,(concat "[" (string-join
-                                              `(,(make-arg arg)
-                                                . ,(parse arglist))
-                                              " ")
-                                         "]"))))))
-                        (`(,arg . ,arglist)
-                         `(,(make-arg arg) . ,(parse arglist)))))))
-                  (t (concat docstring "\n\n" node)))
+           ,(save-match-data
+              (cond ((string-match (rx bol "..." eol) docstring)
+                     (replace-match extra
+                                    'fixedcase 'literal docstring))
+                    ((memq '&rest arglist)
+                     (make-docstring
+                      (named-let parse ((arglist arglist))
+                        (pcase-exhaustive arglist
+                          ('() '())
+                          (`(&rest ,arg) `(,(make-rest arg)))
+                          (`(,arg . ,arglist)
+                           `(,(make-arg arg) . ,(parse arglist)))))))
+                    ((memq '&optional arglist)
+                     (make-docstring
+                      (named-let parse ((arglist arglist))
+                        (pcase-exhaustive arglist
+                          ('() '())
+                          (`(&optional . ,arglist)
+                           (named-let parse ((arglist arglist))
+                             (pcase-exhaustive arglist
+                               ('() '())
+                               (`(&rest ,arg) `(,(make-rest arg)))
+                               (`(,arg . ,arglist)
+                                `(,(concat "[" (string-join
+                                                `(,(make-arg arg)
+                                                  . ,(parse arglist))
+                                                " ")
+                                           "]"))))))
+                          (`(,arg . ,arglist)
+                           `(,(make-arg arg) . ,(parse arglist)))))))
+                    (t (concat docstring "\n\n" extra))))
            . ,(pcase-let
                   (((or `(,(and `(declare . ,_) declaration)
                           . ,subforms)
