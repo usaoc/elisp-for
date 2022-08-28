@@ -28,8 +28,10 @@
 ;;; Code:
 ;;;; Require
 (eval-when-compile (require 'subr-x))
+(require 'cl-lib)
 (require 'ert)
 (require 'for)
+(require 'generator)
 
 ;;;; Internal
 (eval-when-compile

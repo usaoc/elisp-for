@@ -28,6 +28,7 @@
 ;;; Code:
 ;;;; Require
 (eval-when-compile (require 'subr-x))
+(require 'cl-lib)
 (require 'for-iteration)
 (require 'generator)
 
