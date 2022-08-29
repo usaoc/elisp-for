@@ -141,10 +141,9 @@ generators.
 
 <p>Support for destructuring is a non-aim of this package.  For that, one
 should leverage <code>pcase-let</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Destructuring-with-pcase-Patterns.html#Destructuring-with-pcase-Patterns">(elisp)Destructuring with <code>pcase</code>
-Patterns</a>) or similar forms <em>downward compatible</em> with
-<code>let</code> forms.  By default, the iteration forms use <code>pcase-let</code>
-forms, but this is configurable through the buffer-local variable
-<code>for-binder</code>.
+Patterns</a>) or similar <code>let</code>-like forms.  By default, the
+iteration forms use <code>pcase-let</code> forms, but this is configurable
+through the buffer-local variable <code>for-binder</code>.
 </p>
 <p>The destructuring capability of <code>cl-loop</code> forms:
 </p>

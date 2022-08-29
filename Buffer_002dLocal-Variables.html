@@ -56,15 +56,21 @@ specifies them.
 <dl class="def">
 <dt id="index-for_002dbinder"><span class="category">Variable: </span><span><strong>for-binder</strong><a href='#index-for_002dbinder' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This buffer-local variable has a symbol as its value that is used as the
-head of certain <code>let</code>-like forms.  The function cell
-(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Cells.html#Function-Cells">(elisp)Function Cells</a>) of the symbol stores either a primitive
-function (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Primitive-Function-Type.html#Primitive-Function-Type">(elisp)Primitive Function Type</a>) or a macro
-<em>downward compatible</em> with <code>let</code>.  It is an error for it to
-store any other value.  The default value is <code>pcase-let</code>.
+head of certain <code>let</code>-like forms, which defaults to
+<code>pcase-let</code>.  The function cell (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Cells.html#Function-Cells">(elisp)Function Cells</a>) of
+the symbol stores either a primitive function (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Primitive-Function-Type.html#Primitive-Function-Type">(elisp)Primitive Function
+Type</a>) or a macro compatible with the following grammar.
 </p>
-<p>For example, a semantics similar to <code>in-ref</code> clauses of
-<code>cl-loop</code> forms can be achieved by setting <code>for-binder</code> to
-<code>cl-symbol-macrolet</code>:
+<div class="example">
+<pre class="example">(<var>for-binder</var> ([<var>form</var> <var>expression</var>&hellip;])
+  <var>body</var>&hellip;)
+</pre></div>
+
+<p>Above, <var>for-binder</var> is the symbol, the form of <var>form</var> is
+specified by the primitive function or the macro, an <var>expression</var> is
+an expression, and <var>body</var>s are the body.  As an example, a semantics
+similar to <code>in-ref</code> clauses of <code>cl-loop</code> forms can be achieved
+by setting <code>for-binder</code> to <code>cl-symbol-macrolet</code>:
 </p>
 <div class="example">
 <pre class="example">for-binder
