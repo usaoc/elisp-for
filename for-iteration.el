@@ -393,13 +393,14 @@ See Info node `(for)Iteration Macros'."))
 (def-edebug-elem-spec 'for-result-clause '((":result" body)))
 
 (def-edebug-elem-spec 'for-iteration-clause
-  '(([&optional sexp] form)))
+  '(([&optional sexp] [&or (symbolp &rest sexp) form])))
 
 (def-edebug-elem-spec 'for-special-clause
   '(&or ([&or ":break" ":final" ":if" ":if-not" ":do"] &rest form)
-        ([&or ":let" ":if-let"] &rest (sexp form))
+        (":let" &rest (sexp form))
+        (":if-let" &rest &or symbolp ([&optional symbolp] form))
         ([&or ":pcase" ":pcase-not"] &rest pcase-PAT)
-        (keywordp sexp)))
+        (keywordp &rest sexp)))
 
 (def-edebug-elem-spec 'for-multiple-value-form
   '(&or (":values" &rest form) sexp))
