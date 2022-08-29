@@ -41,16 +41,7 @@ A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
 `:expander-case' form as in `define-for-sequence' forms.
 
 \(fn NAME ARGLIST DOCSTRING [DECLARATION] [SUBFORM...] [BODY...])"
-    (declare (debug (&define name lambda-list lambda-doc
-                             [&optional ("declare" def-declarations)]
-                             [&optional
-                              [&or (":type" &rest cl-type-spec)
-                                   (&define ":expander" (arg)
-                                            def-body)
-                                   (&define ":expander-case"
-                                            &rest (pcase-PAT body))]]
-                             def-body))
-             (doc-string 3) (indent 2))
+    (declare (debug define-for-sequence) (doc-string 3) (indent 2))
     (let ((extra "See Info node `(for)Sequence Constructors'."))
       (cl-flet* ((make-arg (arg) (upcase (symbol-name arg)))
                  (make-rest (arg) (concat "[" (make-arg arg) "...]"))
