@@ -191,31 +191,36 @@ The result forms are extracted from BINDINGS or else the default
 result forms are used.  Return a `cons' of BINDINGS without the
 result forms and the result forms."
   (declare (side-effect-free t))
-  (pcase-exhaustive bindings
-    ((or (and '() bindings (let result-forms '(nil)))
-         (and `((:result . ,(and `(,_ . ,_) result-forms)))
-              (let bindings '()))
-         (and `(,_ . ,_)
-              (or (app reverse
-                       `((:result . ,(and `(,_ . ,_) result-forms))
-                         . ,(app nreverse bindings)))
-                  (and bindings
-                       (app (mapcar (lambda (binding)
-                                      (pcase-exhaustive binding
-                                        ((or `(,id ,_) id) id))))
-                            (or (and `(,_) result-forms)
-                                (and `(,_ ,_) (app (lambda (ids)
-                                                     `((cons . ,ids)))
-                                                   result-forms))
-                                (app (lambda (ids) `((list . ,ids)))
-                                     result-forms)))))))
-     `(,(mapcar (lambda (binding)
-                  (pcase-exhaustive binding
-                    ((or (and `(,_ ,_) binding)
-                         (app (lambda (id) `(,id nil)) binding))
-                     binding)))
-                bindings)
-       . ,result-forms))))
+  (cl-flet ((normalize-bindings (bindings)
+              (mapcar (lambda (binding)
+                        (pcase-exhaustive binding
+                          ((or (and `(,id) (let binding `(,id nil)))
+                               (and `(,_ ,_) binding)
+                               (app (lambda (id) `(,id nil)) binding))
+                           binding)))
+                      bindings)))
+    (pcase-exhaustive bindings
+      ((or (and '() bindings (let result-forms '(nil)))
+           (and `((:result . ,(and `(,_ . ,_) result-forms)))
+                (let bindings '()))
+           (and `(,_ . ,_)
+                (or (app reverse
+                         `((:result . ,(and `(,_ . ,_) result-forms))
+                           . ,(app nreverse (app normalize-bindings
+                                                 bindings))))
+                    (app normalize-bindings
+                         (and bindings
+                              (app (mapcar (pcase-lambda (`(,id ,_))
+                                             id))
+                                   (or (and `(,_) result-forms)
+                                       (and `(,_ ,_)
+                                            (app (lambda (ids)
+                                                   `((cons . ,ids)))
+                                                 result-forms))
+                                       (app (lambda (ids)
+                                              `((list . ,ids)))
+                                            result-forms))))))))
+       `(,bindings . ,result-forms)))))
 
 (defun for--parse-body (for-clauses body)
   "Parse FOR-CLAUSES and BODY as the subforms of `for-fold'.
