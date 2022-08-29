@@ -263,10 +263,9 @@ Generators are available in function forms:
 
 Support for destructuring is a non-aim of this package.  For that, one
 should leverage @code{pcase-let} (@pxref{Destructuring with @code{pcase}
-Patterns,,,elisp}) or similar forms @emph{downward compatible} with
-@code{let} forms.  By default, the iteration forms use @code{pcase-let}
-forms, but this is configurable through the buffer-local variable
-@code{for-binder}.
+Patterns,,,elisp}) or similar @code{let}-like forms.  By default, the
+iteration forms use @code{pcase-let} forms, but this is configurable
+through the buffer-local variable @code{for-binder}.
 
 The destructuring capability of @code{cl-loop} forms:
 
@@ -709,15 +708,23 @@ specifies them.
 
 @defvar for-binder
 This buffer-local variable has a symbol as its value that is used as the
-head of certain @code{let}-like forms.  The function cell
-(@pxref{Function Cells,,,elisp}) of the symbol stores either a primitive
-function (@pxref{Primitive Function Type,,,elisp}) or a macro
-@emph{downward compatible} with @code{let}.  It is an error for it to
-store any other value.  The default value is @code{pcase-let}.
+head of certain @code{let}-like forms, which defaults to
+@code{pcase-let}.  The function cell (@pxref{Function Cells,,,elisp}) of
+the symbol stores either a primitive function (@pxref{Primitive Function
+Type,,,elisp}) or a macro compatible with the following grammar.
 
-For example, a semantics similar to @code{in-ref} clauses of
-@code{cl-loop} forms can be achieved by setting @code{for-binder} to
-@code{cl-symbol-macrolet}:
+@example
+@group
+(@var{for-binder} (@optional{@repeated{(@var{form} @var{expression})}})
+  @repeated{@var{body}})
+@end group
+@end example
+
+Above, @var{for-binder} is the symbol, the form of @var{form} is
+specified by the primitive function or the macro, an @var{expression} is
+an expression, and @var{body}s are the body.  As an example, a semantics
+similar to @code{in-ref} clauses of @code{cl-loop} forms can be achieved
+by setting @code{for-binder} to @code{cl-symbol-macrolet}:
 
 @example
 @group
