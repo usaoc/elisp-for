@@ -56,14 +56,6 @@ A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
               (cond ((string-match (rx bol "..." eol) docstring)
                      (replace-match extra
                                     'fixedcase 'literal docstring))
-                    ((memq '&rest arglist)
-                     (make-docstring
-                      (named-let parse ((arglist arglist))
-                        (pcase-exhaustive arglist
-                          ('() '())
-                          (`(&rest ,arg) `(,(make-rest arg)))
-                          (`(,arg . ,arglist)
-                           `(,(make-arg arg) . ,(parse arglist)))))))
                     ((memq '&optional arglist)
                      (make-docstring
                       (named-let parse ((arglist arglist))
@@ -80,6 +72,14 @@ A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
                                                   . ,(parse arglist))
                                                 " ")
                                            "]"))))))
+                          (`(,arg . ,arglist)
+                           `(,(make-arg arg) . ,(parse arglist)))))))
+                    ((memq '&rest arglist)
+                     (make-docstring
+                      (named-let parse ((arglist arglist))
+                        (pcase-exhaustive arglist
+                          ('() '())
+                          (`(&rest ,arg) `(,(make-rest arg)))
                           (`(,arg . ,arglist)
                            `(,(make-arg arg) . ,(parse arglist)))))))
                     (t (concat docstring "\n\n" extra))))
