@@ -455,7 +455,7 @@
   (let ((end (+ 5 (random 5))))
     (should (equal (for-list ((i end) (1+ i)))
                    (cl-loop for i below end collect (1+ i)))))
-  (let ((some-object (make-record 'some-type 0 nil)))
+  (let ((some-object (make-record '#:some-type 0 nil)))
     (should-error (for-list ((item some-object) item))
                   :type 'for-unhandled-type)))
 
