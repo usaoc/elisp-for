@@ -124,11 +124,12 @@ Errors</a>).
      &rArr; (1 2 3)
 </pre></div>
 
-<p><code>(make-record 'some-type 0 nil)</code> triggers
+<p><code>(make-record '#:some-type 0 nil)</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Read-Syntax.html#Special-Read-Syntax">(elisp)Special Read
+Syntax</a> and <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Records.html#Records">(elisp)Records</a>) triggers
 <code>for-unhandled-type</code>:
 </p>
 <div class="example">
-<pre class="example">(let ((some-object (make-record 'some-type 0 nil)))
+<pre class="example">(let ((some-object (make-record '#:some-type 0 nil)))
   (for-list ((item some-object)
              item)))
      error&rarr; Unhandled type: #s(some-type)
