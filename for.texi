@@ -1490,7 +1490,7 @@ is the value of the function form,
 @end deffn
 
 @deffn @seq{for-in-range, in-range, end}
-@seqx{for-in-range, in-range, @var{start} @var{end} @optional{@var{step}}}
+@seqx{for-in-range, in-range, start end @optional{step}}
 
 This sequence iterates over the numbers between @var{start} and
 @var{end}.  @var{start} defaults to @code{0} when omitted.  The step
