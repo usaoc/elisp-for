@@ -51,38 +51,44 @@
   (defmacro for--deftest-seq (&rest body)
     "Define test for sequence constructor."
     (declare (debug (def-body)) (indent 0))
-    `(cl-macrolet
-         ((with (expander &rest body)
-            `(cl-macrolet
-                 ((seq (&rest subforms) (funcall ,expander subforms))
-                  (seq* (&rest subforms)
-                    (let ((form (funcall ,expander subforms)))
-                      `(for--eval ,form))))
-               . ,body)))
-       (ert-deftest for-sequence-expanders ()
-         "Sequence expanders."
-         (with (lambda (subforms) `(for-list ,subforms)) . ,body))
-       (ert-deftest for-sequence-generators ()
-         "Sequence generators."
-         (with (lambda (subforms)
-                 (pcase-let ((`(,value . ,(app nreverse seqs))
-                              (reverse subforms)))
-                   `(cl-loop
-                     ,@(mapcan
-                        (lambda (seq)
-                          (pcase-let*
-                              (((or `(,id ,seq)
-                                    (and `(,seq) (let id nil)))
-                                seq)
-                               (`(,(app symbol-name
-                                        (app (concat "for-")
-                                             (app intern head)))
-                                  . ,subforms)
-                                seq))
-                            `(for ,id iter-by (,head . ,subforms))))
-                        seqs)
-                     collect ,value)))
-               . ,body)))))
+    (for--with-gensyms (with)
+      `(cl-macrolet
+           ((,with (expander &rest body)
+              `(cl-macrolet
+                   ((seq (&rest subforms) (funcall ,expander subforms))
+                    (seq* (&rest subforms)
+                      (let ((form (funcall ,expander subforms)))
+                        `(for--eval ,form))))
+                 . ,body)))
+         (ert-deftest for-sequence-expanders ()
+           "Sequence expanders."
+           (,with (lambda (subforms) `(for-list ,subforms)) . ,body))
+         (ert-deftest for-sequence-generators ()
+           "Sequence generators."
+           (,with (lambda (subforms)
+                    (cl-flet
+                        ((make-clause (head seq)
+                           (pcase-let*
+                               (((or `(,id ,seq)
+                                     (and `(,seq) (let id nil)))
+                                 seq)
+                                (`(,(app symbol-name
+                                         (app (concat "for-")
+                                              (app intern cons)))
+                                   . ,forms)
+                                 seq))
+                             `(,head ,id iter-by (,cons . ,forms)))))
+                      (pcase-let
+                          ((`(,seq . ,(app reverse
+                                           `(,value . ,(app nreverse
+                                                            seqs))))
+                            subforms))
+                        `(cl-loop ,@(make-clause 'for seq)
+                                  ,@(mapcan (lambda (seq)
+                                              (make-clause 'and seq))
+                                            seqs)
+                                  collect ,value))))
+                  . ,body))))))
 
 ;;;; Iteration
 (ert-deftest for-plain-iteration-macros ()
