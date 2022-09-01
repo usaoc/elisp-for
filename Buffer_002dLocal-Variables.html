@@ -58,8 +58,8 @@ specifies them.
 <dd><p>This buffer-local variable has a symbol as its value that is used as the
 head of certain <code>let</code>-like forms, which defaults to
 <code>pcase-let</code>.  The function cell (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Cells.html#Function-Cells">(elisp)Function Cells</a>) of
-the symbol stores either a primitive function (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Primitive-Function-Type.html#Primitive-Function-Type">(elisp)Primitive Function
-Type</a>) or a macro compatible with the following grammar.
+the symbol stores either a macro or a special form compatible with the
+following grammar:
 </p>
 <div class="example">
 <pre class="example">(<var>for-binder</var> ([(<var>form</var> <var>expression</var>)&hellip;])
@@ -67,8 +67,8 @@ Type</a>) or a macro compatible with the following grammar.
 </pre></div>
 
 <p>Above, <var>for-binder</var> is the symbol, the form of <var>form</var> is
-specified by the primitive function or the macro, an <var>expression</var> is
-an expression, and <var>body</var>s are the body.  As an example, a semantics
+specified by the macro or the special form, an <var>expression</var> is an
+expression, and <var>body</var>s are the body.  As an example, a semantics
 similar to <code>in-ref</code> clauses of <code>cl-loop</code> forms can be achieved
 by setting <code>for-binder</code> to <code>cl-symbol-macrolet</code>:
 </p>
