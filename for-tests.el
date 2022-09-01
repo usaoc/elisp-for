@@ -55,7 +55,8 @@
       `(cl-macrolet
            ((,with (expander &rest body)
               `(cl-macrolet
-                   ((seq (&rest subforms) (funcall ,expander subforms))
+                   ((seq (&rest subforms)
+                      (funcall ,expander subforms))
                     (seq* (&rest subforms)
                       (let ((form (funcall ,expander subforms)))
                         `(for--eval ,form))))
