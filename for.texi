@@ -711,8 +711,8 @@ specifies them.
 This buffer-local variable has a symbol as its value that is used as the
 head of certain @code{let}-like forms, which defaults to
 @code{pcase-let}.  The function cell (@pxref{Function Cells,,,elisp}) of
-the symbol stores either a primitive function (@pxref{Primitive Function
-Type,,,elisp}) or a macro compatible with the following grammar.
+the symbol stores either a macro or a special form compatible with the
+following grammar:
 
 @example
 @group
@@ -722,8 +722,8 @@ Type,,,elisp}) or a macro compatible with the following grammar.
 @end example
 
 Above, @var{for-binder} is the symbol, the form of @var{form} is
-specified by the primitive function or the macro, an @var{expression} is
-an expression, and @var{body}s are the body.  As an example, a semantics
+specified by the macro or the special form, an @var{expression} is an
+expression, and @var{body}s are the body.  As an example, a semantics
 similar to @code{in-ref} clauses of @code{cl-loop} forms can be achieved
 by setting @code{for-binder} to @code{cl-symbol-macrolet}:
 
