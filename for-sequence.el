@@ -95,6 +95,14 @@ A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
                                     "for-" (symbol-name name))))
                   . ,subforms)))))))
 
+(defsubst for--make-circular (&rest values)
+  "Make a circular list of VALUES."
+  (declare (pure t) (side-effect-free error-free))
+  (let ((last nil))
+    (let ((tail values))
+      (while tail (cl-shiftf last tail (cdr tail))))
+    (setf (cdr last) values)))
+
 ;;;; Interface
 (defmacro define-for-sequence (name arglist &rest subforms)
   "Define a sequence constructor NAME with ARGLIST and DOCSTRING.
@@ -314,14 +322,6 @@ half-open when STEP is negative."
     (for--iterator-for-clause `(,id ,iterator-form))))
   (cl-the function iterator))
 
-(defsubst for--make-circular (&rest values)
-  "Make a circular list of VALUES."
-  (declare (pure t) (side-effect-free error-free))
-  (let ((last nil))
-    (let ((tail values))
-      (while tail (cl-shiftf last tail (cdr tail))))
-    (setf (cdr last) values)))
-
 (for--defseq for-in-repeat (value &rest values)
   "Return an iterator that repeatedly returns each VALUE.
 
@@ -336,12 +336,13 @@ half-open when STEP is negative."
                     ((cdr ,tail)))))))
   (iter-make (iter-yield value)
              (let ((last nil))
-               (let ((values values))
-                 (while values
-                   (iter-yield (car values))
-                   (cl-shiftf last values (cdr values))))
+               (let ((tail values))
+                 (while tail
+                   (iter-yield (car tail))
+                   (cl-shiftf last tail (cdr tail))))
                (setf (cdr last) (push value values)))
-             (cl-loop (iter-yield (pop values)))))
+             (cl-loop (iter-yield (car values))
+                      (cl-callf cdr values))))
 
 (for--defseq for-in-value (value)
   "Return an iterator that returns VALUE once."
