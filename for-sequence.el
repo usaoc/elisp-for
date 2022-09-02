@@ -461,10 +461,12 @@ with BUFFER as the current buffer.  BUFFER defaults to the
 current buffer when it is nil or omitted."
   (:expander-case
    (`(,id ,(or (and `(,_) (let buffer-form nil)) `(,_ ,buffer-form)))
-    `(,id (for-in-list (if-let ((buffer ,buffer-form))
-                           (with-current-buffer buffer
-                             (overlays-in (point-min) (point-max)))
-                         (overlays-in (point-min) (point-max))))))))
+    (for--with-gensyms (buffer)
+      `(,id (for-in-list
+             (if-let ((,buffer ,buffer-form))
+                 (with-current-buffer ,buffer
+                   (overlays-in (point-min) (point-max)))
+               (overlays-in (point-min) (point-max)))))))))
 
 (for--defseq for-the-windows (&optional frame minibuf)
   "Return an iterator that returns each window in FRAME.
