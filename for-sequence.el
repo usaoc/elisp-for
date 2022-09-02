@@ -348,11 +348,9 @@ half-open when STEP is negative."
   "Return an iterator that returns VALUE once."
   (:expander-case
    (`(,id (,_ ,value-form))
-    (for--with-gensyms (value)
-      (let ((returned '#:returned))
-        `(,id (:do-in ((,value ,value-form)) () ((,value ,value))
-                      ((not (eq ,value ',returned)))
-                      ((,id ,value)) (',returned)))))))
+    (for--with-gensyms (value continue)
+      `(,id (:do-in ((,value ,value-form)) () ((,continue ,t))
+                    (,continue) ((,id ,value)) (nil))))))
   (iter-make (iter-yield value)))
 
 (for--defseq for-on-array (array)

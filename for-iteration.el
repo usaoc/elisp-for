@@ -77,14 +77,13 @@ ITERATION-CLAUSE is (FORM ITERATOR) where FORM is an arbitrary
 form and ITERATOR is an expression that produces an iterator."
   (declare (side-effect-free t))
   (pcase-exhaustive iteration-clause
-    (`(,id ,form)
-     (for--with-gensyms (iterator next)
-       (let* ((returned '#:returned)
-              (next* `(condition-case nil (iter-next ,iterator)
-                        (iter-end-of-sequence ',returned))))
-         `(,id (:do-in ((,iterator ,form)) () ((,next ,next*))
-                       ((not (eq ,next ',returned))) ((,id ,next))
-                       (,next*))))))))
+    (`(,id ,iterator-form)
+     (for--with-gensyms (iterator value next)
+       `(,id (:do-in ((,iterator ,iterator-form)) ((,value nil)) ()
+                     ((condition-case ,next (iter-next ,iterator)
+                        (iter-end-of-sequence nil)
+                        (:success (setq ,value ,next) t)))
+                     ((,id ,value)) ()))))))
 
 (defun for--expand-iteration-clause (clause)
   "Expand the iteration clause CLAUSE as much as possible.
