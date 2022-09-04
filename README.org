@@ -7,6 +7,9 @@
 
 #+title: For
 
+[[https://melpa.org/#/for][file:https://melpa.org/packages/for-badge.svg]]
+[[https://stable.melpa.org/#/for][file:https://stable.melpa.org/packages/for-badge.svg]]
+
 For is an Emacs Lisp extension package that provides iteration and
 sequence forms inspired by Racket.  For detailed documentation, refer
 to [[https://usaoc.github.io/elisp-for/][the manual]].
