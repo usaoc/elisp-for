@@ -858,10 +858,11 @@ This iteration macro is the fundamental building block of other
 iteration macros.  The form of @var{bindings} is the same as the
 @var{varlist} subforms of @code{let} forms, that is, a @var{binding} in
 @var{bindings} has either the form @var{identifier} or the form
-@code{(@var{identifier} @var{expression})}, except that an optional
-@code{(:result @repeated{@var{expression}})} form can appear as the last
-form.  @var{body}s are first transformed according to the following
-rules and appended to @var{for-clause}s preserving their order:
+@code{(@var{identifier} @optional{@var{expression}})}, except that an
+optional @code{(:result @repeated{@var{expression}})} form can appear as
+the last form.  @var{body}s are first transformed according to the
+following rules and appended to @var{for-clause}s preserving their
+order:
 
 @itemize
 @item
@@ -888,9 +889,9 @@ Finally, @var{binding}s are bound by a @code{let} form wrapping the body
 expanded so far, and the @var{expression}s in the @code{:result} form
 are appended.  When no @code{:result} form is present, the sole
 expression defaults to @code{nil} when there is no @var{identifier},
-@var{identifier} when there is one identifier @var{identifier},
-@code{(cons @repeated{@var{identifier}})} when there are two, and
-@code{(list @repeated{@var{identifier}})} when there are three or more.
+@var{identifier} when there is one, @code{(cons
+@repeated{@var{identifier}})} when there are two, and @code{(list
+@repeated{@var{identifier}})} when there are three or more.
 
 An iteration clause has the form @code{(@var{form} @var{sequence-form})}
 where the form of @var{form} is specified by the value of
