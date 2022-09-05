@@ -57,10 +57,11 @@ package.
 iteration macros.  The form of <var>bindings</var> is the same as the
 <var>varlist</var> subforms of <code>let</code> forms, that is, a <var>binding</var> in
 <var>bindings</var> has either the form <var>identifier</var> or the form
-<code>(<var>identifier</var> <var>expression</var>)</code>, except that an optional
-<code>(:result <var>expression</var>&hellip;)</code> form can appear as the last
-form.  <var>body</var>s are first transformed according to the following
-rules and appended to <var>for-clause</var>s preserving their order:
+<code>(<var>identifier</var> [<var>expression</var>])</code>, except that an
+optional <code>(:result <var>expression</var>&hellip;)</code> form can appear as
+the last form.  <var>body</var>s are first transformed according to the
+following rules and appended to <var>for-clause</var>s preserving their
+order:
 </p>
 <ul>
 <li> Each form except the last one is transformed to a <code>:do</code> clause
@@ -85,9 +86,9 @@ Finally, <var>binding</var>s are bound by a <code>let</code> form wrapping the b
 expanded so far, and the <var>expression</var>s in the <code>:result</code> form
 are appended.  When no <code>:result</code> form is present, the sole
 expression defaults to <code>nil</code> when there is no <var>identifier</var>,
-<var>identifier</var> when there is one identifier <var>identifier</var>,
-<code>(cons <var>identifier</var>&hellip;)</code> when there are two, and
-<code>(list <var>identifier</var>&hellip;)</code> when there are three or more.
+<var>identifier</var> when there is one, <code>(cons
+<var>identifier</var>&hellip;)</code> when there are two, and <code>(list
+<var>identifier</var>&hellip;)</code> when there are three or more.
 </p>
 <p>An iteration clause has the form <code>(<var>form</var> <var>sequence-form</var>)</code>
 where the form of <var>form</var> is specified by the value of
