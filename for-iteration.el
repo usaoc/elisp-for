@@ -31,21 +31,6 @@
 (require 'cl-lib)
 
 ;;;; Internal
-(defvar for--datum-dispatch-alist '()
-  "Alist of type specifiers vs generators.")
-
-(defun for--datum-to-iterator (datum)
-  "Dispatch on DATUM and return an iterator.
-
-Find the generator in `for--datum-dispatch-alist' and apply it to
-DATUM."
-  (if-let ((assoc (assoc datum for--datum-dispatch-alist
-                         (lambda (type datum)
-                           (cl-typep datum type)))))
-      (pcase-let ((`(,_ . ,generator) assoc))
-        (funcall generator datum))
-    (signal 'for-unhandled-type (list datum))))
-
 (defun for--datum-to-sequence (datum)
   "Transform DATUM to a sequence form.
 
@@ -120,7 +105,7 @@ when SEQUENCE-FORM is a `:do-in' form."
        (expand (funcall expander clause)))
       (`(,id ,datum)
        (expand (for--iterator-for-clause
-                `(,id (for--datum-to-iterator ,datum))))))))
+                `(,id (for-generator ,datum))))))))
 
 (defun for--nest-for-clauses (for-clauses)
   "Transform FOR-CLAUSES to implicitly nesting clauses.
@@ -426,8 +411,6 @@ See Info node `(for)Iteration Macros'."))
   '(([&rest symbolp] [&optional for-result-clause])))
 
 ;;;; Interface
-(define-error 'for-unhandled-type "Unhandled type")
-
 ;;;###autoload(define-symbol-prop 'for-binder 'safe-local-variable #'symbolp)
 (defvar-local for-binder 'pcase-let
   "The head of certain `let'-like forms in iteration forms.

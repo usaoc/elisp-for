@@ -168,29 +168,36 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                     (define-symbol-prop
                      ',name 'for--sequence-expander ',id))
                   subforms)))
-        (_ `(progn
-              ,@expander
-              ,@(mapcar (lambda (alias)
-                          `(define-symbol-prop
-                            ',alias 'for--alias ',name))
-                        aliases)
-              ,@(mapcar (lambda (type)
-                          `(setf (alist-get
-                                  ',type for--datum-dispatch-alist
-                                  nil nil #'equal)
-                                 #',name))
-                        types)
-              (defun ,name ,arglist
-                ,@docstring ,@declaration
-                . ,(pcase-exhaustive subforms
-                     ((and '() (let (and (pred (not (memq '&rest)))
-                                         (app (remq '&optional) args))
-                                 arglist))
-                      (for--with-gensyms (value)
-                        `((iter-make
-                           (for-do ((,value (,name . ,args))
-                                    (:do (iter-yield ,value))))))))
-                     (`(,_ . ,_) subforms)))))))))
+        (_ (let ((body
+                  (pcase-exhaustive subforms
+                    ((and '() (let (and (pred (not (memq '&rest)))
+                                        (app (remq '&optional) args))
+                                arglist))
+                     (for--with-gensyms (value)
+                       `((iter-make
+                          (for-do ((,value (,name . ,args))
+                                   (:do (iter-yield ,value))))))))
+                    (`(,_ . ,_) subforms))))
+             `(progn
+                ,@expander
+                ,@(mapcar (lambda (alias)
+                            `(define-symbol-prop
+                              ',alias 'for--alias ',name))
+                          aliases)
+                ,@(mapcar (lambda (type)
+                            (for--with-gensyms (datum)
+                              `(cl-defmethod for-generator
+                                 ((,datum ,type))
+                                 (funcall (lambda ,arglist . ,body)
+                                          ,datum))))
+                          types)
+                (defun ,name ,arglist
+                  ,@docstring ,@declaration . ,body))))))))
+
+(cl-defgeneric for-generator (datum)
+  "Return an iterator of DATUM.
+
+See Info node `(for)Sequence Constructors'.")
 
 (for--defseq for-in-array (array)
   "Return an iterator that returns each item in ARRAY."

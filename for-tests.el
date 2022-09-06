@@ -463,7 +463,7 @@
                    (cl-loop for i below end collect (1+ i)))))
   (let ((some-object (make-record '#:some-type 0 nil)))
     (should-error (for-list ((item some-object) item))
-                  :type 'for-unhandled-type)))
+                  :type 'cl-no-applicable-method)))
 
 (ert-deftest for-literal-sequences ()
   "Literal sequences."
