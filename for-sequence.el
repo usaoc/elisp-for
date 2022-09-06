@@ -197,7 +197,12 @@ BODY are the body of generator.  See Info node `(for)Definers'.
 (cl-defgeneric for-generator (datum)
   "Return an iterator of DATUM.
 
-See Info node `(for)Sequence Constructors'.")
+As a special case, return DATUM as is when it is a function.  See
+Info node `(for)Sequence Constructors'."
+  (:method :around (datum)
+           (pcase datum
+             ((cl-type function) datum)
+             (_ (cl-call-next-method datum)))))
 
 (for--defseq for-in-array (array)
   "Return an iterator that returns each item in ARRAY."
@@ -325,7 +330,6 @@ half-open when STEP is negative."
 (for--defseq for-in-iterator (iterator)
   "Return the function ITERATOR as is."
   (declare (pure t) (side-effect-free t))
-  (:type function)
   (:expander-case
    (`(,id (,_ ,iterator-form))
     (for--iterator-for-clause `(,id ,iterator-form))))

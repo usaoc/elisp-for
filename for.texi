@@ -522,8 +522,7 @@ A @code{list} dispatched to the application of @code{for-in-list} to it:
 @end group
 @end example
 
-A @code{function} dispatched to the application of
-@code{for-in-iterator} to it:
+A @code{function} dispatched to itself:
 
 @example
 @group
@@ -534,7 +533,7 @@ A @code{function} dispatched to the application of
 @end group
 @end example
 
-No applicable method for @code{(make-record '#:some-type 0 nil)}
+No applicable primary method for @code{(make-record '#:some-type 0 nil)}
 (@pxref{Special Read Syntax,,,elisp} and @ref{Records,,,elisp}):
 
 @example
@@ -542,7 +541,7 @@ No applicable method for @code{(make-record '#:some-type 0 nil)}
 (let ((some-object (make-record '#:some-type 0 nil)))
   (for-list ((item some-object)
              item)))
-@err{No applicable method: for-generator, #s(some-type)}
+@err{No primary method: for-generator, #s(some-type)}
 @end group
 @end example
 
@@ -784,7 +783,7 @@ It is an error for a type to appear more than once.  The form of
 @code{declare} subforms is the same as normal @code{declare} forms
 (@pxref{Declare Form,,,elisp}).  An @var{alias} is an identifier as an
 alias of @var{name} available when used in iteration clauses.  For each
-@var{type}, a method for @code{for-generator} that dispatches on
+@var{type}, a primary method for @code{for-generator} that dispatches on
 @var{type} is defined.  When an @code{:expander} subform is present, an
 expander with @var{arg} as the sole argument and @var{body}s as the body
 is defined and available when used in iteration clauses.  The expander
@@ -1435,8 +1434,9 @@ constructor used for dynamic dispatch.
 
 @defun for-generator datum
 This sequence constructor returns an iterator of DATUM.  It is a generic
-function whose methods dispatch on the type of DATUM and return an
-iterator.
+function whose primary methods dispatch on the type of DATUM and return
+an iterator.  An `:around' method that returns DATUM as is when it is a
+function is predefined.
 @end defun
 
 Below, all sequence constructors have expanders.  Additional properties
