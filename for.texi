@@ -1445,10 +1445,10 @@ A generic sequence constructor is provided, which is the underlying
 constructor used for dynamic dispatch.
 
 @defun for-generator datum
-This sequence constructor returns an iterator of DATUM.  It is a generic
-function whose primary methods dispatch on the type of DATUM and return
-an iterator.  An `:around' method that returns DATUM as is when it is a
-function is predefined.
+This sequence constructor returns an iterator of @var{datum}.  It is a
+generic function whose primary methods dispatch on the type of
+@var{datum} and return an iterator.  An @code{:around} method that
+returns @var{datum} as is when it is a function is predefined.
 @end defun
 
 Below, all sequence constructors have expanders.  Additional properties
