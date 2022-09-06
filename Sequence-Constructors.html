@@ -51,8 +51,7 @@ Next: <a href="Concept-Index.html" accesskey="n" rel="next">Concept Index</a>, P
 <span id="Sequence-Constructors-1"></span><h2 class="chapter">6 Sequence Constructors</h2>
 <p>Sequence constructors are the heads of sequence forms.  In particular,
 the sequence constructor <code>:do-in</code> is designed for use in expanders
-of other sequence constructors and is thus an auxiliary operator.  Other
-sequence constructors can act as expanders as well as generators.
+of other sequence constructors and is thus an auxiliary operator.
 </p>
 <dl class="def">
 <dt id="index-_003ado_002din"><span class="category">Auxiliary Operator: </span><span><strong>:do-in</strong> <em>memoize-bindings outer-bindings loop-bindings loop-guards inner-bindings loop-forms</em><a href='#index-_003ado_002din' class='copiable-anchor'> &para;</a></span></dt>
@@ -80,7 +79,7 @@ name.  Moreover, for each form <code>(<var>loop-identifier</var>
 <var>loop-form</var>s are evaluated.  It is an error for <var>loop-bindings</var>
 and <var>loop-forms</var> to have unmatched numbers of subforms.  For
 example, a possible implementation of the expander of a sequence
-constructor that iterates over lists is as follows<a id="DOCF15" href="#FOOT15"><sup>15</sup></a>:
+constructor that iterates over lists is as follows<a id="DOCF14" href="#FOOT14"><sup>14</sup></a>:
 </p>
 <div class="example">
 <pre class="example">(:expander-case
@@ -95,6 +94,16 @@ constructor that iterates over lists is as follows<a id="DOCF15" href="#FOOT15">
                           ((cdr ,tail)))))))
 </pre></div>
 </dd></dl>
+
+<p>A generic sequence constructor is provided, which is the underlying
+constructor used for dynamic dispatch.
+</p>
+<dl class="def">
+<dt id="index-for_002dgenerator"><span class="category">Function: </span><span><strong>for-generator</strong> <em>datum</em><a href='#index-for_002dgenerator' class='copiable-anchor'> &para;</a></span></dt>
+<dd><p>This sequence constructor returns an iterator of DATUM.  It is a generic
+function whose methods dispatch on the type of DATUM and return an
+iterator.
+</p></dd></dl>
 
 <p>Below, all sequence constructors have expanders.  Additional properties
 of them as defined by <code>define-for-sequence</code> are also specified
@@ -294,7 +303,7 @@ to <code>nil</code> when omitted.
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT15" href="#DOCF15">(15)</a></h5>
+<h5><a id="FOOT14" href="#DOCF14">(14)</a></h5>
 <p>In this
 example, it may seem unnecessary to &ldquo;memoize&rdquo; the value of
 <var>list-form</var> at first glance.  The actual purpose of doing so in this

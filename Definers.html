@@ -60,13 +60,13 @@ the documentation string, and optional <var>body</var>s as the body.  When no
 <var>body</var> is present and <var>arglist</var> does not contain a <code>&amp;rest</code>
 argument (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-List.html#Argument-List">(elisp)Argument List</a>), the default body is used.
 </p>
-<p>The default body is as follows where <var>args</var> is <var>arglist</var> with a
-potential <code>&amp;optional</code> keyword (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-List.html#Argument-List">(elisp)Argument List</a>)
-removed:
+<p>The default body is as follows where <var>value</var> is a generated
+identifier and <var>args</var> is <var>arglist</var> with a potential
+<code>&amp;optional</code> keyword (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-List.html#Argument-List">(elisp)Argument List</a>) removed:
 </p>
 <div class="example">
-<pre class="example">(iter-make (for-do ((value (<var>name</var> . <var>args</var>))
-                    (:do (iter-yield value)))))
+<pre class="example">(iter-make (for-do ((<var>value</var> (<var>name</var> . <var>args</var>))
+                    (:do (iter-yield <var>value</var>)))))
 </pre></div>
 
 <p>Additional properties can be associated with the sequence constructor
@@ -84,21 +84,17 @@ following types:
 <code>(:expander-case [<var>case</var>&hellip;])</code>
 </li></ul>
 
-<span id="index-terminology-12"></span>
-
 <p>It is an error for a type to appear more than once.  The form of
 <code>declare</code> subforms is the same as normal <code>declare</code> forms
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Declare-Form.html#Declare-Form">(elisp)Declare Form</a>).  An <var>alias</var> is an identifier as an
-alias of <var>name</var> available when used in iteration clauses.  A
-<var>type</var> is a type specifier, whose objects when used as sequence
-forms in iteration clauses are dispatched to <var>name</var>.  It is an error
-for two <var>type</var>s not to be in disjoint relation<a id="DOCF12" href="#FOOT12"><sup>12</sup></a>.  When an
-<code>:expander</code> subform is present, an expander with <var>arg</var> as the
-sole argument and <var>body</var>s as the body is defined and available when
-used in iteration clauses.  The expander receives the iteration clause
-as the argument and produces an expanded iteration clause.  An
-<code>:expander-case</code> subform is equivalent to an <code>:expander</code>
-subform with <code>(pcase-exhaustive <var>arg</var>
+alias of <var>name</var> available when used in iteration clauses.  For each
+<var>type</var>, a method for <code>for-generator</code> that dispatches on
+<var>type</var> is defined.  When an <code>:expander</code> subform is present, an
+expander with <var>arg</var> as the sole argument and <var>body</var>s as the body
+is defined and available when used in iteration clauses.  The expander
+receives the iteration clause as the argument and produces an expanded
+iteration clause.  An <code>:expander-case</code> subform is equivalent to an
+<code>:expander</code> subform with <code>(pcase-exhaustive <var>arg</var>
 [<var>case</var>&hellip;])</code> as the sole expression in <var>body</var>.
 </p>
 <p>Note that the subforms are processed <em>before</em> the generator is
@@ -122,8 +118,9 @@ forms, and produces the further expanded body as a list of forms.
 argument list of expander, and <var>subform</var>s are the body of expander;
 
 </li><li> When <var>arglist</var> has <em>one</em> identifier <var>body</var>,
-<code>(special-clause <var>body</var>)</code> is the argument list of expander, and
-<code>(pcase-exhaustive special-clause
+<code>(<var>special-clause</var> <var>body</var>)</code> is the argument list of
+expander where <var>special-clause</var> is a generated identifier, and
+<code>(pcase-exhaustive <var>special-clause</var>
 [<var>subform</var>&hellip;])</code> is the sole expression in the body
 of expander.
 </li></ul>
@@ -131,15 +128,6 @@ of expander.
 <p>It is an error for <var>arglist</var> to be in any other form.
 </p></dd></dl>
 
-</div>
-<div class="footnote">
-<hr>
-<h4 class="footnotes-heading">Footnotes</h4>
-
-<h5><a id="FOOT12" href="#DOCF12">(12)</a></h5>
-<p>Following
-<a href="http://clhs.lisp.se/Body/26_glo_d.htm">Common Lisp</a>, two types are
-<em>disjoint</em> when they have no element in common.</p>
 </div>
 <hr>
 <div class="header">
