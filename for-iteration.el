@@ -446,7 +446,7 @@ node `(for)Definers'.
   (declare (debug (&define [&name keywordp]
                            [&or [(arg arg) lambda-doc def-body]
                                 [(arg) lambda-doc
-                                 &rest [pcase-PAT body]]]))
+                                 &rest (pcase-PAT body)]]))
            (doc-string 3) (indent 2))
   (pcase-let (((or `(,(and (cl-type string)
                            (app (lambda (form) `(,form)) docstring))
