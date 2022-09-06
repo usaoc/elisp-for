@@ -749,9 +749,10 @@ the documentation string, and optional @var{body}s as the body.  When no
 @var{body} is present and @var{arglist} does not contain a @code{&rest}
 argument (@pxref{Argument List,,,elisp}), the default body is used.
 
-The default body is as follows where @var{value} is a generated
-identifier and @var{args} is @var{arglist} with a potential
-@code{&optional} keyword (@pxref{Argument List,,,elisp}) removed:
+The default body consists of a sole expression as follows where
+@var{value} is a generated identifier and @var{args} is @var{arglist}
+with a potential @code{&optional} keyword (@pxref{Argument
+List,,,elisp}) removed:
 
 @example
 @group
@@ -783,12 +784,23 @@ It is an error for a type to appear more than once.  The form of
 @code{declare} subforms is the same as normal @code{declare} forms
 (@pxref{Declare Form,,,elisp}).  An @var{alias} is an identifier as an
 alias of @var{name} available when used in iteration clauses.  For each
-@var{type}, a primary method for @code{for-generator} that dispatches on
-@var{type} is defined.  When an @code{:expander} subform is present, an
-expander with @var{arg} as the sole argument and @var{body}s as the body
-is defined and available when used in iteration clauses.  The expander
-receives the iteration clause as the argument and produces an expanded
-iteration clause.  An @code{:expander-case} subform is equivalent to an
+@var{type}, a primary method for @code{for-generator} is defined as
+follows where @var{datum} is a generated identifier and @var{body}s are
+potentially the default body:
+
+@example
+@group
+(cl-defmethod for-generator ((@var{datum} @var{type}))
+  (funcall (lambda @var{arglist} @repeated{@var{body}})
+           @var{datum}))
+@end group
+@end example
+
+When an @code{:expander} subform is present, an expander with
+@var{arg} as the sole argument and @var{body}s as the body is defined
+and available when used in iteration clauses.  The expander receives the
+iteration clause as the argument and produces an expanded iteration
+clause.  An @code{:expander-case} subform is equivalent to an
 @code{:expander} subform with @code{(pcase-exhaustive @var{arg}
 @optional{@repeated{@var{case}}})} as the sole expression in @var{body}.
 
@@ -1505,9 +1517,8 @@ clauses is as if this sequence constructor is used.
 @deffn @seq{for-in-iterator, in-iterator, iterator}
 This sequence is equivalent to the sequence @var{iterator}.  When used
 as a function, this sequence constructor checks @var{iterator} to be of
-type @code{function} and returns @var{iterator} as is.  @code{function}s
-are dispatched to it.  It is mainly useful for its expander to avoid the
-dynamic dispatch.
+type @code{function} and returns @var{iterator} as is.  It is mainly
+useful for its expander to avoid the dynamic dispatch.
 @end deffn
 
 @deffn @seq{for-in-repeat, in-repeat, @repeated{value}}
