@@ -95,7 +95,7 @@ expander, or is treated as a function form.  The expansion stops
 when SEQUENCE-FORM is a `:do-in' form."
   (named-let expand
       ((clause (pcase-exhaustive clause
-                 (`(,sequence) `(,(make-symbol "_id") ,sequence))
+                 (`(,sequence) `(,(gensym "_id") ,sequence))
                  (`(,_ ,_) clause))))
     (pcase-exhaustive clause
       ((and `(,_ (:do-in ,(cl-type list) ,(cl-type list)
@@ -528,7 +528,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)"
       ((binder for-binder)
        (`(,(and bindings
                 (app (mapcar (pcase-lambda (`(,id ,_))
-                               (make-symbol (symbol-name id))))
+                               (gensym (symbol-name id))))
                      renamed-ids)
                 (app length length-bindings))
           . ,result-forms)
