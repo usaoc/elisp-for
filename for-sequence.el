@@ -155,9 +155,10 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                  (or `(:expander . ,(and `((,_) ,_ . ,_) body))
                      `(:expander-case
                        . ,(app (lambda (cases)
-                                 `((for-clause)
-                                   (pcase-exhaustive for-clause
-                                     . ,cases)))
+                                 (for--with-gensyms (for-clause)
+                                   `((,for-clause)
+                                     (pcase-exhaustive ,for-clause
+                                       . ,cases))))
                                body))))
            . ,subforms)
          (let ((id (intern (concat (symbol-name name)
@@ -185,9 +186,10 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                      ((and '() (let (and (pred (not (memq '&rest)))
                                          (app (remq '&optional) args))
                                  arglist))
-                      `((iter-make
-                         (for-do ((value (,name . ,args))
-                                  (:do (iter-yield value)))))))
+                      (for--with-gensyms (value)
+                        `((iter-make
+                           (for-do ((,value (,name . ,args))
+                                    (:do (iter-yield ,value))))))))
                      (`(,_ . ,_) subforms)))))))))
 
 (for--defseq for-in-array (array)

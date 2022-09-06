@@ -755,14 +755,14 @@ the documentation string, and optional @var{body}s as the body.  When no
 @var{body} is present and @var{arglist} does not contain a @code{&rest}
 argument (@pxref{Argument List,,,elisp}), the default body is used.
 
-The default body is as follows where @var{args} is @var{arglist} with a
-potential @code{&optional} keyword (@pxref{Argument List,,,elisp})
-removed:
+The default body is as follows where @var{value} is a generated
+identifier and @var{args} is @var{arglist} with a potential
+@code{&optional} keyword (@pxref{Argument List,,,elisp}) removed:
 
 @example
 @group
-(iter-make (for-do ((value (@var{name} . @var{args}))
-                    (:do (iter-yield value)))))
+(iter-make (for-do ((@var{value} (@var{name} . @var{args}))
+                    (:do (iter-yield @var{value})))))
 @end group
 @end example
 
@@ -826,8 +826,9 @@ argument list of expander, and @var{subform}s are the body of expander;
 
 @item
 When @var{arglist} has @emph{one} identifier @var{body},
-@code{(special-clause @var{body})} is the argument list of expander, and
-@code{(pcase-exhaustive special-clause
+@code{(@var{special-clause} @var{body})} is the argument list of
+expander where @var{special-clause} is a generated identifier, and
+@code{(pcase-exhaustive @var{special-clause}
 @optional{@repeated{@var{subform}}})} is the sole expression in the body
 of expander.
 @end itemize

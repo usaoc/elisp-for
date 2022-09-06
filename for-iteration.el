@@ -454,11 +454,12 @@ node `(for)Definers'.
                    (and cases-or-body (let docstring '())))
                cases-or-body))
     (pcase-exhaustive cases-or-body
-      ((or (and (let `(,body-form) arglist)
-                (let arglist `(special-clause ,body-form))
-                (app (lambda (cases)
-                       `((pcase-exhaustive special-clause . ,cases)))
-                     body))
+      ((or (and (let `(,body-arg) arglist)
+                (let `(,arglist . ,body)
+                  (for--with-gensyms (special-clause)
+                    `((,special-clause ,body-arg)
+                      (pcase-exhaustive ,special-clause
+                        . ,cases-or-body)))))
            (and (let `(,_ ,_) arglist) body))
        (let ((id (intern (concat (symbol-name (cl-the keyword name))
                                  "--for-special-clause-expander"))))
