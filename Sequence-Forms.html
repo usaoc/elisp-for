@@ -110,8 +110,7 @@ as a sequence form in iteration clauses.  The expression
      &rArr; (1 2 3)
 </pre></div>
 
-<p>A <code>function</code> dispatched to the application of
-<code>for-in-iterator</code> to it:
+<p>A <code>function</code> dispatched to itself:
 </p>
 <div class="example">
 <pre class="example">(let ((iterator (for-in-list '(1 2 3))))
@@ -120,14 +119,14 @@ as a sequence form in iteration clauses.  The expression
      &rArr; (1 2 3)
 </pre></div>
 
-<p>No applicable method for <code>(make-record '#:some-type 0 nil)</code>
+<p>No applicable primary method for <code>(make-record '#:some-type 0 nil)</code>
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Read-Syntax.html#Special-Read-Syntax">(elisp)Special Read Syntax</a> and <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Records.html#Records">(elisp)Records</a>):
 </p>
 <div class="example">
 <pre class="example">(let ((some-object (make-record '#:some-type 0 nil)))
   (for-list ((item some-object)
              item)))
-     error&rarr; No applicable method: for-generator, #s(some-type)
+     error&rarr; No primary method: for-generator, #s(some-type)
 </pre></div>
 
 <span id="index-sequence-form-4"></span>
