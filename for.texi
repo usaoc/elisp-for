@@ -503,13 +503,16 @@ in iteration clauses to avoid the need of shorthands
 @end group
 @end example
 
+@concept{error, unhandled type}
 @concept{sequence form, dynamic dispatch}
 
 @dfn{Dynamic dispatch} is available when an arbitrary expression is used
 as a sequence form in iteration clauses.  The expression
 @var{expression} is transformed to @code{(for-generator
 @var{expression})}, where @code{for-generator} is a generic function
-(@pxref{Generic Functions,,,elisp}) that acts as a generator.
+(@pxref{Generic Functions,,,elisp}) that acts as a generator.  Moreover,
+@code{for-unhandled-type} is signaled (@pxref{Signaling Errors,,,elisp})
+when the value of @var{expression} is unhandled.
 
 A @code{list} dispatched to the application of @code{for-in-list} to it:
 
@@ -533,15 +536,16 @@ A @code{function} dispatched to itself:
 @end group
 @end example
 
-No applicable primary method for @code{(make-record '#:some-type 0 nil)}
-(@pxref{Special Read Syntax,,,elisp} and @ref{Records,,,elisp}):
+@code{(make-record '#:some-type 0 nil)} (@pxref{Special Read
+Syntax,,,elisp} and @ref{Records,,,elisp}) triggers
+@code{for-unhandled-type}:
 
 @example
 @group
 (let ((some-object (make-record '#:some-type 0 nil)))
   (for-list ((item some-object)
              item)))
-@err{No primary method: for-generator, #s(some-type)}
+@err{Unhandled type: #s(some-type)}
 @end group
 @end example
 
@@ -1447,8 +1451,10 @@ constructor used for dynamic dispatch.
 @defun for-generator datum
 This sequence constructor returns an iterator of @var{datum}.  It is a
 generic function whose primary methods dispatch on the type of
-@var{datum} and return an iterator.  An @code{:around} method that
-returns @var{datum} as is when it is a function is predefined.
+@var{datum} and return an iterator.  The default @code{:around} method
+returns @var{datum} as is when it is a function.  The default primary
+method signals @code{for-unhandled-type} with the singleton list of
+datum as @code{data}.
 @end defun
 
 Below, all sequence constructors have expanders.  Additional properties

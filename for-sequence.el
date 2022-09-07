@@ -194,6 +194,8 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                 (defun ,name ,arglist
                   ,@docstring ,@declaration . ,body))))))))
 
+(define-error 'for-unhandled-type "Unhandled type")
+
 (cl-defgeneric for-generator (datum)
   "Return an iterator of DATUM.
 
@@ -202,7 +204,8 @@ Info node `(for)Sequence Constructors'."
   (:method :around (datum)
            (pcase datum
              ((cl-type function) datum)
-             (_ (cl-call-next-method datum)))))
+             (_ (cl-call-next-method datum))))
+  (signal 'for-unhandled-type (list datum)))
 
 (for--defseq for-in-array (array)
   "Return an iterator that returns each item in ARRAY."
