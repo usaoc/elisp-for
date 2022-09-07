@@ -511,8 +511,8 @@ as a sequence form in iteration clauses.  The expression
 @var{expression} is transformed to @code{(for-generator
 @var{expression})}, where @code{for-generator} is a generic function
 (@pxref{Generic Functions,,,elisp}) that acts as a generator.  Moreover,
-@code{for-unhandled-type} is signaled (@pxref{Signaling Errors,,,elisp})
-when the value of @var{expression} is unhandled.
+@code{for-unhandled-type} is @code{signal}ed (@pxref{Signaling
+Errors,,,elisp}) when the value of @var{expression} is unhandled.
 
 A @code{list} dispatched to the application of @code{for-in-list} to it:
 
@@ -1453,8 +1453,8 @@ This sequence constructor returns an iterator of @var{datum}.  It is a
 generic function whose primary methods dispatch on the type of
 @var{datum} and return an iterator.  The default @code{:around} method
 returns @var{datum} as is when it is a function.  The default primary
-method signals @code{for-unhandled-type} with the singleton list of
-datum as @code{data}.
+method @code{signal}s @code{for-unhandled-type} with the singleton list
+of @var{datum} as @var{data}.
 @end defun
 
 Below, all sequence constructors have expanders.  Additional properties
