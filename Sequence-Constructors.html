@@ -104,8 +104,8 @@ constructor used for dynamic dispatch.
 generic function whose primary methods dispatch on the type of
 <var>datum</var> and return an iterator.  The default <code>:around</code> method
 returns <var>datum</var> as is when it is a function.  The default primary
-method signals <code>for-unhandled-type</code> with the singleton list of
-datum as <code>data</code>.
+method <code>signal</code>s <code>for-unhandled-type</code> with the singleton list
+of <var>datum</var> as <var>data</var>.
 </p></dd></dl>
 
 <p>Below, all sequence constructors have expanders.  Additional properties
