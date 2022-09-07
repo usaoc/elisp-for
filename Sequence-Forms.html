@@ -93,13 +93,16 @@ in iteration clauses to avoid the need of shorthands
      &rArr; ((a . 1) (b . 3))
 </pre></div>
 
+<span id="index-error"></span>
 <span id="index-sequence-form-3"></span>
 
 <p><em>Dynamic dispatch</em> is available when an arbitrary expression is used
 as a sequence form in iteration clauses.  The expression
 <var>expression</var> is transformed to <code>(for-generator
 <var>expression</var>)</code>, where <code>for-generator</code> is a generic function
-(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Generic-Functions.html#Generic-Functions">(elisp)Generic Functions</a>) that acts as a generator.
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Generic-Functions.html#Generic-Functions">(elisp)Generic Functions</a>) that acts as a generator.  Moreover,
+<code>for-unhandled-type</code> is signaled (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Signaling-Errors.html#Signaling-Errors">(elisp)Signaling Errors</a>)
+when the value of <var>expression</var> is unhandled.
 </p>
 <p>A <code>list</code> dispatched to the application of <code>for-in-list</code> to it:
 </p>
@@ -119,14 +122,15 @@ as a sequence form in iteration clauses.  The expression
      &rArr; (1 2 3)
 </pre></div>
 
-<p>No applicable primary method for <code>(make-record '#:some-type 0 nil)</code>
-(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Read-Syntax.html#Special-Read-Syntax">(elisp)Special Read Syntax</a> and <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Records.html#Records">(elisp)Records</a>):
+<p><code>(make-record '#:some-type 0 nil)</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Read-Syntax.html#Special-Read-Syntax">(elisp)Special Read
+Syntax</a> and <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Records.html#Records">(elisp)Records</a>) triggers
+<code>for-unhandled-type</code>:
 </p>
 <div class="example">
 <pre class="example">(let ((some-object (make-record '#:some-type 0 nil)))
   (for-list ((item some-object)
              item)))
-     error&rarr; No primary method: for-generator, #s(some-type)
+     error&rarr; Unhandled type: #s(some-type)
 </pre></div>
 
 <span id="index-sequence-form-4"></span>
