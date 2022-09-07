@@ -48,6 +48,26 @@
                    (eval (backquote #'(lambda () ,form))
                          (or ,dynamic 'lexical))))
       `(eval (backquote ,form) (or ,dynamic 'lexical))))
+  (defmacro for--deftest-dyn (&rest body)
+    "Define test for dynamic dispatch."
+    (declare (debug (def-body)) (indent 0))
+    `(progn
+       (ert-deftest for-dynamic-dispatch ()
+         "Dynamic dispatch."
+         (cl-macrolet
+             ((seq (seq value)
+                (pcase-exhaustive seq
+                  (`(,_ ,_) `(for-list (,seq ,value))))))
+           . ,body))
+       (ert-deftest for-generic-function ()
+         "Generic function."
+         (cl-macrolet
+             ((seq (seq value)
+                (pcase-exhaustive seq
+                  (`(,id ,form)
+                   `(cl-loop for ,id iter-by (for-generator ,form)
+                             collect ,value)))))
+           . ,body))))
   (defmacro for--deftest-seq (&rest body)
     "Define test for sequence constructor."
     (declare (debug (def-body)) (indent 0))
@@ -443,27 +463,21 @@
                                    vector))))))
 
 ;;;; Sequence
-(ert-deftest for-dynamic-dispatch ()
-  "Dynamic dispatch."
+(for--deftest-dyn
   (let* ((list (for--make-test-list))
          (result (mapcar #'1+ list)))
-    (should (equal (for-list ((i list) (1+ i))) result))
-    (should (equal (for-list
-                       ((i (let ((tail list))
-                             (iter-make (while tail
+    (should (equal (seq (i list) (1+ i)) result))
+    (should (equal (seq (i (iter-make (let ((tail list))
+                                        (while tail
                                           (iter-yield (pop tail))))))
-                        (1+ i)))
+                        (1+ i))
                    result))
-    (let ((vector (vconcat list)))
-      (should (equal (for-list ((i vector) (1+ i))) result)))
-    (let ((string (concat list)))
-      (should (equal (for-list ((i string) (1+ i))) result))))
+    (should (equal (seq (i (apply #'vector list)) (1+ i)) result))
+    (should (equal (seq (i (apply #'string list)) (1+ i)) result)))
   (let ((end (+ 5 (random 5))))
-    (should (equal (for-list ((i end) (1+ i)))
-                   (cl-loop for i below end collect (1+ i)))))
-  (let ((some-object (make-record '#:some-type 0 nil)))
-    (should-error (for-list ((item some-object) item))
-                  :type 'cl-no-primary-method)))
+    (should (equal (seq (i end) (1+ i)) (number-sequence 1 end))))
+  (should-error (seq (i (make-record '#:some-type 0 nil)) i)
+                :type 'cl-no-primary-method))
 
 (ert-deftest for-literal-sequences ()
   "Literal sequences."
