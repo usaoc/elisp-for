@@ -1452,9 +1452,10 @@ constructor used for dynamic dispatch.
 This sequence constructor returns an iterator of @var{datum}.  It is a
 generic function whose primary methods dispatch on the type of
 @var{datum} and return an iterator.  The default @code{:around} method
-returns @var{datum} as is when it is a function.  The default primary
-method @code{signal}s @code{for-unhandled-type} with the singleton list
-of @var{datum} as @var{data}.
+returns @var{datum} as is when it is a function, otherwise it invokes
+@code{cl-call-next-method}.  The default primary method @code{signal}s
+@code{for-unhandled-type} with the singleton list of @var{datum} as
+@var{data}.
 @end defun
 
 Below, all sequence constructors have expanders.  Additional properties

@@ -204,7 +204,7 @@ Info node `(for)Sequence Constructors'."
   (:method :around (datum)
            (pcase datum
              ((cl-type function) datum)
-             (_ (cl-call-next-method datum))))
+             (_ (cl-call-next-method))))
   (signal 'for-unhandled-type (list datum)))
 
 (for--defseq for-in-array (array)
