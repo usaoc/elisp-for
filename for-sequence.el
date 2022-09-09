@@ -27,74 +27,13 @@
 
 ;;; Code:
 ;;;; Require
-(eval-when-compile (require 'subr-x))
+(eval-when-compile
+  (require 'for-helper)
+  (require 'for-iteration))
 (require 'cl-lib)
-(require 'for-iteration)
 (require 'generator)
 
 ;;;; Internal
-(eval-when-compile
-  (defmacro for--defseq (name arglist docstring &rest subforms)
-    "Define a sequence constructor NAME with ARGLIST and DOCSTRING.
-
-A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
-`:expander-case' form as in `define-for-sequence' forms.
-
-\(fn NAME ARGLIST DOCSTRING [DECLARATION] [SUBFORM...] [BODY...])"
-    (declare (debug define-for-sequence) (doc-string 3) (indent 2))
-    (let ((extra "See Info node `(for)Sequence Constructors'."))
-      (cl-flet* ((make-arg (arg) (upcase (symbol-name arg)))
-                 (make-rest (arg) (concat "[" (make-arg arg) "...]"))
-                 (make-docstring (args)
-                   (string-join (list docstring extra
-                                      (concat "(fn "
-                                              (string-join args " ")
-                                              ")"))
-                                "\n\n")))
-        `(define-for-sequence ,name ,arglist
-           ,(save-match-data
-              (cond ((string-match (rx bol "..." eol) docstring)
-                     (replace-match extra
-                                    'fixedcase 'literal docstring))
-                    ((memq '&optional arglist)
-                     (make-docstring
-                      (named-let parse ((arglist arglist))
-                        (pcase-exhaustive arglist
-                          ('() '())
-                          (`(&optional . ,arglist)
-                           (named-let parse ((arglist arglist))
-                             (pcase-exhaustive arglist
-                               ('() '())
-                               (`(&rest ,arg) `(,(make-rest arg)))
-                               (`(,arg . ,arglist)
-                                `(,(concat "[" (string-join
-                                                `(,(make-arg arg)
-                                                  . ,(parse arglist))
-                                                " ")
-                                           "]"))))))
-                          (`(,arg . ,arglist)
-                           `(,(make-arg arg) . ,(parse arglist)))))))
-                    ((memq '&rest arglist)
-                     (make-docstring
-                      (named-let parse ((arglist arglist))
-                        (pcase-exhaustive arglist
-                          ('() '())
-                          (`(&rest ,arg) `(,(make-rest arg)))
-                          (`(,arg . ,arglist)
-                           `(,(make-arg arg) . ,(parse arglist)))))))
-                    (t (concat docstring "\n\n" extra))))
-           . ,(pcase-let
-                  (((or `(,(and `(declare . ,_) declaration)
-                          . ,subforms)
-                        (and subforms
-                             (let declaration
-                               '(declare (side-effect-free t)))))
-                    subforms))
-                `(,declaration
-                  (:alias ,(intern (string-remove-prefix
-                                    "for-" (symbol-name name))))
-                  . ,subforms)))))))
-
 (defsubst for--make-circular (&rest values)
   "Make a circular list of VALUES."
   (declare (pure t) (side-effect-free error-free))

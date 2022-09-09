@@ -27,7 +27,7 @@
 
 ;;; Code:
 ;;;; Require
-(eval-when-compile (require 'subr-x))
+(eval-when-compile (require 'for-helper))
 (require 'cl-lib)
 
 ;;;; Internal
@@ -43,18 +43,6 @@ Currently, literal lists, arrays, and integers are transformed to
     ((or (cl-type integer) `',(cl-type integer))
      `(for-in-range ,datum))
     (_ nil)))
-
-(defmacro for--with-gensyms (names &rest body)
-  "Bind NAMEs in NAMES to generated identifiers and evaluate BODY.
-
-\(fn (NAME...) BODY...)"
-  (declare (debug ((&rest symbolp) body)) (indent 1))
-  (pcase-exhaustive names
-    ((and `(,_ . ,_) (let `(,_ . ,_) body)
-          (app (mapcar (lambda (name)
-                         `(,name (gensym ,(symbol-name name)))))
-               bindings))
-     `(let ,bindings . ,body))))
 
 (defun for--expand-iteration-clause (clause)
   "Expand the iteration clause CLAUSE as much as possible.
@@ -295,69 +283,6 @@ from the expanded form.
                     (if (identifier= id value) form
                       `(setq ,id (prog1 ,value ,form)))))))
              pairs :from-end t :initial-value nil))
-
-(eval-when-compile
-  (defmacro for--defspecial
-      (name arglist docstring &rest cases-or-body)
-    "Define the special clause operator NAME.
-
-ARGLIST, DOCSTRING, and CASES-OR-BODY are as in
-`define-for-special-clause' forms.
-
-\(fn NAME ARGLIST DOCSTRING [CASES-OR-BODY...])"
-    (declare (debug define-for-special-clause)
-             (doc-string 3) (indent 2))
-    `(define-for-special-clause ,name ,arglist
-       ,(concat docstring "\n\n"
-                "See Info node `(for)Special-Clause Operators'.")
-       . ,cases-or-body))
-  (defmacro for--defmacro
-      (name arglist docstring declaration &rest body)
-    "Define the iteration macro NAME with the starred version.
-
-ARGLIST, DOCSTRING, DECL, and BODY are as in normal `defmacro'
-forms.
-
-\(fn NAME ARGLIST DOCSTRING DECL BODY...)"
-    (declare (debug defmacro) (doc-string 3) (indent 2))
-    (let ((docstring
-           (let ((extra "BODY = [[BODY-FORM...] MULTIPLE-VALUE-FORM]
-
-BODY-FORM = SPECIAL-CLAUSE | EXPRESSION
-
-FOR-CLAUSES = ([[FOR-CLAUSE...] MULTIPLE-VALUE-FORM])
-
-FOR-CLAUSE = SPECIAL-CLAUSE | ITERATION-CLAUSE
-
-SPECIAL-CLAUSE = (KEYWORD [SUBFORM...])
-
-ITERATION-CLAUSE = ([IDENTIFIER] SEQUENCE-FORM)
-
-See Info node `(for)Iteration Macros'."))
-             (save-match-data
-               (if (string-match (rx bol "..." eol) docstring)
-                   (replace-match extra 'fixedcase 'literal docstring)
-                 (string-join
-                  (list docstring extra
-                        (concat "(fn "
-                                (mapconcat
-                                 (lambda (symbol)
-                                   (upcase (symbol-name symbol)))
-                                 (remq '&rest arglist)
-                                 " ")
-                                ")"))
-                  "\n\n"))))))
-      `(prog1 (defmacro ,name ,arglist
-                ,docstring ,declaration . ,body)
-         (defmacro ,(intern (concat (symbol-name name) "*")) ,arglist
-           ,docstring ,declaration
-           (cl-flet
-               ((for--parse-body (for-clauses body)
-                  (pcase-let ((`(,for-clauses . ,value-form)
-                               (for--parse-body for-clauses body)))
-                    `(,(for--nest-for-clauses for-clauses)
-                      . ,value-form))))
-             . ,body))))))
 
 (def-edebug-elem-spec 'for-result-clause '((":result" body)))
 

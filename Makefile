@@ -9,7 +9,7 @@
 SHELL = /bin/sh
 EMACS = emacs --batch --quick --directory=.
 MAKEINFO = makeinfo
-EL = for.el for-iteration.el for-sequence.el
+EL = for-helper.el for-iteration.el for-sequence.el for.el
 ELC = $(EL:.el=.elc)
 TEST = for-tests.el
 TESTC = $(TEST:.el=.elc)
