@@ -912,6 +912,11 @@ If the sole @var{subform} is a @code{:do-in} form, terminate the
 expansion;
 
 @item
+Else, if @var{datum} is a recognized literal object, expand to
+@code{(@var{form} (@var{head} @var{datum}))} where @var{head} is the
+corresponding sequence constructor;
+
+@item
 Else, if @var{head} is an alias of @var{base}, expand to
 @code{(@var{form} (@var{base} @optional{@repeated{@var{subform}}}))};
 
