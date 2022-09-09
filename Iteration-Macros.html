@@ -102,6 +102,10 @@ iteratively expanded as follows:
 <li> If the sole <var>subform</var> is a <code>:do-in</code> form, terminate the
 expansion;
 
+</li><li> Else, if <var>datum</var> is a recognized literal object, expand to
+<code>(<var>form</var> (<var>head</var> <var>datum</var>))</code> where <var>head</var> is the
+corresponding sequence constructor;
+
 </li><li> Else, if <var>head</var> is an alias of <var>base</var>, expand to
 <code>(<var>form</var> (<var>base</var> [<var>subform</var>&hellip;]))</code>;
 
