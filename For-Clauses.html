@@ -104,11 +104,11 @@ rise to the usefulness of infinite sequences.
 <span id="index-convention-1"></span>
 <span id="index-convention-2"></span>
 
-<p><code>(in-naturals [<var>start</var>])</code><a id="DOCF7" href="#FOOT7"><sup>7</sup></a> is an
+<p><code>(for-in-naturals [<var>start</var>])</code><a id="DOCF7" href="#FOOT7"><sup>7</sup></a> is an
 infinite sequence:
 </p>
 <div class="example">
-<pre class="example">(for-list ((natural (in-naturals))
+<pre class="example">(for-list ((natural (for-in-naturals))
            (item '(a b c))
            (cons natural item)))
      &rArr; ((0 . a) (1 . b) (2 . c))
@@ -176,8 +176,8 @@ It is an error for it to be any other structure produced by <code>cons</code>
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Building-Lists.html#Building-Lists">(elisp)Building Lists</a>, that is, a <em>circular list</em> or a
 <em>dotted list</em>.)<a id="DOCF5" href="#FOOT5"><sup>5</sup></a>.</p>
 <h5><a id="FOOT7" href="#DOCF7">(7)</a></h5>
-<p>In this manual, a
-metavariable is typeset as &lsquo;<samp><var>metavariable</var></samp>&rsquo;, an optional form
+<p>In this manual,
+a metavariable is typeset as &lsquo;<samp><var>metavariable</var></samp>&rsquo;, an optional form
 as &lsquo;<samp>[<var>optional-form</var>]</samp>&rsquo;, and a form repeated <em>once
 or more</em> as &lsquo;<samp><var>repeated-form</var>&hellip;</samp>&rsquo;.  This is the same as
 the Emacs Lisp Manual (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/A-Sample-Function-Description.html#A-Sample-Function-Description">(elisp)A Sample Function Description</a>)

@@ -78,7 +78,7 @@ by setting <code>for-binder</code> to <code>cl-symbol-macrolet</code>:
 </pre><pre class="example">
 
 </pre><pre class="example">(let ((list (list 1 2 3)))
-  (for-do ((reference (in-list list))
+  (for-do ((reference (for-in-list list))
            (:do (setf reference nil))))
   list)
      &rArr; (nil nil nil)

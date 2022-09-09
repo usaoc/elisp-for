@@ -98,8 +98,8 @@ in iteration clauses to avoid the need of shorthands
 
 <p><em>Dynamic dispatch</em> is available when an arbitrary expression is used
 as a sequence form in iteration clauses.  The expression
-<var>expression</var> is transformed to <code>(for-generator
-<var>expression</var>)</code>, where <code>for-generator</code> is a generic function
+<var>expression</var> is transformed to <code>(for-in-iterator (for-generator
+<var>expression</var>))</code>, where <code>for-generator</code> is a generic function
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Generic-Functions.html#Generic-Functions">(elisp)Generic Functions</a>) that acts as a generator.  Moreover,
 <code>for-unhandled-type</code> is <code>signal</code>ed (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Signaling-Errors.html#Signaling-Errors">(elisp)Signaling
 Errors</a>) when the value of <var>expression</var> is unhandled.

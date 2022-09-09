@@ -92,9 +92,26 @@ expression defaults to <code>nil</code> when there is no <var>identifier</var>,
 </p>
 <p>An iteration clause has the form <code>(<var>form</var> <var>sequence-form</var>)</code>
 where the form of <var>form</var> is specified by the value of
-<code>for-binder</code> or the form <code>(<var>sequence-form</var>)</code> transformed
-to the former with a generated identifier as <var>form</var>.
+<code>for-binder</code> and <var>sequence-form</var> is either <code>(<var>head</var>
+[<var>subform</var>&hellip;])</code> or <var>datum</var>.  Alternatively, it
+has the form <code>(<var>sequence-form</var>)</code>, which is first transformed to
+the former with a generated identifier as <var>form</var>.  It is then
+iteratively expanded as follows:
 </p>
+<ul>
+<li> If the sole <var>subform</var> is a <code>:do-in</code> form, terminate the
+expansion;
+
+</li><li> Else, if <var>head</var> is an alias of <var>base</var>, expand to
+<code>(<var>form</var> (<var>base</var> [<var>subform</var>&hellip;]))</code>;
+
+</li><li> Else, if <var>head</var> has an associated expander, call it with the
+iteration clause as the sole argument;
+
+</li><li> Else, expand to <code>(<var>form</var> (for-in-iterator (for-generator
+<var>datum</var>)))</code>.
+</li></ul>
+
 <p>For each <var>identifier</var> and each <var>value</var> produced by the
 multiple-value form, <var>identifier</var> is first bound to the value of
 <var>expression</var> or <code>nil</code> when there is no <var>expression</var> and
