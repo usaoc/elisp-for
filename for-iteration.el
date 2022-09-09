@@ -284,6 +284,7 @@ from the expanded form.
                       `(setq ,id (prog1 ,value ,form)))))))
              pairs :from-end t :initial-value nil))
 
+;;;; Interface
 (def-edebug-elem-spec 'for-result-clause '((":result" body)))
 
 (def-edebug-elem-spec 'for-iteration-clause
@@ -319,7 +320,6 @@ from the expanded form.
 (def-edebug-elem-spec 'for-lists-bindings
   '(([&rest symbolp] [&optional for-result-clause])))
 
-;;;; Interface
 ;;;###autoload(define-symbol-prop 'for-binder 'safe-local-variable #'symbolp)
 (defvar-local for-binder 'pcase-let
   "The head of certain `let'-like forms in iteration forms.
