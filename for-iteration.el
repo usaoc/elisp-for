@@ -56,21 +56,6 @@ Currently, literal lists, arrays, and integers are transformed to
                bindings))
      `(let ,bindings . ,body))))
 
-(defun for--iterator-for-clause (iteration-clause)
-  "Transform ITERATION-CLAUSE to iterate over an iterator.
-
-ITERATION-CLAUSE is (FORM ITERATOR) where FORM is an arbitrary
-form and ITERATOR is an expression that produces an iterator."
-  (declare (side-effect-free t))
-  (pcase-exhaustive iteration-clause
-    (`(,id ,iterator-form)
-     (for--with-gensyms (iterator value next)
-       `(,id (:do-in ((,iterator ,iterator-form)) ((,value nil)) ()
-                     ((condition-case ,next (iter-next ,iterator)
-                        (iter-end-of-sequence nil)
-                        (:success (setq ,value ,next) t)))
-                     ((,id ,value)) ()))))))
-
 (defun for--expand-iteration-clause (clause)
   "Expand the iteration clause CLAUSE as much as possible.
 
@@ -104,8 +89,7 @@ when SEQUENCE-FORM is a `:do-in' form."
              . ,_))
        (expand (funcall expander clause)))
       (`(,id ,datum)
-       (expand (for--iterator-for-clause
-                `(,id (for-generator ,datum))))))))
+       (expand `(,id (for-in-iterator (for-generator ,datum))))))))
 
 (defun for--nest-for-clauses (for-clauses)
   "Transform FOR-CLAUSES to implicitly nesting clauses.

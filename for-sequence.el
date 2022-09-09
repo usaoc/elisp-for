@@ -335,7 +335,12 @@ half-open when STEP is negative."
   (declare (pure t) (side-effect-free t))
   (:expander-case
    (`(,id (,_ ,iterator-form))
-    (for--iterator-for-clause `(,id ,iterator-form))))
+    (for--with-gensyms (iterator value next)
+      `(,id (:do-in ((,iterator ,iterator-form)) ((,value nil)) ()
+                    ((condition-case ,next (iter-next ,iterator)
+                       (iter-end-of-sequence nil)
+                       (:success (setq ,value ,next) t)))
+                    ((,id ,value)) ())))))
   (cl-the function iterator))
 
 (for--defseq for-in-repeat (value &rest values)

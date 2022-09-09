@@ -508,8 +508,8 @@ in iteration clauses to avoid the need of shorthands
 
 @dfn{Dynamic dispatch} is available when an arbitrary expression is used
 as a sequence form in iteration clauses.  The expression
-@var{expression} is transformed to @code{(for-generator
-@var{expression})}, where @code{for-generator} is a generic function
+@var{expression} is transformed to @code{(for-in-iterator (for-generator
+@var{expression}))}, where @code{for-generator} is a generic function
 (@pxref{Generic Functions,,,elisp}) that acts as a generator.  Moreover,
 @code{for-unhandled-type} is @code{signal}ed (@pxref{Signaling
 Errors,,,elisp}) when the value of @var{expression} is unhandled.
