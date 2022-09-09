@@ -384,8 +384,8 @@ rise to the usefulness of infinite sequences.
 @concept{convention, optional form}
 @concept{convention, repeated form}
 
-@code{(in-naturals @optional{@var{start}})}@footnote{In this manual, a
-metavariable is typeset as @samp{@var{metavariable}}, an optional form
+@code{(for-in-naturals @optional{@var{start}})}@footnote{In this manual,
+a metavariable is typeset as @samp{@var{metavariable}}, an optional form
 as @samp{@optional{@var{optional-form}}}, and a form repeated @emph{once
 or more} as @samp{@repeated{@var{repeated-form}}}.  This is the same as
 the Emacs Lisp Manual (@pxref{A Sample Function Description,,,elisp})
@@ -394,7 +394,7 @@ infinite sequence:
 
 @example
 @group
-(for-list ((natural (in-naturals))
+(for-list ((natural (for-in-naturals))
            (item '(a b c))
            (cons natural item)))
 @res{((0 . a) (1 . b) (2 . c))}
@@ -733,7 +733,7 @@ for-binder
 
 @group
 (let ((list (list 1 2 3)))
-  (for-do ((reference (in-list list))
+  (for-do ((reference (for-in-list list))
            (:do (setf reference nil))))
   list)
 @res{(nil nil nil)}
@@ -900,8 +900,29 @@ expression defaults to @code{nil} when there is no @var{identifier},
 
 An iteration clause has the form @code{(@var{form} @var{sequence-form})}
 where the form of @var{form} is specified by the value of
-@code{for-binder} or the form @code{(@var{sequence-form})} transformed
-to the former with a generated identifier as @var{form}.
+@code{for-binder} and @var{sequence-form} is either @code{(@var{head}
+@optional{@repeated{@var{subform}}})} or @var{datum}.  Alternatively, it
+has the form @code{(@var{sequence-form})}, which is first transformed to
+the former with a generated identifier as @var{form}.  It is then
+iteratively expanded as follows:
+
+@itemize
+@item
+If the sole @var{subform} is a @code{:do-in} form, terminate the
+expansion;
+
+@item
+Else, if @var{head} is an alias of @var{base}, expand to
+@code{(@var{form} (@var{base} @optional{@repeated{@var{subform}}}))};
+
+@item
+Else, if @var{head} has an associated expander, call it with the
+iteration clause as the sole argument;
+
+@item
+Else, expand to @code{(@var{form} (for-in-iterator (for-generator
+@var{datum})))}.
+@end itemize
 
 For each @var{identifier} and each @var{value} produced by the
 multiple-value form, @var{identifier} is first bound to the value of
@@ -1515,10 +1536,10 @@ This sequence iterates over the numbers between @var{start} and
 size @var{step} defaults to @code{1} when it is @code{nil} or omitted,
 and it is added to the number after each iteration.  The iteration
 terminates when the number is no longer in the range of @var{start} and
-@var{end}.  The range is right half-open when @var{step} is non-negative
-or otherwise left half-open.  @code{integer}s are dispatched to it.
-Moreover, a literal integer as a sequence form when used in iteration
-clauses is as if this sequence constructor is used.
+@var{end}.  The range is right half-open when @var{step} is
+non-negative, otherwise it is left half-open.  @code{integer}s are
+dispatched to it.  Moreover, a literal integer as a sequence form when
+used in iteration clauses is as if this sequence constructor is used.
 @end deffn
 
 @deffn @seq{for-in-iterator, in-iterator, iterator}
