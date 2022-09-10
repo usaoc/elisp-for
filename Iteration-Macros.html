@@ -237,7 +237,7 @@ evaluation order:
   (let ((<var>vector</var> (make-vector <var>length</var> <var>init</var>)))
     (let ((<var>index</var> 0))
       (for-do ([<var>for-clause</var>&hellip;])
-              [<var>body</var>&hellip;]))
+        [<var>body</var>&hellip;]))
     <var>vector</var>))
 </pre></div>
 
@@ -290,12 +290,11 @@ in the apparent evaluation order:
 
 <div class="example">
 <pre class="example">(if (zerop <var>length</var>) &quot;&quot;
-  (let ((<var>string</var> (make-string <var>length</var>
-                             (or <var>init</var> ?\0)
+  (let ((<var>string</var> (make-string <var>length</var> (or <var>init</var> ?\0)
                              <var>multibyte</var>)))
     (let ((<var>index</var> 0))
       (for-do ([<var>for-clause</var>&hellip;])
-              [<var>body</var>&hellip;]))
+        [<var>body</var>&hellip;]))
     <var>string</var>))
 </pre></div>
 
