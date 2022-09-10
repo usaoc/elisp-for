@@ -27,7 +27,9 @@
 
 ;;; Code:
 ;;;; Require
-(eval-when-compile (require 'subr-x))
+(eval-when-compile
+  (require 'for-helper)
+  (require 'subr-x))
 (require 'cl-lib)
 (require 'ert)
 (require 'for)
