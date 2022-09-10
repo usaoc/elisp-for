@@ -233,7 +233,8 @@ like <code>for-fold</code>, except:
 evaluation order:
 
 <div class="example">
-<pre class="example">(if (zerop <var>length</var>) []
+<pre class="example">(if (zerop <var>length</var>)
+    []
   (let ((<var>vector</var> (make-vector <var>length</var> <var>init</var>)))
     (let ((<var>index</var> 0))
       (for-do ([<var>for-clause</var>&hellip;])
@@ -289,7 +290,8 @@ when omitted.  In such case, it is like <code>for-fold</code>, except:
 in the apparent evaluation order:
 
 <div class="example">
-<pre class="example">(if (zerop <var>length</var>) &quot;&quot;
+<pre class="example">(if (zerop <var>length</var>)
+    &quot;&quot;
   (let ((<var>string</var> (make-string <var>length</var> (or <var>init</var> ?\0)
                              <var>multibyte</var>)))
     (let ((<var>index</var> 0))
