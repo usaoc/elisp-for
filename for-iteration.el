@@ -101,7 +101,7 @@ adjacent iteration clauses."
 (defun for--parse-value-form (form number make-value)
   "Parse FORM as a multiple-value form.
 
-A tail form of FORM is (`values' [VALUE...]) with as many VALUEs
+A tail form of FORM is (`:values' [VALUE...]) with as many VALUEs
 as NUMBER.  An expression EXPR as a tail form is normalized
 to (`:values' EXPR), then the tail form FORM is replaced
 by (`funcall' MAKE-VALUE FORM)."
