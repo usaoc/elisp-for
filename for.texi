@@ -1042,8 +1042,8 @@ to another type.} the list returned by @code{for-list} to vector.
 
 Otherwise, this iteration macro accumulates the values into a fresh
 vector of length @var{length} with each element being @var{init} where
-@var{init} defaults to @code{nil} when omitted.  In such case, it is
-like @code{for-fold}, except:
+@var{init} defaults to @code{0} when omitted.  In such case, it is like
+@code{for-fold}, except:
 
 @itemize
 @item
@@ -1102,10 +1102,10 @@ returned by @code{for-list} to string.
 Otherwise, this iteration macro accumulates the values into a fresh
 string of length @var{length} with each element being @var{init} where
 @var{init} defaults to @code{?\0} (@pxref{General Escape
-Syntax,,,elisp}) when it is @code{nil} or omitted.  The string is always
-a multibyte string (@pxref{Non-ASCII Characters,,,elisp}) when
-@var{multibyte} is true where @var{multibyte} defaults to @code{nil}
-when omitted.  In such case, it is like @code{for-fold}, except:
+Syntax,,,elisp}) when omitted.  The string is always a multibyte string
+(@pxref{Non-ASCII Characters,,,elisp}) when @var{multibyte} is true
+where @var{multibyte} defaults to @code{nil} when omitted.  In such
+case, it is like @code{for-fold}, except:
 
 @itemize
 @item
@@ -1118,8 +1118,7 @@ in the apparent evaluation order:
 @group
 (if (zerop @var{length})
     ""
-  (let ((@var{string} (make-string @var{length} (or @var{init} ?\0)
-                             @var{multibyte})))
+  (let ((@var{string} (make-string @var{length} @var{init} @var{multibyte})))
     (let ((@var{index} 0))
       (for-do (@optional{@repeated{@var{for-clause}}})
         @optional{@repeated{@var{body}}}))
