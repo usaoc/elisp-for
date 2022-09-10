@@ -615,17 +615,18 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])"
                   (for--parse-body for-clauses body)))
        (for--with-gensyms (length init index vector)
          `(let ((,length ,length-form) (,init ,init-form))
-            (let ((,vector (make-vector ,length ,init)))
-              (let ((,index 0))
-                (for-do (,@for-clauses
-                         (:do ,(for--parse-value-form
-                                value-form 1
-                                (pcase-lambda (`(:values ,form))
-                                  `(setf (aref ,vector ,index)
-                                         ,form)))
-                              (cl-incf ,index))
-                         (:break (= ,index ,length)))))
-              ,vector)))))
+            (if (zerop ,length) []
+              (let ((,vector (make-vector ,length ,init)))
+                (let ((,index 0))
+                  (for-do (,@for-clauses
+                           (:do ,(for--parse-value-form
+                                  value-form 1
+                                  (pcase-lambda (`(:values ,form))
+                                    `(setf (aref ,vector ,index)
+                                           ,form)))
+                                (cl-incf ,index))
+                           (:break (= ,index ,length)))))
+                ,vector))))))
     (_ (pcase-let ((`(,for-clauses . ,value-form)
                     (for--parse-body for-clauses body)))
          `(apply #'vector (for-list (,@for-clauses ,value-form)))))))
@@ -656,17 +657,18 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])"
          `(let ((,length ,length-form)
                 (,init (or ,init-form ?\0))
                 (,multibyte ,multibyte-form))
-            (let ((,string (make-string ,length ,init ,multibyte)))
-              (let ((,index 0))
-                (for-do (,@for-clauses
-                         (:do ,(for--parse-value-form
-                                value-form 1
-                                (pcase-lambda (`(:values ,form))
-                                  `(setf (aref ,string ,index)
-                                         ,form)))
-                              (cl-incf ,index))
-                         (:break (= ,index ,length)))))
-              ,string)))))
+            (if (zerop ,length) ""
+              (let ((,string (make-string ,length ,init ,multibyte)))
+                (let ((,index 0))
+                  (for-do (,@for-clauses
+                           (:do ,(for--parse-value-form
+                                  value-form 1
+                                  (pcase-lambda (`(:values ,form))
+                                    `(setf (aref ,string ,index)
+                                           ,form)))
+                                (cl-incf ,index))
+                           (:break (= ,index ,length)))))
+                ,string))))))
     (_ (pcase-let ((`(,for-clauses . ,value-form)
                     (for--parse-body for-clauses body)))
          `(apply #'string (for-list (,@for-clauses ,value-form)))))))

@@ -1054,11 +1054,12 @@ evaluation order:
 
 @example
 @group
-(let ((@var{vector} (make-vector @var{length} @var{init})))
-  (let ((@var{index} 0))
-    (for-do (@optional{@repeated{@var{for-clause}}})
-      @optional{@repeated{@var{body}}}))
-  @var{vector})
+(if (zerop @var{length}) []
+  (let ((@var{vector} (make-vector @var{length} @var{init})))
+    (let ((@var{index} 0))
+      (for-do (@optional{@repeated{@var{for-clause}}})
+              @optional{@repeated{@var{body}}}))
+    @var{vector}))
 @end group
 @end example
 
@@ -1114,13 +1115,14 @@ in the apparent evaluation order:
 
 @example
 @group
-(let ((@var{string} (make-string @var{length}
-                           (or @var{init} ?\0)
-                           @var{multibyte})))
-  (let ((@var{index} 0))
-    (for-do (@optional{@repeated{@var{for-clause}}})
-      @optional{@repeated{@var{body}}}))
-  @var{string})
+(if (zerop @var{length}) ""
+  (let ((@var{string} (make-string @var{length}
+                             (or @var{init} ?\0)
+                             @var{multibyte})))
+    (let ((@var{index} 0))
+      (for-do (@optional{@repeated{@var{for-clause}}})
+              @optional{@repeated{@var{body}}}))
+    @var{string}))
 @end group
 @end example
 
