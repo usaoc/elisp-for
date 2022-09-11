@@ -289,20 +289,25 @@ half-open when STEP is negative."
 
 \(fn VALUE...)"
   (:expander-case
+   (`(,id (,_ ,value-form))
+    (for--with-gensyms (value)
+      `(,id (:do-in ((,value ,value-form)) () () () ((,id ,value))
+                    ()))))
    (`(,id (,_ . ,(and `(,_ . ,_) value-forms)))
     (for--with-gensyms (values tail)
       `(,id (:do-in ((,values (for--make-circular . ,value-forms))) ()
                     ((,tail ,values)) () ((,id (car ,tail)))
                     ((cdr ,tail)))))))
-  (iter-make (iter-yield value)
-             (let (last)
-               (let ((tail values))
-                 (while tail
-                   (iter-yield (car tail))
-                   (cl-shiftf last tail (cdr tail))))
-               (setf (cdr last) (push value values)))
-             (cl-loop (iter-yield (car values))
-                      (cl-callf cdr values))))
+  (if (null values) (iter-make (cl-loop (iter-yield value)))
+    (iter-make (iter-yield value)
+               (let (last)
+                 (let ((tail values))
+                   (while tail
+                     (iter-yield (car tail))
+                     (cl-shiftf last tail (cdr tail))))
+                 (setf (cdr last) (push value values)))
+               (cl-loop (iter-yield (car values))
+                        (cl-callf cdr values)))))
 
 (for--defseq for-in-value (value)
   "Return an iterator that returns VALUE once."
