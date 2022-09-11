@@ -37,7 +37,7 @@
 (defsubst for--make-circular (&rest values)
   "Make a circular list of VALUES."
   (declare (pure t) (side-effect-free error-free))
-  (let ((last nil))
+  (let (last)
     (let ((tail values))
       (while tail (cl-shiftf last tail (cdr tail))))
     (setf (cdr last) values)))
@@ -295,7 +295,7 @@ half-open when STEP is negative."
                     ((,tail ,values)) () ((,id (car ,tail)))
                     ((cdr ,tail)))))))
   (iter-make (iter-yield value)
-             (let ((last nil))
+             (let (last)
                (let ((tail values))
                  (while tail
                    (iter-yield (car tail))
