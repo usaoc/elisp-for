@@ -656,7 +656,8 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])"
        (for--with-gensyms (length init multibyte index string)
          `(let ((,length ,length-form) (,init ,init-form)
                 (,multibyte ,multibyte-form))
-            (if (zerop ,length) ""
+            (if (zerop ,length)
+                (if ,multibyte (make-string 0 ?\0 'multibyte) "")
               (let ((,string (make-string ,length ,init ,multibyte)))
                 (let ((,index 0))
                   (for-do (,@for-clauses

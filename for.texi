@@ -1117,7 +1117,9 @@ in the apparent evaluation order:
 @example
 @group
 (if (zerop @var{length})
-    ""
+    (if @var{multibyte}
+        (make-string 0 ?\0 'multibyte)
+      "")
   (let ((@var{string} (make-string @var{length} @var{init} @var{multibyte})))
     (let ((@var{index} 0))
       (for-do (@optional{@repeated{@var{for-clause}}})
