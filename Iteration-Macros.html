@@ -291,7 +291,9 @@ in the apparent evaluation order:
 
 <div class="example">
 <pre class="example">(if (zerop <var>length</var>)
-    &quot;&quot;
+    (if <var>multibyte</var>
+        (make-string 0 ?\0 'multibyte)
+      &quot;&quot;)
   (let ((<var>string</var> (make-string <var>length</var> <var>init</var> <var>multibyte</var>)))
     (let ((<var>index</var> 0))
       (for-do ([<var>for-clause</var>&hellip;])
