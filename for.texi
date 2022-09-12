@@ -1444,19 +1444,21 @@ the following @code{while} loop:
 Above, @var{for-binder} is the value of @code{for-binder} and
 @var{body}s are the body expanded so far.  As a @code{:do-in} form is
 encountered, the relevant forms are appended to subforms of the same
-name.  Moreover, for each form @code{(@var{loop-identifier}
-@var{initial-value})} in @var{loop-bindings} and each form
-@var{loop-form} in @var{loop-forms}, the form @var{loop-update} updates
-@var{loop-identifier} to the value of @var{loop-form} after all
-@var{loop-form}s are evaluated.  It is an error for @var{loop-bindings}
-and @var{loop-forms} to have unmatched number of subforms.  For example,
-a possible implementation of the expander of a sequence constructor that
-iterates over lists is as follows@footnote{In this example, it may seem
-unnecessary to @enquote{memoize} the value of @var{list-form} at first
-glance.  The actual purpose of doing so in this and many similar cases
-is to preserve the apparent evaluation order, although sometimes
-memoization is indeed necessary to guarantee that the subexpressions are
-evaluated exactly once (@pxref{Argument Evaluation,,,elisp}).}:
+name.  Moreover, for each @var{loop-binding} in @var{loop-bindings} and
+each @var{loop-form} in @var{loop-forms} where @var{loop-binding} has
+either the form @code{(@var{loop-identifier}
+@optional{@var{initial-value}})} or @var{loop-identifier}, the form
+@var{loop-update} updates @var{loop-identifier} to the value of
+@var{loop-form} after all @var{loop-form}s are evaluated.  It is an
+error for @var{loop-bindings} and @var{loop-forms} to have unmatched
+number of subforms.  For example, a possible implementation of the
+expander of a sequence constructor that iterates over lists is as
+follows@footnote{In this example, it may seem unnecessary to
+@enquote{memoize} the value of @var{list-form} at first glance.  The
+actual purpose of doing so in this and many similar cases is to preserve
+the apparent evaluation order, although sometimes memoization is indeed
+necessary to guarantee that the subexpressions are evaluated exactly
+once (@pxref{Argument Evaluation,,,elisp}).}:
 
 @example
 @group

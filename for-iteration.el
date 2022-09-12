@@ -473,7 +473,8 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)"
                                  . ,(cl-mapcar
                                      (lambda (binding form)
                                        (pcase-exhaustive binding
-                                         (`(,id ,_) `(,id ,form))))
+                                         ((or `(,id) `(,id ,_) id)
+                                          `(,id ,form))))
                                      loop-bindings loop-forms))))))
                     (body (if (null inner-bindings) body
                             `((,binder ,inner-bindings . ,body))))
