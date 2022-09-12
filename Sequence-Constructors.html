@@ -72,14 +72,16 @@ the following <code>while</code> loop:
 <p>Above, <var>for-binder</var> is the value of <code>for-binder</code> and
 <var>body</var>s are the body expanded so far.  As a <code>:do-in</code> form is
 encountered, the relevant forms are appended to subforms of the same
-name.  Moreover, for each form <code>(<var>loop-identifier</var>
-<var>initial-form</var>)</code> in <var>loop-bindings</var> and each form
-<var>loop-form</var> in <var>loop-forms</var>, the form <var>loop-update</var> updates
-<var>loop-identifier</var> to the value of <var>loop-form</var> after all
-<var>loop-form</var>s are evaluated.  It is an error for <var>loop-bindings</var>
-and <var>loop-forms</var> to have unmatched numbers of subforms.  For
-example, a possible implementation of the expander of a sequence
-constructor that iterates over lists is as follows<a id="DOCF14" href="#FOOT14"><sup>14</sup></a>:
+name.  Moreover, for each <var>loop-binding</var> in <var>loop-bindings</var> and
+each <var>loop-form</var> in <var>loop-forms</var> where <var>loop-binding</var> has
+either the form <code>(<var>loop-identifier</var>
+[<var>initial-value</var>])</code> or <var>loop-identifier</var>, the form
+<var>loop-update</var> updates <var>loop-identifier</var> to the value of
+<var>loop-form</var> after all <var>loop-form</var>s are evaluated.  It is an
+error for <var>loop-bindings</var> and <var>loop-forms</var> to have unmatched
+number of subforms.  For example, a possible implementation of the
+expander of a sequence constructor that iterates over lists is as
+follows<a id="DOCF14" href="#FOOT14"><sup>14</sup></a>:
 </p>
 <div class="example">
 <pre class="example">(:expander-case
@@ -307,13 +309,12 @@ to <code>nil</code> when omitted.
 <h4 class="footnotes-heading">Footnotes</h4>
 
 <h5><a id="FOOT14" href="#DOCF14">(14)</a></h5>
-<p>In this
-example, it may seem unnecessary to &ldquo;memoize&rdquo; the value of
-<var>list-form</var> at first glance.  The actual purpose of doing so in this
-and many similar cases is to preserve the apparent evaluation order,
-although sometimes memoization is indeed necessary to guarantee that the
-subexpressions are evaluated exactly once (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-Evaluation.html#Argument-Evaluation">(elisp)Argument
-Evaluation</a>).</p>
+<p>In this example, it may seem unnecessary to
+&ldquo;memoize&rdquo; the value of <var>list-form</var> at first glance.  The
+actual purpose of doing so in this and many similar cases is to preserve
+the apparent evaluation order, although sometimes memoization is indeed
+necessary to guarantee that the subexpressions are evaluated exactly
+once (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-Evaluation.html#Argument-Evaluation">(elisp)Argument Evaluation</a>).</p>
 </div>
 <hr>
 <div class="header">

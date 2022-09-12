@@ -56,8 +56,8 @@ package.
 <dd><p>This iteration macro is the fundamental building block of other
 iteration macros.  The form of <var>bindings</var> is the same as the
 <var>varlist</var> subforms of <code>let</code> forms, that is, a <var>binding</var> in
-<var>bindings</var> has either the form <var>identifier</var> or the form
-<code>(<var>identifier</var> [<var>expression</var>])</code>, except that an
+<var>bindings</var> has either the form <code>(<var>identifier</var>
+[<var>expression</var>])</code> or <var>identifier</var>, except that an
 optional <code>(:result <var>expression</var>&hellip;)</code> form can appear as
 the last form.  <var>body</var>s are first transformed according to the
 following rules and appended to <var>for-clause</var>s preserving their
