@@ -95,8 +95,7 @@ potentially the default body:
 </p>
 <div class="example">
 <pre class="example">(cl-defmethod for-generator ((<var>datum</var> <var>type</var>))
-  (funcall (lambda <var>arglist</var> <var>body</var>&hellip;)
-           <var>datum</var>))
+  (<var>name</var> <var>datum</var>))
 </pre></div>
 
 <p>When an <code>:expander</code> subform is present, an expander with
