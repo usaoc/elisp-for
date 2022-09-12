@@ -789,14 +789,12 @@ It is an error for a type to appear more than once.  The form of
 (@pxref{Declare Form,,,elisp}).  An @var{alias} is an identifier as an
 alias of @var{name} available when used in iteration clauses.  For each
 @var{type}, a primary method for @code{for-generator} is defined as
-follows where @var{datum} is a generated identifier and @var{body}s are
-potentially the default body:
+follows where @var{datum} is a generated identifier:
 
 @example
 @group
 (cl-defmethod for-generator ((@var{datum} @var{type}))
-  (funcall (lambda @var{arglist} @repeated{@var{body}})
-           @var{datum}))
+  (@var{name} @var{datum}))
 @end group
 @end example
 

@@ -127,9 +127,7 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                 ,@(mapcar (lambda (type)
                             (for--with-gensyms (datum)
                               `(cl-defmethod for-generator
-                                 ((,datum ,type))
-                                 (funcall (lambda ,arglist . ,body)
-                                          ,datum))))
+                                 ((,datum ,type)) (,name ,datum))))
                           types)
                 (defun ,name ,arglist
                   ,@docstring ,@declaration . ,body))))))))
