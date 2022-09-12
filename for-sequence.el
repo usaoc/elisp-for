@@ -29,7 +29,8 @@
 ;;;; Require
 (eval-when-compile
   (require 'for-helper)
-  (require 'for-iteration))
+  (require 'for-iteration)
+  (require 'subr-x))
 (require 'cl-lib)
 (require 'generator)
 
