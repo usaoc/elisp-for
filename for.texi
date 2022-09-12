@@ -755,8 +755,7 @@ argument (@pxref{Argument List,,,elisp}), the default body is used.
 
 The default body consists of a sole expression as follows where
 @var{value} is a generated identifier and @var{args} is @var{arglist}
-with a potential @code{&optional} keyword (@pxref{Argument
-List,,,elisp}) removed:
+with a potential @code{&optional} keyword removed:
 
 @example
 @group
