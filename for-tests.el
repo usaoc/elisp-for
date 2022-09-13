@@ -56,19 +56,15 @@
     `(progn
        (ert-deftest for-dynamic-dispatch ()
          "Dynamic dispatch."
-         (cl-macrolet
-             ((seq (seq value)
-                (pcase-exhaustive seq
-                  (`(,_ ,_) `(for-list (,seq ,value))))))
+         (cl-macrolet ((seq (seq value) `(for-list (,seq ,value))))
            . ,body))
        (ert-deftest for-generic-function ()
          "Generic function."
          (cl-macrolet
              ((seq (seq value)
-                (pcase-exhaustive seq
-                  (`(,id ,form)
-                   `(cl-loop for ,id iter-by (for-generator ,form)
-                             collect ,value)))))
+                (pcase-let ((`(,id ,form) seq))
+                  `(cl-loop for ,id iter-by (for-generator ,form)
+                            collect ,value))))
            . ,body))))
   (defmacro for--deftest-seq (&rest body)
     "Define test for sequence constructor."
