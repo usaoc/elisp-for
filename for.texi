@@ -1023,17 +1023,16 @@ This iteration macro is the implicitly nesting version of
 @concept{terminology, coerce}
 
 When neither @var{length} nor @var{init} is present, this iteration
-macro is equivalent to the following form (@pxref{Calling
-Functions,,,elisp} and @ref{Vector Functions,,,elisp}), such that it
-coerces@footnote{Following
+macro is equivalent to the following form (@pxref{Vector
+Functions,,,elisp}), such that it coerces@footnote{Following
 @url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_c.htm,
 Common Lisp}, @dfn{coerce} means to non-destructively convert an object
-to another type.} the list returned by @code{for-list} to vector.
+to another type.} the list returned by @code{for-list} to vector:
 
 @example
 @group
-(apply #'vector (for-list (@optional{@repeated{@var{for-clause}}})
-                  @optional{@repeated{@var{body}}}))
+(vconcat (for-list (@optional{@repeated{@var{for-clause}}})
+           @optional{@repeated{@var{body}}}))
 @end group
 @end example
 
@@ -1087,12 +1086,12 @@ This iteration macro is the implicitly nesting version of
 When neither @var{length}, @var{init}, nor @var{multibyte} is present,
 this iteration macro is equivalent to the following form
 (@pxref{Creating Strings,,,elisp}), such that it coerces the list
-returned by @code{for-list} to string.
+returned by @code{for-list} to string:
 
 @example
 @group
-(apply #'string (for-list (@optional{@repeated{@var{for-clause}}})
-                  @optional{@repeated{@var{body}}}))
+(concat (for-list (@optional{@repeated{@var{for-clause}}})
+          @optional{@repeated{@var{body}}}))
 @end group
 @end example
 

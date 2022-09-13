@@ -632,7 +632,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])"
                 ,vector))))))
     (_ (pcase-let ((`(,for-clauses . ,value-form)
                     (for--parse-body for-clauses body)))
-         `(apply #'vector (for-list (,@for-clauses ,value-form)))))))
+         `(vconcat (for-list (,@for-clauses ,value-form)))))))
 
 (for--defmacro for-string (for-clauses &rest body)
   "The string-building iteration macro.
@@ -674,7 +674,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])"
                 ,string))))))
     (_ (pcase-let ((`(,for-clauses . ,value-form)
                     (for--parse-body for-clauses body)))
-         `(apply #'string (for-list (,@for-clauses ,value-form)))))))
+         `(concat (for-list (,@for-clauses ,value-form)))))))
 
 (for--defmacro for-and (for-clauses &rest body)
   "The `and'-folding iteration macro."
