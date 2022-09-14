@@ -8,14 +8,13 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     strategy:
       matrix:
         version:
           - 28.1
+          - 28.2
           - snapshot
     steps:
       - name: Checkout
