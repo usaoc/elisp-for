@@ -88,7 +88,7 @@ true before the iteration.
 
 <dl class="def">
 <dt id="index-_003aif"><span class="category">Auxiliary Operator: </span><span><strong>:if</strong> <em>[guard&hellip;]</em><a href='#index-_003aif' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This special-clause produces the following body:
+<dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
 <pre class="example">((when (and [<var>guard</var>&hellip;])
@@ -98,7 +98,7 @@ true before the iteration.
 
 <dl class="def">
 <dt id="index-_003aif_002dnot"><span class="category">Auxiliary Operator: </span><span><strong>:if-not</strong> <em>[guard&hellip;]</em><a href='#index-_003aif_002dnot' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This special-clause produces the following body:
+<dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
 <pre class="example">((unless (and [<var>guard</var>&hellip;])
@@ -108,8 +108,8 @@ true before the iteration.
 
 <dl class="def">
 <dt id="index-_003alet"><span class="category">Auxiliary Operator: </span><span><strong>:let</strong> <em>[binding&hellip;]</em><a href='#index-_003alet' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This special-clause produces the following body where <var>for-binder</var>
-is the value of <code>for-binder</code>:
+<dd><p>This special-clause operator produces the following body where
+<var>for-binder</var> is the value of <code>for-binder</code>:
 </p>
 <div class="example">
 <pre class="example">((<var>for-binder</var> ([<var>binding</var>&hellip;])
@@ -119,7 +119,7 @@ is the value of <code>for-binder</code>:
 
 <dl class="def">
 <dt id="index-_003aif_002dlet"><span class="category">Auxiliary Operator: </span><span><strong>:if-let</strong> <em>[binding&hellip;]</em><a href='#index-_003aif_002dlet' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This special-clause produces the following body:
+<dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
 <pre class="example">((when-let* ([<var>binding</var>&hellip;])
@@ -129,9 +129,10 @@ is the value of <code>for-binder</code>:
 
 <dl class="def">
 <dt id="index-_003apcase"><span class="category">Auxiliary Operator: </span><span><strong>:pcase</strong> <em>expression [<code>:exhaustive</code>] [pattern&hellip;]</em><a href='#index-_003apcase' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This special-clause produces the following body where <var>pcase</var> is
-<code>pcase</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Pattern_002dMatching-Conditional.html#Pattern_002dMatching-Conditional">(elisp)Pattern-Matching Conditional</a>) when
-<code>exhaustive</code> is omitted, otherwise it is <code>pcase-exhaustive</code>:
+<dd><p>This special-clause operator produces the following body where
+<var>pcase</var> is <code>pcase</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Pattern_002dMatching-Conditional.html#Pattern_002dMatching-Conditional">(elisp)Pattern-Matching
+Conditional</a>) when <code>exhaustive</code> is omitted, otherwise it is
+<code>pcase-exhaustive</code>:
 </p>
 <div class="example">
 <pre class="example">((<var>pcase</var> <var>expression</var>
@@ -142,8 +143,8 @@ is the value of <code>for-binder</code>:
 
 <dl class="def">
 <dt id="index-_003apcase_002dnot"><span class="category">Auxiliary Operator: </span><span><strong>:pcase-not</strong> <em>expression [<code>:as</code> as] [pattern&hellip;]</em><a href='#index-_003apcase_002dnot' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This special-clause produces the following body where <var>as</var> is an
-identifier that defaults to <code>_</code> when omitted:
+<dd><p>This special-clause operator produces the following body where <var>as</var>
+is an identifier that defaults to <code>_</code> when omitted:
 </p>
 <div class="example">
 <pre class="example">((pcase <var>expression</var>
@@ -155,7 +156,7 @@ identifier that defaults to <code>_</code> when omitted:
 
 <dl class="def">
 <dt id="index-_003ado"><span class="category">Auxiliary Operator: </span><span><strong>:do</strong> <em>[expression&hellip;]</em><a href='#index-_003ado' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This special-clause produces the following body:
+<dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
 <pre class="example">([<var>expression</var>&hellip;] [<var>body</var>&hellip;])
