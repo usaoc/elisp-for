@@ -296,7 +296,8 @@ from the expanded form.
   '(&or ([&or ":break" ":final" ":if" ":if-not" ":do"] &rest form)
         (":let" &rest (sexp form))
         (":if-let" &rest &or symbolp ([&optional symbolp] form))
-        ([&or ":pcase" ":pcase-not"] &rest pcase-PAT)
+        (":pcase" form [&optional ":exhaustive"] &rest pcase-PAT)
+        (":pcase-not" form [&optional ":as" symbolp] &rest pcase-PAT)
         (keywordp &rest sexp)))
 
 (def-edebug-elem-spec 'for-multiple-value-form
