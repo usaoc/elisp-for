@@ -14,10 +14,6 @@
 ``\phrase\''
 @end macro
 
-@macro concept{entry, subentry}
-@cindex \entry\ @subentry \subentry\
-@end macro
-
 @macro rnrs{n}
 @acronym{R@sup{\n\}RS, @cite{Revised@sup{\n\} Report on the Algorithmic
 Language Scheme}}
@@ -134,13 +130,12 @@ Iteration Forms
 
 @node Introduction
 @chapter Introduction
-@concept{comparison to @code{cl-loop}, Lispy}
-@concept{comparison to @code{cl-loop}, functional}
-@concept{terminology, expression}
-@concept{terminology, form}
-@concept{terminology, subexpression}
-@concept{terminology, subform}
-
+@cindex comparison to @code{cl-loop} @subentry Lispy
+@cindex comparison to @code{cl-loop} @subentry functional
+@cindex terminology @subentry expression
+@cindex terminology @subentry form
+@cindex terminology @subentry subexpression
+@cindex terminology @subentry subform
 Despite the same name as the imperative iteration construct in
 @url{https://doi.org/10.1093/comjnl/5.4.349, Algol}, this package is
 inspired by the @url{https://docs.racket-lang.org/reference/for.html,
@@ -313,14 +308,13 @@ found in later chapters.
 
 @node For Clauses
 @section For Clauses
-@concept{for clause, iteration clause}
-@concept{for clause, special clause}
-@concept{terminology, an error}
-@concept{terminology, list}
-@concept{terminology, circular list}
-@concept{terminology, dotted list}
-@concept{terminology, proper list}
-
+@cindex for clause @subentry iteration clause
+@cindex for clause @subentry special clause
+@cindex terminology @subentry an error
+@cindex terminology @subentry list
+@cindex terminology @subentry circular list
+@cindex terminology @subentry dotted list
+@cindex terminology @subentry proper list
 The expansion of an iteration form is driven by a series of @dfn{for
 clauses}, classified into @dfn{iteration clauses} and @dfn{special
 clauses}.  Iteration clauses decide the shapes of the expanded forms,
@@ -380,10 +374,9 @@ Adjacent iteration clauses are considered parallel and thus iterated at
 the same time.  When one of them ends, the iteration ends.  This gives
 rise to the usefulness of infinite sequences.
 
-@concept{convention, metavariable}
-@concept{convention, optional form}
-@concept{convention, repeated form}
-
+@cindex convention @subentry metavariable
+@cindex convention @subentry optional form
+@cindex convention @subentry repeated form
 @code{(for-in-naturals @optional{@var{start}})}@footnote{In this manual,
 a metavariable is typeset as @samp{@var{metavariable}}, an optional form
 as @samp{@optional{@var{optional-form}}}, and a form repeated @emph{once
@@ -433,8 +426,7 @@ An equivalent @code{for-list*} form:
 @end group
 @end example
 
-@concept{terminology, identifier}
-
+@cindex terminology @subentry identifier
 An iteration clause normally has the form @code{(@var{form}
 @var{sequence})} where the form of @var{form} is specified by the value
 of @code{for-binder} and @var{sequence} is a sequence form.
@@ -453,9 +445,8 @@ Variables,,,elisp}) accepted by the grammar and the form of
 
 @node Sequence Forms
 @section Sequence Forms
-@concept{sequence form, expander}
-@concept{sequence form, iterator}
-
+@cindex sequence form @subentry expander
+@cindex sequence form @subentry iterator
 A @dfn{sequence form} represents an ordered collection of values, much
 like an @dfn{iterator} (@pxref{Generators,,,elisp}).  In fact, a
 sequence form produces an iterator when evaluated as a function form
@@ -486,8 +477,7 @@ Directly iterate over the list:
 @end group
 @end example
 
-@concept{sequence form, alias}
-
+@cindex sequence form @subentry alias
 For convenience, a sequence constructor can have @dfn{aliases} when used
 in iteration clauses to avoid the need of shorthands
 (@pxref{Shorthands,,,elisp}).
@@ -503,9 +493,8 @@ in iteration clauses to avoid the need of shorthands
 @end group
 @end example
 
-@concept{error, unhandled type}
-@concept{sequence form, dynamic dispatch}
-
+@cindex error @subentry unhandled type
+@cindex sequence form @subentry dynamic dispatch
 @dfn{Dynamic dispatch} is available when an arbitrary expression is used
 as a sequence form in iteration clauses.  The expression
 @var{expression} is transformed to @code{(for-in-iterator (for-generator
@@ -549,8 +538,7 @@ Syntax,,,elisp} and @ref{Records,,,elisp}) triggers
 @end group
 @end example
 
-@concept{sequence form, literal object}
-
+@cindex sequence form @subentry literal object
 Analogous to dynamic dispatch, certain @dfn{literal
 objects}@footnote{Following
 @url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_l.htm,
@@ -574,8 +562,7 @@ Recognized literal objects are implicitly wrapped in sequence forms:
 
 @node Multiple Values
 @section Multiple Values
-@concept{limitation, multiple values}
-
+@cindex limitation @subentry multiple values
 It is not uncommon for one to iteratively update multiple state
 variables.  To functionally do so, it is convenient to be able to
 produce multiple values from a single expression where the values are in
@@ -677,9 +664,8 @@ position.  The formal grammar of multiple-value forms in an
 @end group
 @end example
 
-@concept{multiple-value form, tail form}
-@concept{terminology, generalized Boolean}
-
+@cindex multiple-value form @subentry tail form
+@cindex terminology @subentry generalized Boolean
 Each @var{multiple-value-form} whose head is a global macro
 (@pxref{Defining Macros,,,elisp}) or a local macro (@pxref{Macro
 Bindings,,,cl}) is expanded (@pxref{Expansion,,,elisp}) ahead of time
@@ -933,8 +919,7 @@ later updated to @var{value} after each iteration.
 @end defmac
 
 @defmac for-fold* bindings (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-@concept{iteration form, implicitly nesting}
-
+@cindex iteration form @subentry implicitly nesting
 This iteration macro is the @dfn{implicitly nesting} version of
 @code{for-fold}, such that every iteration clause is a group in its own.
 This is achieved by separating each pair of adjacent iteration clauses
@@ -967,8 +952,7 @@ implying that it is an error for the multiple-value form to produce not
 exactly one value.
 
 @defmac for-list (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-@concept{terminology, fresh}
-
+@cindex terminology @subentry fresh
 This iteration macro accumulates the values into a
 fresh@footnote{Following
 @url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_f.htm,
@@ -1026,8 +1010,7 @@ This iteration macro is the implicitly nesting version of
 @end defmac
 
 @defmac for-vector (@optional{@repeated{for-clause}}) @optional{@code{:length} length @optional{@code{:init} init}} @optional{@repeated{body}}
-@concept{terminology, coerce}
-
+@cindex terminology @subentry coerce
 When neither @var{length} nor @var{init} is present, this iteration
 macro is equivalent to the following form (@pxref{Vector
 Functions,,,elisp}), such that it coerces@footnote{Following
@@ -1074,8 +1057,7 @@ This iteration macro is the implicitly nesting version of
 @end defmac
 
 @defmac for-string (@optional{@repeated{for-clause}}) @optional{@code{:length} length @optional{@code{:init} init @optional{@code{:multibyte} multibyte}}} @optional{@repeated{body}}
-@concept{terminology, coerce}
-
+@cindex terminology @subentry coerce
 When neither @var{length}, @var{init}, nor @var{multibyte} is present,
 this iteration macro is equivalent to the following form
 (@pxref{Creating Strings,,,elisp}), such that it coerces the list
@@ -1275,8 +1257,7 @@ identifier:
 
 @node Special-Clause Operators
 @section Special-Clause Operators
-@concept{terminology, auxiliary operator}
-
+@cindex terminology @subentry auxiliary operator
 Special-clause operators are @dfn{auxiliary operators} in the sense that
 they are heads of auxiliary forms that are only syntactically valid in
 certain forms.  In the case of special-clause operators, the auxiliary
