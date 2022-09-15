@@ -125,7 +125,6 @@ later updated to <var>value</var> after each iteration.
 <dl class="def">
 <dt id="index-for_002dfold_002a"><span class="category">Macro: </span><span><strong>for-fold*</strong> <em>bindings ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfold_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><span id="index-iteration-form"></span>
-
 <p>This iteration macro is the <em>implicitly nesting</em> version of
 <code>for-fold</code>, such that every iteration clause is a group in its own.
 This is achieved by separating each pair of adjacent iteration clauses
@@ -135,7 +134,7 @@ with a vacuous special clause such as <code>(:do)</code>.
 <dl class="def">
 <dt id="index-for_002ddo"><span class="category">Macro: </span><span><strong>for-do</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002ddo' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro performs side effects and produces <code>nil</code> as
-the value.  It is equivalent to the following <code>for-fold</code> form:
+the value.  It is equivalent to the following form:
 </p>
 <div class="example">
 <pre class="example">(for-fold ()
@@ -150,22 +149,27 @@ the value.  It is equivalent to the following <code>for-fold</code> form:
 <dd><p>This iteration macro is the implicitly nesting version of <code>for-do</code>.
 </p></dd></dl>
 
+<p>Below, <var>for-clause*</var>s are <var>for-clause</var>s including the
+transformed <var>body</var>s but excluding the multiple-value form, and
+<var>value*</var> is the multiple-value form where each tail form
+<code>(:values <var>expression</var>)</code> is replaced by <var>expression</var>,
+implying that it is an error for the multiple-value form to produce not
+exactly one value.
+</p>
 <dl class="def">
 <dt id="index-for_002dlist"><span class="category">Macro: </span><span><strong>for-list</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlist' class='copiable-anchor'> &para;</a></span></dt>
 <dd><span id="index-terminology-11"></span>
-
 <p>This iteration macro accumulates the values into a
 fresh<a id="DOCF12" href="#FOOT12"><sup>12</sup></a> list and returns
-the list.  It is like <code>for-fold</code>, except:
+the list.  It is equivalent to the following form where <var>list</var> is a
+generated identifier:
 </p>
-<ul>
-<li> <var>bindings</var> is <code>((<var>list</var> '()) (:result (nreverse
-<var>list</var>)))</code> where <var>list</var> is a generated identifier;
-
-</li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
-form is transformed to <code>(cons <var>expression</var> <var>list</var>)</code>.  It is
-an error for the multiple-value form to produce not exactly one value.
-</li></ul>
+<div class="example">
+<pre class="example">(for-fold ((<var>list</var> '())
+           (:result (nreverse <var>list</var>)))
+    ([<var>for-clause*</var>&hellip;]
+     (cons <var>value*</var> <var>list</var>)))
+</pre></div>
 </dd></dl>
 
 <dl class="def">
@@ -210,7 +214,6 @@ identifiers in <var>bindings</var>.
 <dl class="def">
 <dt id="index-for_002dvector"><span class="category">Macro: </span><span><strong>for-vector</strong> <em>([for-clause&hellip;]) [<code>:length</code> length [<code>:init</code> init]] [body&hellip;]</em><a href='#index-for_002dvector' class='copiable-anchor'> &para;</a></span></dt>
 <dd><span id="index-terminology-12"></span>
-
 <p>When neither <var>length</var> nor <var>init</var> is present, this iteration
 macro is equivalent to the following form (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Vector-Functions.html#Vector-Functions">(elisp)Vector
 Functions</a>), such that it coerces<a id="DOCF13" href="#FOOT13"><sup>13</sup></a> the list returned by <code>for-list</code> to vector:
@@ -222,36 +225,26 @@ Functions</a>), such that it coerces<a id="DOCF13" href="#FOOT13"><sup>13</sup><
 
 <p>Otherwise, this iteration macro accumulates the values into a fresh
 vector of length <var>length</var> with each element being <var>init</var> where
-<var>init</var> defaults to <code>0</code> when omitted.  In such case, it is like
-<code>for-fold</code>, except:
+<var>init</var> defaults to <code>0</code> when omitted.  In such case, it is
+equivalent to the following form (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Setting-Generalized-Variables.html#Setting-Generalized-Variables">(elisp)Setting Generalized
+Variables</a>) where <var>vector</var> and <var>index</var> are generated
+identifiers provided that <var>length</var> and <var>init</var> are evaluated
+exactly once in the apparent evaluation order:
 </p>
-<ul>
-<li> The iteration form is first transformed to the following form where
-<var>vector</var> and <var>index</var> are generated identifiers provided that
-<var>length</var> and <var>init</var> are evaluated exactly once in the apparent
-evaluation order:
-
 <div class="example">
 <pre class="example">(if (zerop <var>length</var>)
     []
   (let ((<var>vector</var> (make-vector <var>length</var> <var>init</var>)))
-    (let ((<var>index</var> 0))
-      (for-do ([<var>for-clause</var>&hellip;])
-        [<var>body</var>&hellip;]))
+    (for-fold ((<var>index</var> 0))
+        ([<var>for-clause*</var>&hellip;]
+         (:do (setf (aref <var>vector</var> <var>index</var>)
+                    <var>value*</var>))
+         (:pcase (1+ <var>index</var>)
+                 <var>index</var>)
+         (:break (= <var>index</var> <var>length</var>))
+         <var>index</var>))
     <var>vector</var>))
 </pre></div>
-
-</li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
-form is transformed to <code>(setf (aref <var>vector</var> <var>index</var>)
-<var>expression</var>)</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Setting-Generalized-Variables.html#Setting-Generalized-Variables">(elisp)Setting Generalized Variables</a>), and
-the transformed multiple-value form <var>form</var> is inserted into the
-<code>:do</code> clause <code>(:do <var>form</var> (cl-incf <var>index</var>))</code>
-(see <a data-manual="cl" href="https://www.gnu.org/software/emacs/manual/html_node/cl/Modify-Macros.html#Modify-Macros">(cl)Modify Macros</a>).  It is an error for the multiple-value
-form to produce not exactly one value;
-
-</li><li> A <code>:break</code> clause <code>(:break (= <var>index</var> <var>length</var>))</code> is
-inserted after the above-mentioned <code>:do</code> clause.
-</li></ul>
 </dd></dl>
 
 <dl class="def">
@@ -263,7 +256,6 @@ inserted after the above-mentioned <code>:do</code> clause.
 <dl class="def">
 <dt id="index-for_002dstring"><span class="category">Macro: </span><span><strong>for-string</strong> <em>([for-clause&hellip;]) [<code>:length</code> length [<code>:init</code> init [<code>:multibyte</code> multibyte]]] [body&hellip;]</em><a href='#index-for_002dstring' class='copiable-anchor'> &para;</a></span></dt>
 <dd><span id="index-terminology-13"></span>
-
 <p>When neither <var>length</var>, <var>init</var>, nor <var>multibyte</var> is present,
 this iteration macro is equivalent to the following form
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Strings.html#Creating-Strings">(elisp)Creating Strings</a>), such that it coerces the list
@@ -278,38 +270,28 @@ returned by <code>for-list</code> to string:
 string of length <var>length</var> with each element being <var>init</var> where
 <var>init</var> defaults to <code>?\0</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/General-Escape-Syntax.html#General-Escape-Syntax">(elisp)General Escape
 Syntax</a>) when omitted.  The string is always a multibyte string
-(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Non_002dASCII-Characters.html#Non_002dASCII-Characters">(elisp)Non-ASCII Characters</a>) when <var>multibyte</var> is true
-where <var>multibyte</var> defaults to <code>nil</code> when omitted.  In such
-case, it is like <code>for-fold</code>, except:
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Non_002dASCII-Characters.html#Non_002dASCII-Characters">(elisp)Non-ASCII Characters</a>) when <var>multibyte</var> is true.  In
+such case, it is equivalent to the following form where <var>string</var> and
+<var>index</var> are generated identifiers provided that <var>length</var>,
+<var>init</var>, and <var>multibyte</var> are evaluated exactly once in the
+apparent evaluation order:
 </p>
-<ul>
-<li> The iteration form is first transformed to the following form where
-<var>string</var> and <var>index</var> are generated identifiers provided that
-<var>length</var>, <var>init</var>, and <var>multibyte</var> are evaluated exactly once
-in the apparent evaluation order:
-
 <div class="example">
 <pre class="example">(if (zerop <var>length</var>)
     (if <var>multibyte</var>
         (make-string 0 ?\0 'multibyte)
       &quot;&quot;)
   (let ((<var>string</var> (make-string <var>length</var> <var>init</var> <var>multibyte</var>)))
-    (let ((<var>index</var> 0))
-      (for-do ([<var>for-clause</var>&hellip;])
-        [<var>body</var>&hellip;]))
+    (for-fold ((<var>index</var> 0))
+        ([<var>for-clause*</var>&hellip;]
+         (:do (setf (aref <var>string</var> <var>index</var>)
+                    <var>value*</var>))
+         (:pcase (1+ <var>index</var>)
+                 <var>index</var>)
+         (:break (= <var>index</var> <var>length</var>))
+         <var>index</var>))
     <var>string</var>))
 </pre></div>
-
-</li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
-form is transformed to <code>(setf (aref <var>string</var> <var>index</var>)
-<var>expression</var>)</code>, and the transformed multiple-value form <var>form</var>
-is inserted into the <code>:do</code> clause <code>(:do <var>form</var> (cl-incf
-<var>index</var>))</code> .  It is an error for the multiple-value form to produce
-not exactly one value;
-
-</li><li> A <code>:break</code> clause <code>(:break (= <var>index</var> <var>length</var>))</code> is
-inserted after the above-mentioned <code>:do</code> clause.
-</li></ul>
 </dd></dl>
 
 <dl class="def">
@@ -320,28 +302,17 @@ inserted after the above-mentioned <code>:do</code> clause.
 
 <dl class="def">
 <dt id="index-for_002dand"><span class="category">Macro: </span><span><strong>for-and</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dand' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro performs <code>and</code> on the values.  It is like
-<code>for-fold</code>, except:
+<dd><p>This iteration macro performs <code>and</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Combining-Conditions.html#Combining-Conditions">(elisp)Combining
+Conditions</a>) on the values.  It is equivalent to the following
+form where <var>value</var> is a generated identifier:
 </p>
-<ul>
-<li> The iteration form is first transformed to the following form where
-<var>value</var> is a generated identifier:
-
 <div class="example">
-<pre class="example">(let ((<var>value</var> t))
-  (for-do ([<var>for-clause</var>&hellip;])
-    [<var>body</var>&hellip;])
-  <var>value</var>)
+<pre class="example">(for-fold ((<var>value</var> t))
+    ([<var>for-clause*</var>&hellip;]
+     (:pcase <var>value*</var> <var>value</var>)
+     (:final (not <var>value</var>))
+     <var>value</var>))
 </pre></div>
-
-</li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
-form is transformed to <code>(setq <var>value</var> <var>expression</var>)</code>, and
-the multiple-value form is transformed to a <code>:do</code> clause.  It is an
-error for the multiple-value form to produce not exactly one value;
-
-</li><li> A <code>:break</code> clause <code>(:break (not <var>value</var>))</code> is inserted
-after the above-mentioned <code>:do</code> clause.
-</li></ul>
 </dd></dl>
 
 <dl class="def">
@@ -352,28 +323,16 @@ after the above-mentioned <code>:do</code> clause.
 
 <dl class="def">
 <dt id="index-for_002dor"><span class="category">Macro: </span><span><strong>for-or</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dor' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro performs <code>or</code> on the values.  It is like
-<code>for-fold</code>, except:
+<dd><p>This iteration macro performs <code>or</code> on the values.  It is equivalent
+to the following form where <var>value</var> is a generated identifier:
 </p>
-<ul>
-<li> The iteration form is first transformed to the following form where
-<var>value</var> is a generated identifier:
-
 <div class="example">
-<pre class="example">(let ((<var>value</var> nil))
-  (for-do ([<var>for-clause</var>&hellip;])
-    [<var>body</var>&hellip;])
-  <var>value</var>)
+<pre class="example">(for-fold ((<var>value</var> nil))
+    ([<var>for-clause*</var>&hellip;]
+     (:pcase <var>value*</var> <var>value</var>)
+     (:final <var>value</var>)
+     <var>value</var>))
 </pre></div>
-
-</li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
-form is transformed to <code>(setq <var>value</var> <var>expression</var>)</code>, and
-the multiple-value form is transformed to a <code>:do</code> clause.  It is an
-error for the multiple-value form to produce not exactly one value;
-
-</li><li> A <code>:break</code> clause <code>(:break <var>value</var>)</code> is inserted after the
-above-mentioned <code>:do</code> clause.
-</li></ul>
 </dd></dl>
 
 <dl class="def">
@@ -383,17 +342,15 @@ above-mentioned <code>:do</code> clause.
 
 <dl class="def">
 <dt id="index-for_002dsum"><span class="category">Macro: </span><span><strong>for-sum</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dsum' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro accumulates the values into a sum.  It is like
-<code>for-fold</code>, except:
+<dd><p>This iteration macro accumulates the values into a sum.  It is
+equivalent to the following form where <var>sum</var> is a generated
+identifier:
 </p>
-<ul>
-<li> <var>bindings</var> is <code>((<var>sum</var> 0))</code> where <var>sum</var> is a generated
-identifier;
-
-</li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
-form is transformed to <code>(+ <var>expression</var> <var>sum</var>)</code>.  It is an
-error for the multiple-value form to produce not exactly one value.
-</li></ul>
+<div class="example">
+<pre class="example">(for-fold ((<var>sum</var> 0))
+    ([<var>for-clause*</var>&hellip;]
+     (+ <var>value*</var> <var>sum</var>)))
+</pre></div>
 </dd></dl>
 
 <dl class="def">
@@ -404,17 +361,15 @@ error for the multiple-value form to produce not exactly one value.
 
 <dl class="def">
 <dt id="index-for_002dproduct"><span class="category">Macro: </span><span><strong>for-product</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dproduct' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro accumulates the values into a product.  It is like
-<code>for-fold</code>, except:
+<dd><p>This iteration macro accumulates the values into a product.  It is
+equivalent to the following form where <var>product</var> is a generated
+identifier:
 </p>
-<ul>
-<li> <var>bindings</var> is <code>((<var>product</var> 1))</code> where <var>product</var> is a
-generated identifier;
-
-</li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
-form is transformed to <code>(* <var>expression</var> <var>product</var>)</code>.  It is
-an error for the multiple-value form to produce not exactly one value.
-</li></ul>
+<div class="example">
+<pre class="example">(for-fold ((<var>product</var> 0))
+    ([<var>for-clause*</var>&hellip;]
+     (* <var>value*</var> <var>product</var>)))
+</pre></div>
 </dd></dl>
 
 <dl class="def">
@@ -426,16 +381,15 @@ an error for the multiple-value form to produce not exactly one value.
 <dl class="def">
 <dt id="index-for_002dfirst"><span class="category">Macro: </span><span><strong>for-first</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfirst' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro returns the first value or <code>nil</code> if the
-iteration never begins.  It is like <code>for-fold</code>, except:
+iteration never begins.  It is equivalent to the following form where
+<var>value</var> is a generated identifier:
 </p>
-<ul>
-<li> <var>bindings</var> is <code>((<var>value</var> nil))</code> where <var>value</var> is a
-generated identifier;
-
-</li><li> A <code>:final</code> clause <code>(:final)</code> is inserted before the
-multiple-value form, so that the iteration is immediately terminated
-after the first iteration.
-</li></ul>
+<div class="example">
+<pre class="example">(for-fold ((<var>value</var> nil))
+    ([<var>for-clause*</var>&hellip;]
+     (:final)
+     <var>value*</var>))
+</pre></div>
 </dd></dl>
 
 <dl class="def">
@@ -446,13 +400,15 @@ after the first iteration.
 
 <dl class="def">
 <dt id="index-for_002dlast"><span class="category">Macro: </span><span><strong>for-last</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlast' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro returns the last value or <code>nil</code> if the
-iteration never begins.  It is like <code>for-fold</code>, except:
+<dd><p>This iteration macro returns the first value or <code>nil</code> if the
+iteration never begins.  It is equivalent to the following form where
+<var>value</var> is a generated identifier:
 </p>
-<ul>
-<li> <var>bindings</var> is <code>((<var>value</var> nil))</code> where <var>value</var> is a
-generated identifier.
-</li></ul>
+<div class="example">
+<pre class="example">(for-fold ((<var>value</var> nil))
+    ([<var>for-clause</var>&hellip;])
+  [<var>body</var>&hellip;])
+</pre></div>
 </dd></dl>
 
 <dl class="def">
@@ -463,17 +419,15 @@ generated identifier.
 
 <dl class="def">
 <dt id="index-for_002dmax"><span class="category">Macro: </span><span><strong>for-max</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dmax' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro performs <code>max</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Comparison-of-Numbers.html#Comparison-of-Numbers">(elisp)Comparison of
-Numbers</a>) on the values.  It is like <code>for-fold</code>, except:
+<dd><p>This iteration macro accumulates the values into a product.  It is
+equivalent to the following form where <var>max</var> is a generated
+identifier:
 </p>
-<ul>
-<li> <var>bindings</var> is <code>((<var>max</var> -1.0e+INF))</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Float-Basics.html#Float-Basics">(elisp)Float
-Basics</a>) where <var>max</var> is a generated identifier;
-
-</li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
-form is transformed to <code>(max <var>expression</var> <var>max</var>)</code>.  It is
-an error for the multiple-value form to produce not exactly one value.
-</li></ul>
+<div class="example">
+<pre class="example">(for-fold ((<var>max</var> -1.0e+INF))
+    ([<var>for-clause*</var>&hellip;]
+     (max <var>value*</var> <var>max</var>)))
+</pre></div>
 </dd></dl>
 
 <dl class="def">
@@ -484,24 +438,16 @@ an error for the multiple-value form to produce not exactly one value.
 
 <dl class="def">
 <dt id="index-for_002dmin"><span class="category">Macro: </span><span><strong>for-min</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dmin' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro performs <code>min</code> on the values.  It is like
-<code>for-fold</code>, except:
+<dd><p>This iteration macro performs <code>min</code> on the values.  It is
+equivalent to the following form where <var>min</var> is a generated
+identifier:
 </p>
-<ul>
-<li> <var>bindings</var> is <code>((<var>min</var> 1.0e+INF))</code> where <var>min</var> is a
-generated identifier;
-
-</li><li> Each expression <var>expression</var> in the tail forms of the multiple-value
-form is transformed to <code>(min <var>expression</var> <var>min</var>)</code>.  It is
-an error for the multiple-value form to produce not exactly one value.
-</li></ul>
+<div class="example">
+<pre class="example">(for-fold ((<var>min</var> 1.0e+INF))
+    ([<var>for-clause*</var>&hellip;]
+     (min <var>value*</var> <var>min</var>)))
+</pre></div>
 </dd></dl>
-
-<dl class="def">
-<dt id="index-for_002dmin_002a"><span class="category">Macro: </span><span><strong>for-min*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dmin_002a' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro is the implicitly nesting version of
-<code>for-min</code>.
-</p></dd></dl>
 
 </div>
 <div class="footnote">

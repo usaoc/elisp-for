@@ -51,7 +51,6 @@ Next: <a href="Multiple-Values.html" accesskey="n" rel="next">Multiple Values</a
 <span id="Sequence-Forms-1"></span><h3 class="section">2.2 Sequence Forms</h3>
 <span id="index-sequence-form"></span>
 <span id="index-sequence-form-1"></span>
-
 <p>A <em>sequence form</em> represents an ordered collection of values, much
 like an <em>iterator</em> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Generators.html#Generators">(elisp)Generators</a>).  In fact, a
 sequence form produces an iterator when evaluated as a function form
@@ -79,7 +78,6 @@ the values of it:
 </pre></div>
 
 <span id="index-sequence-form-2"></span>
-
 <p>For convenience, a sequence constructor can have <em>aliases</em> when used
 in iteration clauses to avoid the need of shorthands
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Shorthands.html#Shorthands">(elisp)Shorthands</a>).
@@ -95,7 +93,6 @@ in iteration clauses to avoid the need of shorthands
 
 <span id="index-error"></span>
 <span id="index-sequence-form-3"></span>
-
 <p><em>Dynamic dispatch</em> is available when an arbitrary expression is used
 as a sequence form in iteration clauses.  The expression
 <var>expression</var> is transformed to <code>(for-in-iterator (for-generator
@@ -122,19 +119,17 @@ Errors</a>) when the value of <var>expression</var> is unhandled.
      &rArr; (1 2 3)
 </pre></div>
 
-<p><code>(make-record '#:some-type 0 nil)</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Read-Syntax.html#Special-Read-Syntax">(elisp)Special Read
-Syntax</a> and <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Records.html#Records">(elisp)Records</a>) triggers
-<code>for-unhandled-type</code>:
+<p><code>(record '#:some-type)</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Read-Syntax.html#Special-Read-Syntax">(elisp)Special Read Syntax</a> and
+<a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Records.html#Records">(elisp)Records</a>) triggers <code>for-unhandled-type</code>:
 </p>
 <div class="example">
-<pre class="example">(let ((some-object (make-record '#:some-type 0 nil)))
+<pre class="example">(let ((some-object (record '#:some-type)))
   (for-list ((item some-object)
              item)))
      error&rarr; Unhandled type: #s(some-type)
 </pre></div>
 
 <span id="index-sequence-form-4"></span>
-
 <p>Analogous to dynamic dispatch, certain <em>literal
 objects</em><a id="DOCF9" href="#FOOT9"><sup>9</sup></a> are implicitly wrapped
 in sequence forms when used in iteration clauses.  Currently, literal
