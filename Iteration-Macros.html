@@ -400,7 +400,7 @@ iteration never begins.  It is equivalent to the following form where
 
 <dl class="def">
 <dt id="index-for_002dlast"><span class="category">Macro: </span><span><strong>for-last</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlast' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro returns the first value or <code>nil</code> if the
+<dd><p>This iteration macro returns the last value or <code>nil</code> if the
 iteration never begins.  It is equivalent to the following form where
 <var>value</var> is a generated identifier:
 </p>
@@ -419,9 +419,9 @@ iteration never begins.  It is equivalent to the following form where
 
 <dl class="def">
 <dt id="index-for_002dmax"><span class="category">Macro: </span><span><strong>for-max</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dmax' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro accumulates the values into a product.  It is
-equivalent to the following form where <var>max</var> is a generated
-identifier:
+<dd><p>This iteration macro performs <code>max</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Comparison-of-Numbers.html#Comparison-of-Numbers">(elisp)Comparison of
+Numbers</a>) on the values.  It is equivalent to the following form
+where <var>max</var> is a generated identifier:
 </p>
 <div class="example">
 <pre class="example">(for-fold ((<var>max</var> -1.0e+INF))
