@@ -487,7 +487,7 @@
     (should (equal (seq (i (apply #'string list)) (1+ i)) result)))
   (let ((end (+ 5 (random 5))))
     (should (equal (seq (i end) (1+ i)) (number-sequence 1 end))))
-  (should-error (seq (i (make-record '#:some-type 0 nil)) i)
+  (should-error (seq (i (record '#:some-type)) i)
                 :type 'for-unhandled-type))
 
 (ert-deftest for-literal-sequences ()

@@ -525,13 +525,12 @@ A @code{function} dispatched to itself:
 @end group
 @end example
 
-@code{(make-record '#:some-type 0 nil)} (@pxref{Special Read
-Syntax,,,elisp} and @ref{Records,,,elisp}) triggers
-@code{for-unhandled-type}:
+@code{(record '#:some-type)} (@pxref{Special Read Syntax,,,elisp} and
+@ref{Records,,,elisp}) triggers @code{for-unhandled-type}:
 
 @example
 @group
-(let ((some-object (make-record '#:some-type 0 nil)))
+(let ((some-object (record '#:some-type)))
   (for-list ((item some-object)
              item)))
 @err{Unhandled type: #s(some-type)}
