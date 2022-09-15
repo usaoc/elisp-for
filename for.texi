@@ -943,7 +943,7 @@ with a vacuous special clause such as @code{(:do)}.
 
 @defmac for-do (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro performs side effects and produces @code{nil} as
-the value.  It is equivalent to the following @code{for-fold} form:
+the value.  It is equivalent to the following form:
 
 @example
 @group
@@ -959,6 +959,13 @@ the value.  It is equivalent to the following @code{for-fold} form:
 This iteration macro is the implicitly nesting version of @code{for-do}.
 @end defmac
 
+Below, @var{for-clause*}s are @var{for-clause}s including the
+transformed @var{body}s but excluding the multiple-value form, and
+@var{value*} is the multiple-value form where each tail form
+@code{(:values @var{expression})} is replaced by @var{expression},
+implying that it is an error for the multiple-value form to produce not
+exactly one value.
+
 @defmac for-list (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 @concept{terminology, fresh}
 
@@ -966,18 +973,17 @@ This iteration macro accumulates the values into a
 fresh@footnote{Following
 @url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_f.htm,
 Common Lisp}, a @dfn{fresh} object is newly allocated.} list and returns
-the list.  It is like @code{for-fold}, except:
+the list.  It is equivalent to the following form where @var{list} is a
+generated identifier:
 
-@itemize
-@item
-@var{bindings} is @code{((@var{list} '()) (:result (nreverse
-@var{list})))} where @var{list} is a generated identifier;
-
-@item
-Each expression @var{expression} in the tail forms of the multiple-value
-form is transformed to @code{(cons @var{expression} @var{list})}.  It is
-an error for the multiple-value form to produce not exactly one value.
-@end itemize
+@example
+@group
+(for-fold ((@var{list} '())
+           (:result (nreverse @var{list})))
+    (@optional{@repeated{@var{for-clause*}}}
+     (cons @var{value*} @var{list})))
+@end group
+@end example
 @end defmac
 
 @defmac for-list* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
@@ -1038,41 +1044,28 @@ to another type.} the list returned by @code{for-list} to vector:
 
 Otherwise, this iteration macro accumulates the values into a fresh
 vector of length @var{length} with each element being @var{init} where
-@var{init} defaults to @code{0} when omitted.  In such case, it is like
-@code{for-fold}, except:
-
-@itemize
-@item
-The iteration form is first transformed to the following form where
-@var{vector} and @var{index} are generated identifiers provided that
-@var{length} and @var{init} are evaluated exactly once in the apparent
-evaluation order:
+@var{init} defaults to @code{0} when omitted.  In such case, it is
+equivalent to the following form (@pxref{Setting Generalized
+Variables,,,elisp}) where @var{vector} and @var{index} are generated
+identifiers provided that @var{length} and @var{init} are evaluated
+exactly once in the apparent evaluation order:
 
 @example
 @group
 (if (zerop @var{length})
     []
   (let ((@var{vector} (make-vector @var{length} @var{init})))
-    (let ((@var{index} 0))
-      (for-do (@optional{@repeated{@var{for-clause}}})
-        @optional{@repeated{@var{body}}}))
+    (for-fold ((@var{index} 0))
+        (@optional{@repeated{@var{for-clause*}}}
+         (:do (setf (aref @var{vector} @var{index})
+                    @var{value*}))
+         (:pcase (1+ @var{index})
+                 @var{index})
+         (:break (= @var{index} @var{length}))
+         @var{index}))
     @var{vector}))
 @end group
 @end example
-
-@item
-Each expression @var{expression} in the tail forms of the multiple-value
-form is transformed to @code{(setf (aref @var{vector} @var{index})
-@var{expression})} (@pxref{Setting Generalized Variables,,,elisp}), and
-the transformed multiple-value form @var{form} is inserted into the
-@code{:do} clause @code{(:do @var{form} (cl-incf @var{index}))}
-(@pxref{Modify Macros,,,cl}).  It is an error for the multiple-value
-form to produce not exactly one value;
-
-@item
-A @code{:break} clause @code{(:break (= @var{index} @var{length}))} is
-inserted after the above-mentioned @code{:do} clause.
-@end itemize
 @end defmac
 
 @defmac for-vector* (@optional{@repeated{for-clause}}) @optional{@code{:length} length @optional{@code{:init} init}} @optional{@repeated{body}}
@@ -1099,16 +1092,11 @@ Otherwise, this iteration macro accumulates the values into a fresh
 string of length @var{length} with each element being @var{init} where
 @var{init} defaults to @code{?\0} (@pxref{General Escape
 Syntax,,,elisp}) when omitted.  The string is always a multibyte string
-(@pxref{Non-ASCII Characters,,,elisp}) when @var{multibyte} is true
-where @var{multibyte} defaults to @code{nil} when omitted.  In such
-case, it is like @code{for-fold}, except:
-
-@itemize
-@item
-The iteration form is first transformed to the following form where
-@var{string} and @var{index} are generated identifiers provided that
-@var{length}, @var{init}, and @var{multibyte} are evaluated exactly once
-in the apparent evaluation order:
+(@pxref{Non-ASCII Characters,,,elisp}) when @var{multibyte} is true.  In
+such case, it is equivalent to the following form where @var{string} and
+@var{index} are generated identifiers provided that @var{length},
+@var{init}, and @var{multibyte} are evaluated exactly once in the
+apparent evaluation order:
 
 @example
 @group
@@ -1117,25 +1105,17 @@ in the apparent evaluation order:
         (make-string 0 ?\0 'multibyte)
       "")
   (let ((@var{string} (make-string @var{length} @var{init} @var{multibyte})))
-    (let ((@var{index} 0))
-      (for-do (@optional{@repeated{@var{for-clause}}})
-        @optional{@repeated{@var{body}}}))
+    (for-fold ((@var{index} 0))
+        (@optional{@repeated{@var{for-clause*}}}
+         (:do (setf (aref @var{string} @var{index})
+                    @var{value*}))
+         (:pcase (1+ @var{index})
+                 @var{index})
+         (:break (= @var{index} @var{length}))
+         @var{index}))
     @var{string}))
 @end group
 @end example
-
-@item
-Each expression @var{expression} in the tail forms of the multiple-value
-form is transformed to @code{(setf (aref @var{string} @var{index})
-@var{expression})}, and the transformed multiple-value form @var{form}
-is inserted into the @code{:do} clause @code{(:do @var{form} (cl-incf
-@var{index}))} .  It is an error for the multiple-value form to produce
-not exactly one value;
-
-@item
-A @code{:break} clause @code{(:break (= @var{index} @var{length}))} is
-inserted after the above-mentioned @code{:do} clause.
-@end itemize
 @end defmac
 
 @defmac for-string* (@optional{@repeated{for-clause}}) @optional{@code{:length} length @optional{@code{:init} init @optional{@code{:multibyte} multibyte}}} @optional{@repeated{body}}
@@ -1144,33 +1124,19 @@ This iteration macro is the implicitly nesting version of
 @end defmac
 
 @defmac for-and (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-This iteration macro performs @code{and} on the values.  It is like
-@code{for-fold}, except:
-
-@itemize
-@item
-The iteration form is first transformed to the following form where
-@var{value} is a generated identifier:
+This iteration macro performs @code{and} (@pxref{Combining
+Conditions,,,elisp}) on the values.  It is equivalent to the following
+form where @var{value} is a generated identifier:
 
 @example
 @group
-(let ((@var{value} t))
-  (for-do (@optional{@repeated{@var{for-clause}}})
-    @optional{@repeated{@var{body}}})
-  @var{value})
+(for-fold ((@var{value} t))
+    (@optional{@repeated{@var{for-clause*}}}
+     (:pcase @var{value*} @var{value})
+     (:final (not @var{value}))
+     @var{value}))
 @end group
 @end example
-
-@item
-Each expression @var{expression} in the tail forms of the multiple-value
-form is transformed to @code{(setq @var{value} @var{expression})}, and
-the multiple-value form is transformed to a @code{:do} clause.  It is an
-error for the multiple-value form to produce not exactly one value;
-
-@item
-A @code{:break} clause @code{(:break (not @var{value}))} is inserted
-after the above-mentioned @code{:do} clause.
-@end itemize
 @end defmac
 
 @defmac for-and* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
@@ -1179,33 +1145,18 @@ This iteration macro is the implicitly nesting version of
 @end defmac
 
 @defmac for-or (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-This iteration macro performs @code{or} on the values.  It is like
-@code{for-fold}, except:
-
-@itemize
-@item
-The iteration form is first transformed to the following form where
-@var{value} is a generated identifier:
+This iteration macro performs @code{or} on the values.  It is equivalent
+to the following form where @var{value} is a generated identifier:
 
 @example
 @group
-(let ((@var{value} nil))
-  (for-do (@optional{@repeated{@var{for-clause}}})
-    @optional{@repeated{@var{body}}})
-  @var{value})
+(for-fold ((@var{value} nil))
+    (@optional{@repeated{@var{for-clause*}}}
+     (:pcase @var{value*} @var{value})
+     (:final @var{value})
+     @var{value}))
 @end group
 @end example
-
-@item
-Each expression @var{expression} in the tail forms of the multiple-value
-form is transformed to @code{(setq @var{value} @var{expression})}, and
-the multiple-value form is transformed to a @code{:do} clause.  It is an
-error for the multiple-value form to produce not exactly one value;
-
-@item
-A @code{:break} clause @code{(:break @var{value})} is inserted after the
-above-mentioned @code{:do} clause.
-@end itemize
 @end defmac
 
 @defmac for-or* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
@@ -1213,19 +1164,17 @@ This iteration macro is the implicitly nesting version of @code{for-or}.
 @end defmac
 
 @defmac for-sum (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-This iteration macro accumulates the values into a sum.  It is like
-@code{for-fold}, except:
+This iteration macro accumulates the values into a sum.  It is
+equivalent to the following form where @var{sum} is a generated
+identifier:
 
-@itemize
-@item
-@var{bindings} is @code{((@var{sum} 0))} where @var{sum} is a generated
-identifier;
-
-@item
-Each expression @var{expression} in the tail forms of the multiple-value
-form is transformed to @code{(+ @var{expression} @var{sum})}.  It is an
-error for the multiple-value form to produce not exactly one value.
-@end itemize
+@example
+@group
+(for-fold ((@var{sum} 0))
+    (@optional{@repeated{@var{for-clause*}}}
+     (+ @var{value*} @var{sum})))
+@end group
+@end example
 @end defmac
 
 @defmac for-sum* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
@@ -1234,19 +1183,17 @@ This iteration macro is the implicitly nesting version of
 @end defmac
 
 @defmac for-product (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-This iteration macro accumulates the values into a product.  It is like
-@code{for-fold}, except:
+This iteration macro accumulates the values into a product.  It is
+equivalent to the following form where @var{product} is a generated
+identifier:
 
-@itemize
-@item
-@var{bindings} is @code{((@var{product} 1))} where @var{product} is a
-generated identifier;
-
-@item
-Each expression @var{expression} in the tail forms of the multiple-value
-form is transformed to @code{(* @var{expression} @var{product})}.  It is
-an error for the multiple-value form to produce not exactly one value.
-@end itemize
+@example
+@group
+(for-fold ((@var{product} 0))
+    (@optional{@repeated{@var{for-clause*}}}
+     (* @var{value*} @var{product})))
+@end group
+@end example
 @end defmac
 
 @defmac for-product* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
@@ -1256,18 +1203,17 @@ This iteration macro is the implicitly nesting version of
 
 @defmac for-first (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro returns the first value or @code{nil} if the
-iteration never begins.  It is like @code{for-fold}, except:
+iteration never begins.  It is equivalent to the following form where
+@var{value} is a generated identifier:
 
-@itemize
-@item
-@var{bindings} is @code{((@var{value} nil))} where @var{value} is a
-generated identifier;
-
-@item
-A @code{:final} clause @code{(:final)} is inserted before the
-multiple-value form, so that the iteration is immediately terminated
-after the first iteration.
-@end itemize
+@example
+@group
+(for-fold ((@var{value} nil))
+    (@optional{@repeated{@var{for-clause*}}}
+     (:final)
+     @var{value*}))
+@end group
+@end example
 @end defmac
 
 @defmac for-first* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
@@ -1276,14 +1222,17 @@ This iteration macro is the implicitly nesting version of
 @end defmac
 
 @defmac for-last (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-This iteration macro returns the last value or @code{nil} if the
-iteration never begins.  It is like @code{for-fold}, except:
+This iteration macro returns the first value or @code{nil} if the
+iteration never begins.  It is equivalent to the following form where
+@var{value} is a generated identifier:
 
-@itemize
-@item
-@var{bindings} is @code{((@var{value} nil))} where @var{value} is a
-generated identifier.
-@end itemize
+@example
+@group
+(for-fold ((@var{value} nil))
+    (@optional{@repeated{@var{for-clause}}})
+  @optional{@repeated{@var{body}}})
+@end group
+@end example
 @end defmac
 
 @defmac for-last* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
@@ -1292,19 +1241,17 @@ This iteration macro is the implicitly nesting version of
 @end defmac
 
 @defmac for-max (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-This iteration macro performs @code{max} (@pxref{Comparison of
-Numbers,,,elisp}) on the values.  It is like @code{for-fold}, except:
+This iteration macro accumulates the values into a product.  It is
+equivalent to the following form where @var{max} is a generated
+identifier:
 
-@itemize
-@item
-@var{bindings} is @code{((@var{max} -1.0e+INF))} (@pxref{Float
-Basics,,,elisp}) where @var{max} is a generated identifier;
-
-@item
-Each expression @var{expression} in the tail forms of the multiple-value
-form is transformed to @code{(max @var{expression} @var{max})}.  It is
-an error for the multiple-value form to produce not exactly one value.
-@end itemize
+@example
+@group
+(for-fold ((@var{max} -1.0e+INF))
+    (@optional{@repeated{@var{for-clause*}}}
+     (max @var{value*} @var{max})))
+@end group
+@end example
 @end defmac
 
 @defmac for-max* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
@@ -1313,24 +1260,17 @@ This iteration macro is the implicitly nesting version of
 @end defmac
 
 @defmac for-min (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-This iteration macro performs @code{min} on the values.  It is like
-@code{for-fold}, except:
+This iteration macro performs @code{min} on the values.  It is
+equivalent to the following form where @var{min} is a generated
+identifier:
 
-@itemize
-@item
-@var{bindings} is @code{((@var{min} 1.0e+INF))} where @var{min} is a
-generated identifier;
-
-@item
-Each expression @var{expression} in the tail forms of the multiple-value
-form is transformed to @code{(min @var{expression} @var{min})}.  It is
-an error for the multiple-value form to produce not exactly one value.
-@end itemize
-@end defmac
-
-@defmac for-min* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-This iteration macro is the implicitly nesting version of
-@code{for-min}.
+@example
+@group
+(for-fold ((@var{min} 1.0e+INF))
+    (@optional{@repeated{@var{for-clause*}}}
+     (min @var{value*} @var{min})))
+@end group
+@end example
 @end defmac
 
 @node Special-Clause Operators
