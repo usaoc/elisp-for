@@ -1203,7 +1203,7 @@ This iteration macro is the implicitly nesting version of
 @end defmac
 
 @defmac for-last (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-This iteration macro returns the first value or @code{nil} if the
+This iteration macro returns the last value or @code{nil} if the
 iteration never begins.  It is equivalent to the following form where
 @var{value} is a generated identifier:
 
@@ -1222,9 +1222,9 @@ This iteration macro is the implicitly nesting version of
 @end defmac
 
 @defmac for-max (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
-This iteration macro accumulates the values into a product.  It is
-equivalent to the following form where @var{max} is a generated
-identifier:
+This iteration macro performs @code{max} (@pxref{Comparison of
+Numbers,,,elisp}) on the values.  It is equivalent to the following form
+where @var{max} is a generated identifier:
 
 @example
 @group
