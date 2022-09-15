@@ -314,7 +314,7 @@ half-open when STEP is negative."
   (:expander-case
    (`(,id (,_ ,value-form))
     (for--with-gensyms (value continue)
-      `(,id (:do-in ((,value ,value-form)) () ((,continue ,t))
+      `(,id (:do-in ((,value ,value-form)) () ((,continue t))
                     (,continue) ((,id ,value)) (nil))))))
   (iter-make (iter-yield value)))
 
