@@ -1340,8 +1340,8 @@ This special-clause operator produces the following body:
 @deffn @aux{:pcase, expression @optional{@code{:exhaustive}} @optional{@repeated{pattern}}}
 This special-clause operator produces the following body where
 @var{pcase} is @code{pcase} (@pxref{Pattern-Matching
-Conditional,,,elisp}) when @code{exhaustive} is omitted, otherwise it is
-@code{pcase-exhaustive}:
+Conditional,,,elisp}) when @code{:exhaustive} is omitted, otherwise it
+is @code{pcase-exhaustive}:
 
 @example
 @group
