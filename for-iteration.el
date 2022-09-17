@@ -435,8 +435,8 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)"
                                    `((when ,final-guard
                                        (setq ,final nil))
                                      . ,body)
-                                   `((:pcase (and . ,guards)
-                                             ,final-guard)
+                                   `((:let (,final-guard
+                                            (and . ,guards)))
                                      . ,parsed)
                                    clauses)))
                          (_ (parse final-ids body
@@ -617,7 +617,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])"
                                   value-form 1
                                   (pcase-lambda (`(:values ,form))
                                     form))))
-                     (:pcase (1+ ,index) ,index)
+                     (:let (,index (1+ ,index)))
                      (:break (= ,index ,length))
                      ,index))
                 ,vector))))))
@@ -660,7 +660,7 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])"
                                   value-form 1
                                   (pcase-lambda (`(:values ,form))
                                     form))))
-                     (:pcase (1+ ,index) ,index)
+                     (:let (,index (1+ ,index)))
                      (:break (= ,index ,length))
                      ,index))
                 ,string))))))
@@ -676,10 +676,9 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])"
     (for--with-gensyms (value)
       `(for-fold ((,value t))
            (,@for-clauses
-            (:pcase ,(for--parse-value-form
-                      value-form 1
-                      (pcase-lambda (`(:values ,form)) form))
-                    ,value)
+            (:let (,value ,(for--parse-value-form
+                            value-form 1
+                            (pcase-lambda (`(:values ,form)) form))))
             (:final (not ,value))
             ,value)))))
 
@@ -691,10 +690,9 @@ BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])"
     (for--with-gensyms (value)
       `(for-fold ((,value nil))
            (,@for-clauses
-            (:pcase ,(for--parse-value-form
-                      value-form 1
-                      (pcase-lambda (`(:values ,form)) form))
-                    ,value)
+            (:let (,value ,(for--parse-value-form
+                            value-form 1
+                            (pcase-lambda (`(:values ,form)) form))))
             (:final ,value)
             ,value)))))
 

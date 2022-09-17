@@ -995,8 +995,7 @@ exactly once in the apparent evaluation order:
         (@optional{@repeated{@var{for-clause*}}}
          (:do (setf (aref @var{vector} @var{index})
                     @var{value*}))
-         (:pcase (1+ @var{index})
-                 @var{index})
+         (:let (@var{index} (1+ @var{index})))
          (:break (= @var{index} @var{length}))
          @var{index}))
     @var{vector}))
@@ -1044,8 +1043,7 @@ apparent evaluation order:
         (@optional{@repeated{@var{for-clause*}}}
          (:do (setf (aref @var{string} @var{index})
                     @var{value*}))
-         (:pcase (1+ @var{index})
-                 @var{index})
+         (:let (@var{index} (1+ @var{index})))
          (:break (= @var{index} @var{length}))
          @var{index}))
     @var{string}))
@@ -1067,7 +1065,7 @@ form where @var{value} is a generated identifier:
 @group
 (for-fold ((@var{value} t))
     (@optional{@repeated{@var{for-clause*}}}
-     (:pcase @var{value*} @var{value})
+     (:let (@var{value} @var{value*}))
      (:final (not @var{value}))
      @var{value}))
 @end group
@@ -1087,7 +1085,7 @@ to the following form where @var{value} is a generated identifier:
 @group
 (for-fold ((@var{value} nil))
     (@optional{@repeated{@var{for-clause*}}}
-     (:pcase @var{value*} @var{value})
+     (:let (@var{value} @var{value*}))
      (:final @var{value})
      @var{value}))
 @end group
