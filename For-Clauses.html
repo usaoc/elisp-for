@@ -141,12 +141,12 @@ presence of <code>(:do)</code>:
 </pre></div>
 
 <span id="index-terminology-9"></span>
-<p>An iteration clause normally has the form <code>(<var>form</var>
-<var>sequence</var>)</code> where the form of <var>form</var> is specified by the value
-of <code>for-binder</code> and <var>sequence</var> is a sequence form.
-Alternatively, it can have the form <code>(<var>sequence</var>)</code>, in which
-case it is transformed to <code>(<var>identifier</var> <var>sequence</var>)</code> with
-a generated identifier<a id="DOCF8" href="#FOOT8"><sup>8</sup></a> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#Creating-Symbols">(elisp)Creating Symbols</a>) as <var>identifier</var>.  A
+<p>An iteration clause normally has the form <code>(<var>pattern</var>
+<var>sequence</var>)</code> where <var>pattern</var> is a <code>pcase</code> pattern and
+<var>sequence</var> is a sequence form.  Alternatively, it can have the form
+<code>(<var>sequence</var>)</code>, in which case it is transformed to
+<code>(<var>identifier</var> <var>sequence</var>)</code> with a generated
+identifier<a id="DOCF8" href="#FOOT8"><sup>8</sup></a> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#Creating-Symbols">(elisp)Creating Symbols</a>) as <var>identifier</var>.  A
 special clause has the form <code>(<var>keyword</var> . <var>subforms</var>)</code>
 where <var>keyword</var> is one of the keywords (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Constant-Variables.html#Constant-Variables">(elisp)Constant
 Variables</a>) accepted by the grammar and the form of

@@ -47,7 +47,7 @@ cite { font-style: italic; }
 Previous: <a href="Iteration-Macros.html" accesskey="p" rel="prev">Iteration Macros</a>, Up: <a href="Iteration-Forms.html" accesskey="u" rel="up">Iteration Forms</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<span id="Special_002dClause-Operators-1"></span><h3 class="section">5.2 Special-Clause Operators</h3>
+<span id="Special_002dClause-Operators-1"></span><h3 class="section">4.2 Special-Clause Operators</h3>
 <span id="index-terminology-14"></span>
 <p>Special-clause operators are <em>auxiliary operators</em> in the sense that
 they are heads of auxiliary forms that are only syntactically valid in
@@ -108,11 +108,10 @@ true before the iteration.
 
 <dl class="def">
 <dt id="index-_003alet"><span class="category">Auxiliary Operator: </span><span><strong>:let</strong> <em>[binding&hellip;]</em><a href='#index-_003alet' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This special-clause operator produces the following body where
-<var>for-binder</var> is the value of <code>for-binder</code>:
+<dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">((<var>for-binder</var> ([<var>binding</var>&hellip;])
+<pre class="example">((pcase-let ([<var>binding</var>&hellip;])
    [<var>body</var>&hellip;]))
 </pre></div>
 </dd></dl>

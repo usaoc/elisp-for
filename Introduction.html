@@ -138,11 +138,9 @@ generators.
      &rArr; #&lt;a list of five pseudo-random integers&gt;
 </pre></div>
 
-<p>Support for destructuring is a non-aim of this package.  For that, one
-should leverage <code>pcase-let</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Destructuring-with-pcase-Patterns.html#Destructuring-with-pcase-Patterns">(elisp)Destructuring with <code>pcase</code>
-Patterns</a>) or similar <code>let</code>-like forms.  By default, the
-iteration forms use <code>pcase-let</code> forms, but this is configurable
-through the buffer-local variable <code>for-binder</code>.
+<p>The iteration forms use <code>pcase-let</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Destructuring-with-pcase-Patterns.html#Destructuring-with-pcase-Patterns">(elisp)Destructuring with
+<code>pcase</code> Patterns</a>) as the binding construct where it makes
+sense.  This is useful for, but not only for destructuring.
 </p>
 <p>The destructuring capability of <code>cl-loop</code> forms:
 </p>
@@ -155,7 +153,7 @@ through the buffer-local variable <code>for-binder</code>.
      &rArr; (1 3)
 </pre></div>
 
-<p><code>for-list</code> forms use <code>pcase-let</code> forms by default:
+<p><code>for-list</code> forms use <code>pcase-let</code> forms:
 </p>
 <div class="example">
 <pre class="example">(for-list ((`(,number . ,string) '((1 . &quot;1&quot;)

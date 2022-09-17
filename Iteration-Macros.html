@@ -47,7 +47,7 @@ cite { font-style: italic; }
 Next: <a href="Special_002dClause-Operators.html" accesskey="n" rel="next">Special-Clause Operators</a>, Up: <a href="Iteration-Forms.html" accesskey="u" rel="up">Iteration Forms</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<span id="Iteration-Macros-1"></span><h3 class="section">5.1 Iteration Macros</h3>
+<span id="Iteration-Macros-1"></span><h3 class="section">4.1 Iteration Macros</h3>
 <p>Iteration macros are global macros acting as the entry points of this
 package.
 </p>
@@ -90,12 +90,12 @@ expression defaults to <code>nil</code> when there is no <var>identifier</var>,
 <var>identifier</var>&hellip;)</code> when there are two, and <code>(list
 <var>identifier</var>&hellip;)</code> when there are three or more.
 </p>
-<p>An iteration clause has the form <code>(<var>form</var> <var>sequence-form</var>)</code>
-where the form of <var>form</var> is specified by the value of
-<code>for-binder</code> and <var>sequence-form</var> is either <code>(<var>head</var>
+<p>An iteration clause has the form <code>(<var>pattern</var>
+<var>sequence-form</var>)</code> where <var>pattern</var> is a <code>pcase</code> pattern and
+<var>sequence-form</var> is either <code>(<var>head</var>
 [<var>subform</var>&hellip;])</code> or <var>datum</var>.  Alternatively, it
 has the form <code>(<var>sequence-form</var>)</code>, which is first transformed to
-the former with a generated identifier as <var>form</var>.  It is then
+the former with a generated identifier as <var>pattern</var>.  It is then
 iteratively expanded as follows:
 </p>
 <ul>
@@ -103,16 +103,16 @@ iteratively expanded as follows:
 expansion;
 
 </li><li> Else, if <var>datum</var> is a recognized literal object, expand to
-<code>(<var>form</var> (<var>head</var> <var>datum</var>))</code> where <var>head</var> is the
+<code>(<var>pattern</var> (<var>head</var> <var>datum</var>))</code> where <var>head</var> is the
 corresponding sequence constructor;
 
 </li><li> Else, if <var>head</var> is an alias of <var>base</var>, expand to
-<code>(<var>form</var> (<var>base</var> [<var>subform</var>&hellip;]))</code>;
+<code>(<var>pattern</var> (<var>base</var> [<var>subform</var>&hellip;]))</code>;
 
 </li><li> Else, if <var>head</var> has an associated expander, call it with the
 iteration clause as the sole argument;
 
-</li><li> Else, expand to <code>(<var>form</var> (for-in-iterator (for-generator
+</li><li> Else, expand to <code>(<var>pattern</var> (for-in-iterator (for-generator
 <var>datum</var>)))</code>.
 </li></ul>
 
@@ -239,8 +239,7 @@ exactly once in the apparent evaluation order:
         ([<var>for-clause*</var>&hellip;]
          (:do (setf (aref <var>vector</var> <var>index</var>)
                     <var>value*</var>))
-         (:pcase (1+ <var>index</var>)
-                 <var>index</var>)
+         (:let (<var>index</var> (1+ <var>index</var>)))
          (:break (= <var>index</var> <var>length</var>))
          <var>index</var>))
     <var>vector</var>))
@@ -286,8 +285,7 @@ apparent evaluation order:
         ([<var>for-clause*</var>&hellip;]
          (:do (setf (aref <var>string</var> <var>index</var>)
                     <var>value*</var>))
-         (:pcase (1+ <var>index</var>)
-                 <var>index</var>)
+         (:let (<var>index</var> (1+ <var>index</var>)))
          (:break (= <var>index</var> <var>length</var>))
          <var>index</var>))
     <var>string</var>))
@@ -309,7 +307,7 @@ form where <var>value</var> is a generated identifier:
 <div class="example">
 <pre class="example">(for-fold ((<var>value</var> t))
     ([<var>for-clause*</var>&hellip;]
-     (:pcase <var>value*</var> <var>value</var>)
+     (:let (<var>value</var> <var>value*</var>))
      (:final (not <var>value</var>))
      <var>value</var>))
 </pre></div>
@@ -329,7 +327,7 @@ to the following form where <var>value</var> is a generated identifier:
 <div class="example">
 <pre class="example">(for-fold ((<var>value</var> nil))
     ([<var>for-clause*</var>&hellip;]
-     (:pcase <var>value*</var> <var>value</var>)
+     (:let (<var>value</var> <var>value*</var>))
      (:final <var>value</var>)
      <var>value</var>))
 </pre></div>

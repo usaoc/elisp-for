@@ -48,7 +48,7 @@ cite { font-style: italic; }
 Next: <a href="Concept-Index.html" accesskey="n" rel="next">Concept Index</a>, Previous: <a href="Iteration-Forms.html" accesskey="p" rel="prev">Iteration Forms</a>, Up: <a href="index.html" accesskey="u" rel="up">For</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<span id="Sequence-Constructors-1"></span><h2 class="chapter">6 Sequence Constructors</h2>
+<span id="Sequence-Constructors-1"></span><h2 class="chapter">5 Sequence Constructors</h2>
 <p>Sequence constructors are the heads of sequence forms.  In particular,
 the sequence constructor <code>:do-in</code> is designed for use in expanders
 of other sequence constructors and is thus an auxiliary operator.
@@ -57,24 +57,23 @@ of other sequence constructors and is thus an auxiliary operator.
 <dt id="index-_003ado_002din"><span class="category">Auxiliary Operator: </span><span><strong>:do-in</strong> <em>memoize-bindings outer-bindings loop-bindings loop-guards inner-bindings loop-forms</em><a href='#index-_003ado_002din' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence constructor declares the forms to be appended to subforms
 in expanded iteration forms.  An iteration form essentially expands to
-the following <code>while</code> loop:
+the following <code>while</code> loop where <var>body</var>s are the body expanded
+so far:
 </p>
 <div class="example">
 <pre class="example">(let <var>memoize-bindings</var>
   (let <var>outer-bindings</var>
     (let <var>loop-bindings</var>
       (while (and . <var>loop-guards</var>)
-        (<var>for-binder</var> <var>inner-bindings</var>
+        (pcase-let <var>inner-bindings</var>
           [<var>body</var>&hellip;]
           <var>loop-update</var>))))
 </pre></div>
 
-<p>Above, <var>for-binder</var> is the value of <code>for-binder</code> and
-<var>body</var>s are the body expanded so far.  As a <code>:do-in</code> form is
-encountered, the relevant forms are appended to subforms of the same
-name.  Moreover, for each <var>loop-binding</var> in <var>loop-bindings</var> and
-each <var>loop-form</var> in <var>loop-forms</var> where <var>loop-binding</var> has
-either the form <code>(<var>loop-identifier</var>
+<p>As a <code>:do-in</code> form is encountered, the relevant forms are appended
+to subforms of the same name.  Moreover, for each <var>loop-binding</var> in
+<var>loop-bindings</var> and each <var>loop-form</var> in <var>loop-forms</var> where
+<var>loop-binding</var> has either the form <code>(<var>loop-identifier</var>
 [<var>initial-value</var>])</code> or <var>loop-identifier</var>, the form
 <var>loop-update</var> updates <var>loop-identifier</var> to the value of
 <var>loop-form</var> after all <var>loop-form</var>s are evaluated.  It is an
