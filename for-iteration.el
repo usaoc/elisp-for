@@ -290,11 +290,11 @@ from the expanded form.
 (def-edebug-elem-spec 'for-result-clause '((":result" body)))
 
 (def-edebug-elem-spec 'for-iteration-clause
-  '(([&optional sexp] [&or (symbolp &rest sexp) form])))
+  '(([&optional pcase-PAT] [&or (symbolp &rest sexp) form])))
 
 (def-edebug-elem-spec 'for-special-clause
   '(&or ([&or ":break" ":final" ":if" ":if-not" ":do"] &rest form)
-        (":let" &rest (sexp form))
+        (":let" &rest (pcase-PAT &optional form))
         (":if-let" &rest &or symbolp ([&optional symbolp] form))
         (":pcase" form [&optional ":exhaustive"] &rest pcase-PAT)
         (":pcase-not" form [&optional ":as" symbolp] &rest pcase-PAT)
@@ -322,12 +322,6 @@ from the expanded form.
 
 (def-edebug-elem-spec 'for-lists-bindings
   '(([&rest symbolp] [&optional for-result-clause])))
-
-;;;###autoload(define-symbol-prop 'for-binder 'safe-local-variable #'symbolp)
-(defvar-local for-binder 'pcase-let
-  "The head of certain `let'-like forms in iteration forms.
-
-See Info node `(for)Buffer-Local Variables'.")
 
 (defmacro define-for-special-clause (name arglist &rest cases-or-body)
   "Define the special clause operator NAME.
@@ -372,8 +366,8 @@ node `(for)Definers'.
   (`(,_ . ,guards) `((unless (and . ,guards) . ,body))) )
 
 (for--defspecial :let (body)
-  "Evaluate BODY with subforms bound by `for-binder'."
-  (`(,_ . ,bindings) `((,for-binder ,bindings . ,body))))
+  "Evaluate BODY with subforms bound by `pcase-let'."
+  (`(,_ . ,bindings) `((pcase-let ,bindings . ,body))))
 
 (for--defspecial :if-let (body)
   "Evaluate BODY with subforms bound by `when-let*'."
@@ -420,8 +414,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)"
                         for-multiple-value-form]))
            (indent 2))
   (pcase-let
-      ((binder for-binder)
-       (`(,(and bindings
+      ((`(,(and bindings
                 (app (mapcar (pcase-lambda (`(,id ,_))
                                (gensym (symbol-name id))))
                      renamed-ids)
@@ -479,7 +472,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)"
                                           `(,id ,form))))
                                      loop-bindings loop-forms))))))
                     (body (if (null inner-bindings) body
-                            `((,binder ,inner-bindings . ,body))))
+                            `((pcase-let ,inner-bindings . ,body))))
                     (body `((while (and ,@break-ids
                                         ,@final-ids . ,loop-guards)
                               . ,body)))

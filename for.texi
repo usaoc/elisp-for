@@ -103,13 +103,11 @@ Generic sequence constructors that are both expanders and generators.
 @menu
 * Introduction::                Who put @code{for} loops in my Lisp?
 * Basic Concepts::              You ought to well understand them.
-* Buffer-Local Variables::      Look, this package has variables!
 * Definers::                    Are definitions expressions?
 * Iteration Forms::             When @code{for} loops meet @code{let} forms.
 * Sequence Constructors::       Let's construct the construction.
 * Concept Index::               All your concept are belong to us.
 * Function Index::              Otherwise what are you looking for?
-* Variable Index::              Variables can programmatically vary.
 
 @detailmenu
  --- The Detailed Node Listing ---
@@ -256,11 +254,9 @@ Generators are available in function forms:
 @end group
 @end example
 
-Support for destructuring is a non-aim of this package.  For that, one
-should leverage @code{pcase-let} (@pxref{Destructuring with @code{pcase}
-Patterns,,,elisp}) or similar @code{let}-like forms.  By default, the
-iteration forms use @code{pcase-let} forms, but this is configurable
-through the buffer-local variable @code{for-binder}.
+The iteration forms use @code{pcase-let} (@pxref{Destructuring with
+@code{pcase} Patterns,,,elisp}) as the binding construct where it makes
+sense.  This is useful for, but not only for destructuring.
 
 The destructuring capability of @code{cl-loop} forms:
 
@@ -275,7 +271,7 @@ The destructuring capability of @code{cl-loop} forms:
 @end group
 @end example
 
-@code{for-list} forms use @code{pcase-let} forms by default:
+@code{for-list} forms use @code{pcase-let} forms:
 
 @example
 @group
@@ -427,12 +423,12 @@ An equivalent @code{for-list*} form:
 @end example
 
 @cindex terminology @subentry identifier
-An iteration clause normally has the form @code{(@var{form}
-@var{sequence})} where the form of @var{form} is specified by the value
-of @code{for-binder} and @var{sequence} is a sequence form.
-Alternatively, it can have the form @code{(@var{sequence})}, in which
-case it is transformed to @code{(@var{identifier} @var{sequence})} with
-a generated identifier@footnote{In
+An iteration clause normally has the form @code{(@var{pattern}
+@var{sequence})} where @var{pattern} is a @code{pcase} pattern and
+@var{sequence} is a sequence form.  Alternatively, it can have the form
+@code{(@var{sequence})}, in which case it is transformed to
+@code{(@var{identifier} @var{sequence})} with a generated
+identifier@footnote{In
 @url{http://www.r6rs.org/final/html/r6rs-lib/r6rs-lib-Z-H-13.html,
 @rnrs{6}}, an @dfn{identifier} is roughly a syntax object of
 non-constant symbol.  Emacs Lisp does not have the concept of syntax
@@ -684,48 +680,6 @@ is actually a subset of Emacs Lisp's special forms (@pxref{Special
 Forms,,,elisp}) with @var{tail-form} added.  In a sense, special forms
 are extended to support multiple-value forms where possible.
 
-@node Buffer-Local Variables
-@chapter Buffer-Local Variables
-All buffer-local variables in this package are provided so that the
-expansion of certain forms can be configured file-locally.  This chapter
-specifies them.
-
-@defvar for-binder
-This buffer-local variable has a symbol as its value that is used as the
-head of certain @code{let}-like forms, which defaults to
-@code{pcase-let}.  The function cell (@pxref{Function Cells,,,elisp}) of
-the symbol stores either a macro or a special form compatible with the
-following grammar:
-
-@example
-@group
-(@var{for-binder} (@optional{@repeated{(@var{form} @var{expression})}})
-  @repeated{@var{body}})
-@end group
-@end example
-
-Above, @var{for-binder} is the symbol, the form of @var{form} is
-specified by the macro or the special form, an @var{expression} is an
-expression, and @var{body}s are the body.  As an example, a semantics
-similar to @code{in-ref} clauses of @code{cl-loop} forms can be achieved
-by setting @code{for-binder} to @code{cl-symbol-macrolet}:
-
-@example
-@group
-for-binder
-@res{cl-symbol-macrolet}
-@end group
-
-@group
-(let ((list (list 1 2 3)))
-  (for-do ((reference (for-in-list list))
-           (:do (setf reference nil))))
-  list)
-@res{(nil nil nil)}
-@end group
-@end example
-@end defvar
-
 @node Definers
 @chapter Definers
 Two definers are available for defining sequence constructors and
@@ -880,12 +834,12 @@ expression defaults to @code{nil} when there is no @var{identifier},
 @repeated{@var{identifier}})} when there are two, and @code{(list
 @repeated{@var{identifier}})} when there are three or more.
 
-An iteration clause has the form @code{(@var{form} @var{sequence-form})}
-where the form of @var{form} is specified by the value of
-@code{for-binder} and @var{sequence-form} is either @code{(@var{head}
+An iteration clause has the form @code{(@var{pattern}
+@var{sequence-form})} where @var{pattern} is a @code{pcase} pattern and
+@var{sequence-form} is either @code{(@var{head}
 @optional{@repeated{@var{subform}}})} or @var{datum}.  Alternatively, it
 has the form @code{(@var{sequence-form})}, which is first transformed to
-the former with a generated identifier as @var{form}.  It is then
+the former with a generated identifier as @var{pattern}.  It is then
 iteratively expanded as follows:
 
 @itemize
@@ -895,19 +849,19 @@ expansion;
 
 @item
 Else, if @var{datum} is a recognized literal object, expand to
-@code{(@var{form} (@var{head} @var{datum}))} where @var{head} is the
+@code{(@var{pattern} (@var{head} @var{datum}))} where @var{head} is the
 corresponding sequence constructor;
 
 @item
 Else, if @var{head} is an alias of @var{base}, expand to
-@code{(@var{form} (@var{base} @optional{@repeated{@var{subform}}}))};
+@code{(@var{pattern} (@var{base} @optional{@repeated{@var{subform}}}))};
 
 @item
 Else, if @var{head} has an associated expander, call it with the
 iteration clause as the sole argument;
 
 @item
-Else, expand to @code{(@var{form} (for-in-iterator (for-generator
+Else, expand to @code{(@var{pattern} (for-in-iterator (for-generator
 @var{datum})))}.
 @end itemize
 
@@ -1315,12 +1269,11 @@ This special-clause operator produces the following body:
 @end deffn
 
 @deffn @aux{:let, @optional{@repeated{binding}}}
-This special-clause operator produces the following body where
-@var{for-binder} is the value of @code{for-binder}:
+This special-clause operator produces the following body:
 
 @example
 @group
-((@var{for-binder} (@optional{@repeated{@var{binding}}})
+((pcase-let (@optional{@repeated{@var{binding}}})
    @optional{@repeated{@var{body}}}))
 @end group
 @end example
@@ -1385,7 +1338,8 @@ of other sequence constructors and is thus an auxiliary operator.
 @deffn @aux{:do-in, memoize-bindings outer-bindings loop-bindings loop-guards inner-bindings loop-forms}
 This sequence constructor declares the forms to be appended to subforms
 in expanded iteration forms.  An iteration form essentially expands to
-the following @code{while} loop:
+the following @code{while} loop where @var{body}s are the body expanded
+so far:
 
 @example
 @group
@@ -1393,18 +1347,16 @@ the following @code{while} loop:
   (let @var{outer-bindings}
     (let @var{loop-bindings}
       (while (and . @var{loop-guards})
-        (@var{for-binder} @var{inner-bindings}
+        (pcase-let @var{inner-bindings}
           @optional{@repeated{@var{body}}}
           @var{loop-update}))))
 @end group
 @end example
 
-Above, @var{for-binder} is the value of @code{for-binder} and
-@var{body}s are the body expanded so far.  As a @code{:do-in} form is
-encountered, the relevant forms are appended to subforms of the same
-name.  Moreover, for each @var{loop-binding} in @var{loop-bindings} and
-each @var{loop-form} in @var{loop-forms} where @var{loop-binding} has
-either the form @code{(@var{loop-identifier}
+As a @code{:do-in} form is encountered, the relevant forms are appended
+to subforms of the same name.  Moreover, for each @var{loop-binding} in
+@var{loop-bindings} and each @var{loop-form} in @var{loop-forms} where
+@var{loop-binding} has either the form @code{(@var{loop-identifier}
 @optional{@var{initial-value}})} or @var{loop-identifier}, the form
 @var{loop-update} updates @var{loop-identifier} to the value of
 @var{loop-form} after all @var{loop-form}s are evaluated.  It is an
@@ -1619,10 +1571,5 @@ This index contains the concepts and terminologies.
 @appendix Function Index
 This index contains the auxiliary operators, functions, and macros.
 @printindex fn
-
-@node Variable Index
-@appendix Variable Index
-This index contains the variables.
-@printindex vr
 
 @bye

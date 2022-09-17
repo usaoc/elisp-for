@@ -458,21 +458,6 @@
     (should-error (for-do ((i (in-list tree))
                            (:pcase i :exhaustive `(,_)))))))
 
-(ert-deftest for-buffer-local-variables ()
-  "Buffer-local variables."
-  (let ((for-binder 'cl-symbol-macrolet)
-        (list (for--make-test-list)) (item (random 10)))
-    (should (cl-every (lambda (i) (eql i item))
-                      (for--eval (let ((list (list . ,list)))
-                                   (for-do ((i (in-list list))
-                                            (:do (setf i ,item))))
-                                   list))))
-    (should (cl-every (lambda (i) (eql i item))
-                      (for--eval (let ((vector (vector . ,list)))
-                                   (for-do ((i (in-array vector))
-                                            (:do (setf i ,item))))
-                                   vector))))))
-
 ;;;; Sequence
 (for--deftest-dyn
   (let* ((list (for--make-test-list))
