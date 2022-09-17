@@ -289,8 +289,19 @@ from the expanded form.
 ;;;; Interface
 (def-edebug-elem-spec 'for-result-clause '((":result" body)))
 
+(def-edebug-elem-spec 'for-sequence-form
+  '(&or (":do-in"
+         (&rest &or (symbolp &optional form) symbolp)
+         (&rest &or (symbolp &optional form) symbolp)
+         (&rest &or (symbolp &optional form) symbolp)
+         (&rest form)
+         (&rest (pcase-PAT &optional form))
+         (&rest form))
+        (symbolp &rest sexp)
+        form))
+
 (def-edebug-elem-spec 'for-iteration-clause
-  '(([&optional pcase-PAT] [&or (symbolp &rest sexp) form])))
+  '(([&optional pcase-PAT] for-sequence-form)))
 
 (def-edebug-elem-spec 'for-special-clause
   '(&or ([&or ":break" ":final" ":if" ":if-not" ":do"] &rest form)
@@ -313,12 +324,12 @@ from the expanded form.
      [&optional for-result-clause])))
 
 (def-edebug-elem-spec 'for-vector-keywords
-  '(&optional ":length" form [&optional ":init" form]))
+  '(&optional [":length" form &optional [":init" form]]))
 
 (def-edebug-elem-spec 'for-string-keywords
-  '(&optional ":length" form
-              [&optional ":init" form
-                         [&optional ":multibyte" form]]))
+  '(&optional [":length" form
+               &optional [":init" form
+                          &optional [":multibyte" form]]]))
 
 (def-edebug-elem-spec 'for-lists-bindings
   '(([&rest symbolp] [&optional for-result-clause])))
