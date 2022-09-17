@@ -581,8 +581,8 @@ A @code{cl-loop} form involving multiple state variables:
 @example
 @group
 (cl-loop with value1 = 0
-           and value2 = '()
-           and value3 = -1.0e+INF
+         and value2 = '()
+         and value3 = -1.0e+INF
          for number below 5
          do (cl-incf value1 number)
             (push number value2)
