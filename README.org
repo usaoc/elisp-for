@@ -36,10 +36,8 @@ to [[https://usaoc.github.io/elisp-for/][the manual]].
   If only the iteration forms and sequence expanders are used, it is
   recommended that the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Named-Features.html][named feature]] ~for~ be available only [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Eval-During-Compile.html][at
   compile time]], otherwise the named feature must also be available
-  at execution time.  The [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffer_002dLocal-Variables.html][buffer-local variable]] ~for-binder~ can be
-  specified [[https://www.gnu.org/software/emacs/manual/html_node/emacs/File-Variables.html][file-locally]] or [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html][directory-locally]] to alter the behavior of
-  certain ~let~-like forms.  [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Shorthands.html][Shorthands]] may be useful for those who
-  use the sequence generators.
+  at execution time.  [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Shorthands.html][Shorthands]] may be useful for those who use the
+  sequence generators.
 
   Although it is not a must, it is recommended that [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Variable-Scoping.html][lexical binding]] be
   enabled, as this package is designed and optimized for such usage.
