@@ -52,14 +52,9 @@ Next: <a href="Special_002dClause-Operators.html" accesskey="n" rel="next">Speci
 package.
 </p>
 <dl class="def">
-<dt id="index-for_002dfold"><span class="category">Macro: </span><span><strong>for-fold</strong> <em>bindings ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfold' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-for_002dfold"><span class="category">Macro: </span><span><strong>for-fold</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfold' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the fundamental building block of other
-iteration macros.  The form of <var>bindings</var> is the same as the
-<var>varlist</var> subforms of <code>let</code> forms, that is, a <var>binding</var> in
-<var>bindings</var> has either the form <code>(<var>identifier</var>
-[<var>expression</var>])</code> or <var>identifier</var>, except that an
-optional <code>(:result <var>expression</var>&hellip;)</code> form can appear as
-the last form.  <var>body</var>s are first transformed according to the
+iteration macros.  <var>body</var>s are first transformed according to the
 following rules and appended to <var>for-clause</var>s preserving their
 order:
 </p>
@@ -73,20 +68,21 @@ unless it is already a special clause;
 <p><var>for-clause</var>s are then processed in order.  Multiple adjacent
 iteration clauses are treated as a group, and special clauses serve to
 separate the groups of iteration clauses.  A group of iteration clauses
-or a special clause to the left of another group of iteration clauses or
+expands to a <code>while</code> loop wrapping the body expanded so far, and a
+special clause expands according to its idiosyncratic rules, presumably
+wrapping the body expanded so far.  A group of iteration clauses or a
+special clause to the left of another group of iteration clauses or
 special clause nests the latter.  The last form is a multiple-value form
 that produces as many values as there are <var>binding</var>s.  It is an
 error for the multiple-value form to produce not as many values as there
 are <var>binding</var>s.
 </p>
-<p>A group of iteration clauses expands to a <code>while</code> loop wrapping the
-body expanded so far.  A special clause expands according to its
-idiosyncratic rules, presumably wrapping the body expanded so far.
-Finally, <var>binding</var>s are bound by a <code>let</code> form wrapping the body
-expanded so far, and the <var>expression</var>s in the <code>:result</code> form
-are appended.  When no <code>:result</code> form is present, the sole
-expression defaults to <code>nil</code> when there is no <var>identifier</var>,
-<var>identifier</var> when there is one, <code>(cons
+<p>After <var>for-clause</var>s are processed, <var>expression</var>s are appended to
+the body, and <var>binding</var>s are bound by a <code>let</code> form wrapping the
+body.  Given that <var>binding</var> has either the form
+<code>(<var>identifier</var> [<var>expression</var>])</code> or
+<var>identifier</var>, <var>expression</var> defaults to <code>nil</code> when there is
+no <var>identifier</var>, <var>identifier</var> when there is one, <code>(cons
 <var>identifier</var>&hellip;)</code> when there are two, and <code>(list
 <var>identifier</var>&hellip;)</code> when there are three or more.
 </p>
@@ -123,7 +119,7 @@ later updated to <var>value</var> after each iteration.
 </p></dd></dl>
 
 <dl class="def">
-<dt id="index-for_002dfold_002a"><span class="category">Macro: </span><span><strong>for-fold*</strong> <em>bindings ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfold_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-for_002dfold_002a"><span class="category">Macro: </span><span><strong>for-fold*</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfold_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><span id="index-iteration-form"></span>
 <p>This iteration macro is the <em>implicitly nesting</em> version of
 <code>for-fold</code>, such that every iteration clause is a group in its own.
@@ -179,34 +175,28 @@ generated identifier:
 </p></dd></dl>
 
 <dl class="def">
-<dt id="index-for_002dlists"><span class="category">Macro: </span><span><strong>for-lists</strong> <em>bindings ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlists' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-for_002dlists"><span class="category">Macro: </span><span><strong>for-lists</strong> <em>([identifier&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlists' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro accumulates the values into fresh lists and
-sequentially evaluates the expressions in the <code>:result</code> form with
-the identifiers in <var>bindings</var> bound to the lists.  It is like
-<code>for-fold</code>, except:
+sequentially evaluates <var>expression</var>s with <var>identifier</var>s bound to
+the lists.  It is like <code>for-fold</code>, except:
 </p>
 <ul>
-<li> <var>bindings</var> is a list of identifiers with an optional <code>:result</code>
-form where each identifier is initially bound to <code>'()</code>;
+<li> Each <var>identifier</var> is transformed to <code>(<var>identifier</var> '())</code> as
+<var>binding</var>, and <var>expression</var>s are wrapped in a <code>let</code> form
+with each <var>identifier</var> bound to <code>(nreverse <var>identifier</var>)</code>;
 
-</li><li> The expressions in the <code>:result</code> form, with the same default as
-<code>for-fold</code>, are wrapped in a <code>let</code> form with each identifier
-<var>identifier</var> in <var>bindings</var> bound to <code>(nreverse
-<var>identifier</var>)</code>;
-
-</li><li> For each expression <var>expression</var> in the tail forms of the
-multiple-value form and each identifier <var>identifier</var> in
-<var>bindings</var>, <var>expression</var> is transformed to <code>(cons
-<var>expression</var> <var>identifier</var>)</code>.  It is an error for the
+</li><li> For each <var>expression</var> in the tail forms of the multiple-value form
+and each <var>identifier</var>, <var>expression</var> is transformed to
+<code>(cons <var>expression</var> <var>identifier</var>)</code>.  It is an error for the
 multiple-value form to produce not as many values as there are
-identifiers in <var>bindings</var>.
+<var>identifier</var>s.
 </li></ul>
 
 <p>The values of <var>identifier</var>s during the iteration are unspecified.
 </p></dd></dl>
 
 <dl class="def">
-<dt id="index-for_002dlists_002a"><span class="category">Macro: </span><span><strong>for-lists*</strong> <em>bindings ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlists_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-for_002dlists_002a"><span class="category">Macro: </span><span><strong>for-lists*</strong> <em>([identifier&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlists_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-lists</code>.
 </p></dd></dl>
