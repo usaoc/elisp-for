@@ -325,13 +325,13 @@ Following
 @url{http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_p.htm,
 Common Lisp} and Emacs Lisp (@pxref{Cons Cells,,,elisp}), a @dfn{proper
 list} is either the empty list or a list terminated by the empty list.
-It is an error for it to be any other structure produced by @code{cons}
-(@pxref{Building Lists,,,elisp}, that is, a @dfn{circular list} or a
-@dfn{dotted list}.)@footnote{Following
+It is an error@footnote{Following
 @url{https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-4.html,
 @rnrs{5}}, @dfn{an error} does not specify whether or when the error is
-detected or reported.}.}.  A special clause @code{(:if (numberp item))}
-@emph{following} the iteration clause decides that the partially
+detected or reported.} for it to be any other structure produced by
+@code{cons} (@pxref{Building Lists,,,elisp}), that is, a @dfn{circular
+list} or a @dfn{dotted list}.}.  A special clause @code{(:if (numberp
+item))} @emph{following} the iteration clause decides that the partially
 expanded form is skipped unless @code{item} is @code{numberp}
 (@pxref{Predicates on Numbers,,,elisp}).
 
