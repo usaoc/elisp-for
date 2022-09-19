@@ -71,16 +71,13 @@ See Info node `(for)Iteration Macros'."))
            (save-match-data
              (if (string-match (rx bol "..." eol) docstring)
                  (replace-match extra 'fixedcase 'literal docstring)
-               (string-join
-                (list docstring extra
-                      (concat "(fn "
-                              (mapconcat
+               (let ((arglist (mapconcat
                                (lambda (symbol)
                                  (upcase (symbol-name symbol)))
                                (remq '&rest arglist)
-                               " ")
-                              ")"))
-                "\n\n"))))))
+                               " ")))
+                 (concat docstring "\n\n" extra "\n\n"
+                         "(fn " arglist ")")))))))
     `(prog1 (defmacro ,name ,arglist ,docstring ,decl . ,body)
        (defmacro ,(intern (concat (symbol-name name) "*")) ,arglist
          ,docstring ,decl
@@ -103,11 +100,8 @@ A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
     (cl-flet* ((make-arg (arg) (upcase (symbol-name arg)))
                (make-rest (arg) (concat "[" (make-arg arg) "...]"))
                (make-docstring (args)
-                 (string-join (list docstring extra
-                                    (concat "(fn "
-                                            (string-join args " ")
-                                            ")"))
-                              "\n\n")))
+                 (concat docstring "\n\n" extra "\n\n"
+                         "(fn " (string-join args " ") ")")))
       `(define-for-sequence ,name ,arglist
          ,(save-match-data
             (cond ((string-match (rx bol "..." eol) docstring)
@@ -119,16 +113,14 @@ A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
                       (pcase-exhaustive arglist
                         ('() '())
                         (`(&optional . ,arglist)
-                         (named-let parse ((arglist arglist))
-                           (pcase-exhaustive arglist
-                             ('() '())
-                             (`(&rest ,arg) `(,(make-rest arg)))
-                             (`(,arg . ,arglist)
-                              `(,(concat "[" (string-join
-                                              `(,(make-arg arg)
-                                                . ,(parse arglist))
-                                              " ")
-                                         "]"))))))
+                         `(,(named-let parse ((arglist arglist))
+                              (pcase-exhaustive arglist
+                                (`(,arg)
+                                 (concat "[" (make-arg arg) "]"))
+                                (`(&rest ,arg) (make-rest arg))
+                                (`(,arg . ,arglist)
+                                 (concat "[" (make-arg arg) " "
+                                         (parse arglist) "]"))))))
                         (`(,arg . ,arglist)
                          `(,(make-arg arg) . ,(parse arglist)))))))
                   ((memq '&rest arglist)
