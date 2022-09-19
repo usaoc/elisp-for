@@ -63,8 +63,8 @@ example, an iteration clause <code>(item '(a 2 &quot;3&quot;))</code> decides th
 <code>item</code> is bound to each <code>car</code> of the literal list
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Quoting.html#Quoting">(elisp)Quoting</a>) sequence <code>(a 2 &quot;3&quot;)</code> and that the
 iteration is stopped when it reaches the terminating empty list
-(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Box-Diagrams.html#Box-Diagrams">(elisp)Box Diagrams</a>)<a id="DOCF6" href="#FOOT6"><sup>6</sup></a>.  A special clause <code>(:if (numberp item))</code>
-<em>following</em> the iteration clause decides that the partially
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Box-Diagrams.html#Box-Diagrams">(elisp)Box Diagrams</a>)<a id="DOCF6" href="#FOOT6"><sup>6</sup></a>.  A special clause <code>(:if (numberp
+item))</code> <em>following</em> the iteration clause decides that the partially
 expanded form is skipped unless <code>item</code> is <code>numberp</code>
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Predicates-on-Numbers.html#Predicates-on-Numbers">(elisp)Predicates on Numbers</a>).
 </p>
@@ -169,9 +169,9 @@ specified, an object is a <em>list</em> if and only if it is a proper list.
 Following
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_p.htm">Common Lisp</a> and Emacs Lisp (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Cons-Cells.html#Cons-Cells">(elisp)Cons Cells</a>), a <em>proper
 list</em> is either the empty list or a list terminated by the empty list.
-It is an error for it to be any other structure produced by <code>cons</code>
-(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Building-Lists.html#Building-Lists">(elisp)Building Lists</a>, that is, a <em>circular list</em> or a
-<em>dotted list</em>.)<a id="DOCF5" href="#FOOT5"><sup>5</sup></a>.</p>
+It is an error<a id="DOCF5" href="#FOOT5"><sup>5</sup></a> for it to be any other structure produced by
+<code>cons</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Building-Lists.html#Building-Lists">(elisp)Building Lists</a>), that is, a <em>circular
+list</em> or a <em>dotted list</em>.</p>
 <h5><a id="FOOT7" href="#DOCF7">(7)</a></h5>
 <p>In this manual,
 a metavariable is typeset as &lsquo;<samp><var>metavariable</var></samp>&rsquo;, an optional form
