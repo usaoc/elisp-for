@@ -413,9 +413,9 @@ subforms after the sequence are the patterns."
 (for--defmacro for-fold (bindings for-clauses &rest body)
   "The fundamental folding iteration macro.
 
-BINDINGS = ([BINDING...] [(:result [EXPRESSION...])])
+BINDINGS = ([BINDING...] [(:result EXPRESSION...)])
 
-BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)"
+BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
   (declare (debug (&or [for-fold-bindings
                         ([&rest for-for-clause]
                          for-multiple-value-form)]
@@ -561,7 +561,7 @@ BINDING = IDENTIFIER | (IDENTIFIER EXPRESSION)"
 (for--defmacro for-lists (bindings for-clauses &rest body)
   "The multiple-list-building iteration macro.
 
-BINDINGS = ([IDENTIFIER...] [(:result [EXPRESSION...])])"
+BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
   (declare (debug (&or [for-lists-bindings
                         ([&rest for-for-clause]
                          for-multiple-value-form)]
