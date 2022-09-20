@@ -143,43 +143,36 @@ by (`funcall' MAKE-VALUE FORM)."
                 (app (lambda (form) `(:values ,form)) tail-form)))
        (funcall make-value tail-form)))))
 
-(defun for--parse-bindings (bindings)
+(defun for--parse-bindings (bindings make-binding)
   "Parse BINDINGS as the subform of `for-fold'.
 
 The result forms are extracted from BINDINGS or else the default
-result forms are used.  Return a `cons' of BINDINGS without the
-result forms and the result forms."
+result forms are used.  Each BINDING in BINDINGS is replaced
+by (`funcall' MAKE-BINDING BINDING).  Return a `cons' of the
+transformed BINDINGs and the result forms."
   (declare (side-effect-free t))
-  (cl-flet ((normalize-bindings (bindings)
-              (mapcar (lambda (binding)
-                        (pcase-exhaustive binding
-                          ((or (and `(,id) (let binding `(,id nil)))
-                               (and `(,_ ,_) binding)
-                               (app (lambda (id) `(,id nil)) binding))
-                           binding)))
-                      bindings)))
-    (pcase-exhaustive bindings
-      ((or (and '() bindings (let result-forms '(nil)))
-           (and `((:result . ,(and `(,_ . ,_) result-forms)))
-                (let bindings '()))
-           (and `(,_ . ,_)
-                (or (app reverse
-                         `((:result . ,(and `(,_ . ,_) result-forms))
-                           . ,(app nreverse (app normalize-bindings
-                                                 bindings))))
-                    (app normalize-bindings
-                         (and bindings
-                              (app (mapcar (pcase-lambda (`(,id ,_))
-                                             id))
-                                   (or (and `(,_) result-forms)
-                                       (and `(,_ ,_)
-                                            (app (lambda (ids)
-                                                   `((cons . ,ids)))
-                                                 result-forms))
-                                       (app (lambda (ids)
-                                              `((list . ,ids)))
-                                            result-forms))))))))
-       `(,bindings . ,result-forms)))))
+  (pcase-exhaustive bindings
+    ((or (and '() bindings (let result-forms '(nil)))
+         (and `((:result . ,(and `(,_ . ,_) result-forms)))
+              (let bindings '()))
+         (and `(,_ . ,_)
+              (or (app reverse
+                       `((:result . ,(and `(,_ . ,_) result-forms))
+                         . ,(app nreverse (app (mapcar make-binding)
+                                               bindings))))
+                  (app (mapcar make-binding)
+                       (and bindings
+                            (app (mapcar (pcase-lambda (`(,id ,_))
+                                           id))
+                                 (or (and `(,_) result-forms)
+                                     (and `(,_ ,_)
+                                          (app (lambda (ids)
+                                                 `((cons . ,ids)))
+                                               result-forms))
+                                     (app (lambda (ids)
+                                            `((list . ,ids)))
+                                          result-forms))))))))
+     `(,bindings . ,result-forms))))
 
 (defun for--parse-body (for-clauses body)
   "Parse FOR-CLAUSES and BODY as the subforms of `for-fold'.
@@ -431,7 +424,15 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
                      renamed-ids)
                 (app length length-bindings))
           . ,result-forms)
-        (for--parse-bindings bindings))
+        (for--parse-bindings
+         bindings (lambda (binding)
+                    (pcase-exhaustive binding
+                      ((or (and `(,_ ,_) binding)
+                           (and `(,id) (let binding `(,id nil)))
+                           (and (cl-type symbol)
+                                (app (lambda (id) `(,id nil))
+                                     binding)))
+                       binding)))))
        (`(,(app (lambda (clauses)
                   (named-let parse
                       ((final-ids '()) (body '()) (parsed '())
@@ -576,11 +577,9 @@ BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
                 (app length length-bindings))
           . ,result-forms)
         (for--parse-bindings
-         (mapcar (lambda (form)
-                   (pcase-exhaustive form
-                     ((cl-type symbol) `(,form '()))
-                     (`(:result . ,_) form)))
-                 bindings)))
+         bindings (lambda (id)
+                    (pcase-exhaustive id
+                      ((cl-type symbol) `(,id '()))))))
        (`(,for-clauses . ,value-form)
         (for--parse-body for-clauses body)))
     `(for-fold
