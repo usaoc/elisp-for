@@ -75,7 +75,8 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                            def-body))
            (doc-string 3) (indent 2))
   (pcase-let
-      (((or `(,(and (cl-type string)
+      ((name-string (symbol-name name))
+       ((or `(,(and (cl-type string)
                     (app (lambda (form) `(,form)) docstring))
               . ,subforms)
             (let docstring '()))
@@ -101,7 +102,7 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                                        . ,cases))))
                                body))))
            . ,subforms)
-         (let ((id (intern (concat (symbol-name name)
+         (let ((id (intern (concat name-string
                                    "--for-sequence-expander"))))
            (parse declaration aliases types
                   `((eval-and-compile (defun ,id . ,body))
@@ -125,9 +126,12 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                               ',alias 'for--alias ',name))
                           aliases)
                 ,@(mapcar (lambda (type)
-                            (for--with-gensyms (datum)
+                            (let ((datum (make-symbol "datum")))
                               `(cl-defmethod for-generator
-                                 ((,datum ,type)) (,name ,datum))))
+                                 ((,datum ,type))
+                                 ,(concat "Call `" name-string
+                                          "' with DATUM.")
+                                 (,name ,datum))))
                           types)
                 (defun ,name ,arglist
                   ,@docstring ,@declaration . ,body))))))))
@@ -138,11 +142,17 @@ BODY are the body of generator.  See Info node `(for)Definers'.
   "Return an iterator of DATUM.
 
 As a special case, return DATUM as is when it is a function.  See
-Info node `(for)Sequence Constructors'."
-  (:method :around (datum)
-           (pcase datum
-             ((cl-type function) datum)
-             (_ (cl-call-next-method))))
+Info node `(for)Sequence Constructors'.")
+
+(cl-defmethod for-generator :around (datum)
+  "Return DATUM as is when it is a function.
+
+Otherwise, invoke `cl-call-next-method'."
+  (pcase datum
+    ((cl-type function) datum) (_ (cl-call-next-method))))
+
+(cl-defmethod for-generator (datum)
+  "Signal `for-unhandled-type' with DATUM."
   (signal 'for-unhandled-type (list datum)))
 
 (for--defseq for-in-array (array)
