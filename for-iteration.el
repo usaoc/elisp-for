@@ -298,8 +298,11 @@ from the expanded form.
 
 (def-edebug-elem-spec 'for-special-clause
   '(&or ([&or ":break" ":final" ":if" ":if-not" ":do"] &rest form)
-        (":let" &rest (pcase-PAT &optional form))
-        (":if-let" &rest &or symbolp ([&optional symbolp] form))
+        ([&or ":let" ":let*"] &rest (pcase-PAT &optional form))
+        (":if-let" &or
+         [symbolp form]
+         [&rest &or symbolp ([&optional symbolp] form)])
+        (":if-let*" &rest &or symbolp ([&optional symbolp] form))
         (":pcase" form [&optional ":exhaustive"] &rest pcase-PAT)
         (":pcase-not" form [&optional ":as" symbolp] &rest pcase-PAT)
         (keywordp &rest sexp)))
@@ -373,7 +376,15 @@ node `(for)Definers'.
   "Evaluate BODY with subforms bound by `pcase-let'."
   (`(,_ . ,bindings) `((pcase-let ,bindings . ,body))))
 
+(for--defspecial :let* (body)
+  "Evaluate BODY with subforms bound by `pcase-let*'."
+  (`(,_ . ,bindings) `((pcase-let* ,bindings . ,body))))
+
 (for--defspecial :if-let (body)
+  "Evaluate BODY with subforms bound by `when-let'."
+  (`(,_ . ,bindings) `((when-let ,bindings . ,body))))
+
+(for--defspecial :if-let* (body)
   "Evaluate BODY with subforms bound by `when-let*'."
   (`(,_ . ,bindings) `((when-let* ,bindings . ,body))))
 

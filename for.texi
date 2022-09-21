@@ -1266,7 +1266,29 @@ This special-clause operator produces the following body:
 @end example
 @end deffn
 
+@deffn @aux{:let*, @optional{@repeated{binding}}}
+This special-clause operator produces the following body:
+
+@example
+@group
+((pcase-let* (@optional{@repeated{@var{binding}}})
+   @optional{@repeated{@var{body}}}))
+@end group
+@end example
+@end deffn
+
 @deffn @aux{:if-let, @optional{@repeated{binding}}}
+This special-clause operator produces the following body:
+
+@example
+@group
+((when-let (@optional{@repeated{@var{binding}}})
+   @optional{@repeated{@var{body}}}))
+@end group
+@end example
+@end deffn
+
+@deffn @aux{:if-let*, @optional{@repeated{binding}}}
 This special-clause operator produces the following body:
 
 @example
