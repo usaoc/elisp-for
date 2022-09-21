@@ -422,8 +422,7 @@
                                  (and-let* (((cl-evenp j)) (l (1+ j))
                                             ((list j k l))))))
                        (delq nil)))))
-    (let ((list (apply #'for--make-circular list))
-          (length (- (length list) (+ 2 (random 2)))))
+    (let ((length (- (length list) (+ 2 (random 2)))))
       (should (string= (with-output-to-string
                          (for-do ((i (in-list list)) (j (in-naturals))
                                   (:break (= j length))
