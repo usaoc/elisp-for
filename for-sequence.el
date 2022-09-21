@@ -121,18 +121,20 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                     (`(,_ . ,_) subforms))))
              `(progn
                 ,@expander
-                ,@(mapcar (lambda (alias)
-                            `(define-symbol-prop
-                              ',alias 'for--alias ',name))
-                          aliases)
-                ,@(mapcar (lambda (type)
-                            (let ((datum (make-symbol "datum")))
-                              `(cl-defmethod for-generator
-                                 ((,datum ,type))
-                                 ,(concat "Call `" name-string
-                                          "' with DATUM.")
-                                 (,name ,datum))))
-                          types)
+                ,@(if (null aliases) '()
+                    (mapcar (lambda (alias)
+                              `(define-symbol-prop
+                                ',alias 'for--alias ',name))
+                            aliases))
+                ,@(if (null types) '()
+                    (mapcar (lambda (type)
+                              (let ((datum (make-symbol "datum")))
+                                `(cl-defmethod for-generator
+                                   ((,datum ,type))
+                                   ,(concat "Call `" name-string
+                                            "' with DATUM.")
+                                   (,name ,datum))))
+                            types))
                 (defun ,name ,arglist
                   ,@docstring ,@declaration . ,body))))))))
 
