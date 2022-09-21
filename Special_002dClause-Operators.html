@@ -117,7 +117,27 @@ true before the iteration.
 </dd></dl>
 
 <dl class="def">
+<dt id="index-_003alet_002a"><span class="category">Auxiliary Operator: </span><span><strong>:let*</strong> <em>[binding&hellip;]</em><a href='#index-_003alet_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dd><p>This special-clause operator produces the following body:
+</p>
+<div class="example">
+<pre class="example">((pcase-let* ([<var>binding</var>&hellip;])
+   [<var>body</var>&hellip;]))
+</pre></div>
+</dd></dl>
+
+<dl class="def">
 <dt id="index-_003aif_002dlet"><span class="category">Auxiliary Operator: </span><span><strong>:if-let</strong> <em>[binding&hellip;]</em><a href='#index-_003aif_002dlet' class='copiable-anchor'> &para;</a></span></dt>
+<dd><p>This special-clause operator produces the following body:
+</p>
+<div class="example">
+<pre class="example">((when-let ([<var>binding</var>&hellip;])
+   [<var>body</var>&hellip;]))
+</pre></div>
+</dd></dl>
+
+<dl class="def">
+<dt id="index-_003aif_002dlet_002a"><span class="category">Auxiliary Operator: </span><span><strong>:if-let*</strong> <em>[binding&hellip;]</em><a href='#index-_003aif_002dlet_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
