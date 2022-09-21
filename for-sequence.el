@@ -128,12 +128,11 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                             aliases))
                 ,@(if (null types) '()
                     (mapcar (lambda (type)
-                              (let ((datum (make-symbol "datum")))
-                                `(cl-defmethod for-generator
-                                   ((,datum ,type))
-                                   ,(concat "Call `" name-string
-                                            "' with DATUM.")
-                                   (,name ,datum))))
+                              `(cl-defmethod for-generator
+                                 ((#1=#:datum ,type))
+                                 ,(concat "Call `" name-string
+                                          "' with DATUM.")
+                                 (,name #1#)))
                             types))
                 (defun ,name ,arglist
                   ,@docstring ,@declaration . ,body))))))))
