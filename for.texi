@@ -1131,9 +1131,9 @@ iteration never begins.  It is equivalent to the following form where
 @example
 @group
 (for-fold ((@var{value} nil))
-    (@optional{@repeated{@var{for-clause*}}}
-     (:final)
-     @var{value*}))
+    ((:final)
+     @optional{@repeated{@var{for-clause}}})
+  @optional{@repeated{@var{body}}})
 @end group
 @end example
 @end defmac

@@ -750,7 +750,7 @@ BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
                (for--parse-body for-clauses body)))
     (for--with-gensyms (value)
       `(for-fold ((,value nil))
-           (,@for-clauses (:final) ,value-form)))))
+           ((:final) ,@for-clauses ,value-form)))))
 
 (for--defmacro for-last (for-clauses &rest body)
   "The last-value-returning iteration macro."
