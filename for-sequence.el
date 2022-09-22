@@ -288,11 +288,11 @@ half-open when STEP is negative."
   (:expander-case
    (`(,id (,_ ,iterator-form))
     (for--with-gensyms (iterator value)
-      (let* ((returned '#:returned)
+      (let* ((returned ''#:returned)
              (next `(condition-case nil (iter-next ,iterator)
-                      (iter-end-of-sequence ',returned))))
+                      (iter-end-of-sequence ,returned))))
         `(,id (:do-in ((,iterator ,iterator-form)) () ((,value ,next))
-                      ((not (eq ,value ',returned))) ((,id ,value))
+                      ((not (eq ,value ,returned))) ((,id ,value))
                       (,next)))))))
   (cl-the function iterator))
 
