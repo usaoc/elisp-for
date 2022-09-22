@@ -374,9 +374,9 @@ iteration never begins.  It is equivalent to the following form where
 </p>
 <div class="example">
 <pre class="example">(for-fold ((<var>value</var> nil))
-    ([<var>for-clause*</var>&hellip;]
-     (:final)
-     <var>value*</var>))
+    ((:final)
+     [<var>for-clause</var>&hellip;])
+  [<var>body</var>&hellip;])
 </pre></div>
 </dd></dl>
 
