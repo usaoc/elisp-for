@@ -372,21 +372,11 @@ node `(for)Definers'.
   "Evaluate BODY unless all subforms are non-nil."
   (`(,_ . ,guards) `((unless (and . ,guards) . ,body))) )
 
-(for--defspecial :let (body)
-  "Evaluate BODY with subforms bound by `pcase-let'."
-  (`(,_ . ,bindings) `((pcase-let ,bindings . ,body))))
+(for--defspecial-let :let pcase-let
+  "Evaluate BODY with subforms bound by `%S'.")
 
-(for--defspecial :let* (body)
-  "Evaluate BODY with subforms bound by `pcase-let*'."
-  (`(,_ . ,bindings) `((pcase-let* ,bindings . ,body))))
-
-(for--defspecial :if-let (body)
-  "Evaluate BODY with subforms bound by `when-let'."
-  (`(,_ . ,bindings) `((when-let ,bindings . ,body))))
-
-(for--defspecial :if-let* (body)
-  "Evaluate BODY with subforms bound by `when-let*'."
-  (`(,_ . ,bindings) `((when-let* ,bindings . ,body))))
+(for--defspecial-let :if-let when-let
+  "Evaluate BODY with subforms bound by `%S'.")
 
 (for--defspecial :pcase (body)
   "Evaluate BODY when the first subform is matched.

@@ -46,6 +46,23 @@ ARGLIST, DOCSTRING, and CASES-OR-BODY are as in
               "See Info node `(for)Special-Clause Operators'.")
      . ,cases-or-body))
 
+(defmacro for--defspecial-let (name head docstring)
+  "Define the special clause operator NAME.
+
+HEAD is a `let'-like macro.  DOCSTRING is the documentation string."
+  (declare (debug (&define [&name keywordp] symbolp))
+           (doc-string 3) (indent 2))
+  (cl-flet ((make-def (name head)
+              `(for--defspecial ,name (#1=#:body)
+                 ,(format docstring head)
+                 (`(,_ . ,#2=#:bindings)
+                  ,(let ((body `((,head . ,'(,#2# . ,#1#)))))
+                     (list '\` body)))))
+            (make-star (name)
+              (intern (concat (symbol-name name) "*"))))
+    `(prog1 ,(make-def name head)
+       ,(make-def (make-star name) (make-star head)))))
+
 (defmacro for--defmacro (name arglist docstring decl &rest body)
   "Define the iteration macro NAME with the starred version.
 
@@ -149,12 +166,9 @@ A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
 
 \(fn (NAME...) BODY...)"
   (declare (debug ((&rest symbolp) body)) (indent 1))
-  (pcase-exhaustive names
-    ((and `(,_ . ,_) (let `(,_ . ,_) body)
-          (app (mapcar (lambda (name)
-                         `(,name (gensym ,(symbol-name name)))))
-               bindings))
-     `(let ,bindings . ,body))))
+  `(let ,(mapcar (lambda (name) `(,name (gensym ,(symbol-name name))))
+                 names)
+     . ,body))
 
 ;;;; Provide
 (provide 'for-helper)
