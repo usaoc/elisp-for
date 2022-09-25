@@ -572,32 +572,27 @@ BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
                         [&rest for-body-form]
                         for-multiple-value-form]))
            (indent 2))
-  (pcase-let
-      ((`(,(and bindings
-                (app (mapcar (pcase-lambda (`(,id ,_)) id)) ids)
-                (app length length-bindings))
-          . ,result-forms)
-        (for--parse-bindings
-         bindings (lambda (id)
-                    (pcase-exhaustive id
-                      ((cl-type symbol) `(,id '()))))))
-       (`(,for-clauses . ,value-form)
-        (for--parse-body for-clauses body)))
-    `(for-fold
-         (,@bindings
-          (:result . ,(if (null ids) result-forms
-                        `((let ,(mapcar (lambda (id)
-                                          `(,id (nreverse ,id)))
-                                        ids)
-                            . ,result-forms)))))
-         (,@for-clauses
-          ,(for--parse-value-form
-            value-form length-bindings
-            (if (zerop length-bindings) #'identity
-              (pcase-lambda (`(:values . ,forms))
-                `(:values . ,(cl-mapcar (lambda (form id)
-                                          `(cons ,form ,id))
-                                        forms ids)))))))))
+  (pcase-let ((`(,bindings . ,result-forms)
+               (for--parse-bindings
+                bindings (lambda (id) `(,(cl-the symbol id) '()))))
+              (`(,for-clauses . ,value-form)
+               (for--parse-body for-clauses body)))
+    (cl-flet ((make-fold (bindings value-form)
+                `(for-fold ,bindings (,@for-clauses ,value-form))))
+      (if (null bindings)
+          (make-fold `((:result . ,result-forms)) value-form)
+        (let ((ids (mapcar (pcase-lambda (`(,id ,_)) id) bindings)))
+          (make-fold `(,@bindings
+                       (:result (let ,(mapcar (lambda (id)
+                                                `(,id (nreverse ,id)))
+                                              ids)
+                                  . ,result-forms)))
+                     (for--parse-value-form
+                      value-form (length bindings)
+                      (pcase-lambda (`(:values . ,forms))
+                        `(:values . ,(cl-mapcar (lambda (form id)
+                                                  `(cons ,form ,id))
+                                                forms ids))))))))))
 
 (for--defmacro for-vector (for-clauses &rest body)
   "The vector-building iteration macro.
