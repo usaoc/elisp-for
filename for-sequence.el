@@ -287,8 +287,8 @@ half-open when STEP is negative."
   (declare (pure t) (side-effect-free t))
   (:expander-case
    (`(,id (,_ ,iterator-form))
-    (for--with-gensyms (iterator value)
-      (let* ((returned ''#:returned)
+    (for--with-gensyms (returned iterator value)
+      (let* ((returned `',returned)
              (next `(condition-case nil (iter-next ,iterator)
                       (iter-end-of-sequence ,returned))))
         `(,id (:do-in ((,iterator ,iterator-form)) () ((,value ,next))
