@@ -254,6 +254,16 @@ INNER-BINDINGS LOOP-FORMS]) and HEAD is either (`:break'
                   `(,@more-loop-forms . ,loop-forms)
                   t groups clauses)))))))
 
+(defun for--normalize-binding (binding)
+  "Normalize each BINDING to be (ID VALUE)."
+  (declare (side-effect-free t))
+  (pcase-exhaustive binding
+    ((or (and `(,_ ,_) binding)
+         (and `(,id) (let binding `(,id nil)))
+         (and (cl-type symbol)
+              (app (lambda (id) `(,id nil)) binding)))
+     binding)))
+
 (defmacro for--setq (&rest pairs)
   "Expand to a form equivalent to (`cl-psetq' [ID VALUE]...).
 
@@ -278,6 +288,35 @@ from the expanded form.
                     (if (identifier= id value) form
                       `(setq ,id (prog1 ,value ,form)))))))
              pairs :from-end t :initial-value nil))
+
+(defmacro for--named-let (name bindings &rest body)
+  "Named `let'-ish construct.
+
+NAME is bound to a local macro that updates BINDINGS in BODY.
+
+\(fn NAME (BINDING...) BODY...)"
+  (declare (debug (symbolp
+                   (&rest &or (symbolp &optional form) symbolp)
+                   body))
+           (indent 2))
+  (pcase-let
+      (((and (app (mapcar (pcase-lambda (`(,id ,_)) id))
+                  (and ids (app (mapcar (lambda (id)
+                                          (gensym (symbol-name id))))
+                                renamed-ids)))
+             (app (mapcar (pcase-lambda (`(,_ ,value)) value))
+                  values))
+        bindings))
+    (cl-flet ((make-binding (id value) `(,id ,value)))
+      `(let ,(cl-mapcar #'make-binding renamed-ids values)
+         (cl-symbol-macrolet
+             ,(cl-mapcar #'make-binding ids renamed-ids)
+           (cl-macrolet
+               ((,name (&rest values)
+                  `(for--setq . ,(cl-mapcar (lambda (id value)
+                                              `(,id ,value))
+                                            ',renamed-ids values))))
+             . ,body))))))
 
 ;;;; Interface
 (def-edebug-elem-spec 'for-result-clause '((":result" body)))
@@ -419,21 +458,8 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
                         for-multiple-value-form]))
            (indent 2))
   (pcase-let
-      ((`(,(and bindings
-                (app (mapcar (pcase-lambda (`(,id ,_))
-                               (gensym (symbol-name id))))
-                     renamed-ids)
-                (app length length-bindings))
-          . ,result-forms)
-        (for--parse-bindings
-         bindings (lambda (binding)
-                    (pcase-exhaustive binding
-                      ((or (and `(,_ ,_) binding)
-                           (and `(,id) (let binding `(,id nil)))
-                           (and (cl-type symbol)
-                                (app (lambda (id) `(,id nil))
-                                     binding)))
-                       binding)))))
+      ((`(,bindings . ,result-forms)
+        (for--parse-bindings bindings #'for--normalize-binding))
        (`(,(app (lambda (clauses)
                   (named-let parse
                       ((final-ids '()) (body '()) (parsed '())
@@ -459,80 +485,84 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
                   ,(app for--parse-for-clauses for-clauses)))
           . ,value-form)
         (for--parse-body for-clauses body)))
-    (named-let expand
-        ((break-ids '())
-         (body `(,(for--parse-value-form
-                   value-form length-bindings
-                   (if (zerop length-bindings) (lambda (_form) nil)
-                     (pcase-lambda (`(:values . ,forms))
-                       `(for--setq
-                         . ,(cl-mapcar (lambda (id form) `(,id ,form))
-                                       renamed-ids forms)))))
-                 . ,body))
-         (clauses (reverse for-clauses)))
-      (cl-flet
-          ((make-iteration (body memoize-bindings outer-bindings
-                                 loop-bindings loop-guards
-                                 inner-bindings loop-forms)
-             (let* ((body (if (null loop-forms) body
-                            `(,@body
-                              (when (and ,@break-ids ,@final-ids)
-                                (for--setq
-                                 . ,(cl-mapcar
-                                     (lambda (binding form)
-                                       (pcase-exhaustive binding
-                                         ((or `(,id) `(,id ,_) id)
-                                          `(,id ,form))))
-                                     loop-bindings loop-forms))))))
-                    (body (if (null inner-bindings) body
-                            `((pcase-let ,inner-bindings . ,body))))
-                    (body `((while (and ,@break-ids
-                                        ,@final-ids . ,loop-guards)
-                              . ,body)))
-                    (body (if (null loop-bindings) body
-                            `((let ,loop-bindings . ,body))))
-                    (body (if (null outer-bindings) body
-                            `((let ,outer-bindings . ,body))))
-                    (body (if (null memoize-bindings) body
-                            `((let ,memoize-bindings . ,body)))))
-               body)))
-        (if (null clauses)
-            (let* ((body (pcase (nconc break-ids final-ids)
-                           ('() body)
-                           (ids `((let ,(mapcar (lambda (id) `(,id t))
-                                                ids)
-                                    . ,body)))))
-                   (body (if (null result-forms) body
-                           `(,@body . ,result-forms)))
-                   (body (if (null bindings) body
-                           `((let ,(cl-mapcar
-                                    (pcase-lambda (id `(,_ ,value))
-                                      `(,id ,value))
-                                    renamed-ids bindings)
-                               (cl-symbol-macrolet
-                                   ,(cl-mapcar
-                                     (pcase-lambda (`(,id ,_) value)
-                                       `(,id ,value))
-                                     bindings renamed-ids)
-                                 . ,body))))))
-              (macroexp-progn body))
-          (pcase-let ((`((,head . ,iteration-forms) . ,clauses)
-                       clauses))
-            (cl-symbol-macrolet
-                ((expanded (if (null iteration-forms) body
-                             (apply #'make-iteration
-                                    body iteration-forms))))
-              (pcase-exhaustive head
-                (`(:break . ,guards)
-                 (for--with-gensyms (break)
-                   (expand `(,break . ,break-ids)
-                           `((if (and . ,guards) (setq ,break nil)
-                               . ,expanded))
-                           clauses)))
-                (`(,expander . ,special-clause)
-                 (expand break-ids
-                         (funcall expander special-clause expanded)
-                         clauses))))))))))
+    (cl-flet
+        ((make-body (update)
+           (named-let expand
+               ((break-ids '()) (body `(,update . ,body))
+                (clauses (reverse for-clauses)))
+             (cl-flet
+                 ((make-iteration (body
+                                   memoize-bindings outer-bindings
+                                   loop-bindings loop-guards
+                                   inner-bindings loop-forms)
+                    (cl-flet ((make-body (body)
+                                `((while (and ,@break-ids
+                                              ,@final-ids
+                                              . ,loop-guards)
+                                    . ,(if (null inner-bindings) body
+                                         `((pcase-let ,inner-bindings
+                                             . ,body)))))))
+                      (let* ((body
+                              (pcase-exhaustive loop-bindings
+                                ('() (make-body body))
+                                (`(,_ . ,_)
+                                 (for--with-gensyms (update)
+                                   `((for--named-let ,update
+                                         ,(mapcar
+                                           #'for--normalize-binding
+                                           loop-bindings)
+                                       . ,(make-body
+                                           `(,@body
+                                             (when (and ,@break-ids
+                                                        ,@final-ids)
+                                               (,update
+                                                ,@loop-forms))))))))))
+                             (body
+                              (if (null outer-bindings) body
+                                `((let ,outer-bindings . ,body))))
+                             (body
+                              (if (null memoize-bindings) body
+                                `((let ,memoize-bindings . ,body)))))
+                        body))))
+               (if (null clauses)
+                   (let* ((body (pcase (nconc break-ids final-ids)
+                                  ('() body)
+                                  (ids `((let ,(mapcar (lambda (id)
+                                                         `(,id t))
+                                                       ids)
+                                           . ,body)))))
+                          (body (if (null result-forms) body
+                                  `(,@body . ,result-forms))))
+                     body)
+                 (pcase-let ((`((,head . ,iteration-forms) . ,clauses)
+                              clauses))
+                   (cl-symbol-macrolet
+                       ((expanded (if (null iteration-forms) body
+                                    (apply #'make-iteration
+                                           body iteration-forms))))
+                     (pcase-exhaustive head
+                       (`(:break . ,guards)
+                        (for--with-gensyms (break)
+                          (expand `(,break . ,break-ids)
+                                  `((if (and . ,guards)
+                                        (setq ,break nil)
+                                      . ,expanded))
+                                  clauses)))
+                       (`(,expander . ,special-clause)
+                        (expand break-ids
+                                (funcall expander
+                                         special-clause expanded)
+                                clauses))))))))))
+      (macroexp-progn
+       (if (null bindings)
+           (make-body (for--parse-value-form
+                       value-form 0 (lambda (_form) nil)))
+         (for--with-gensyms (update)
+           `((for--named-let ,update ,bindings
+               . ,(make-body (for--parse-value-form
+                              value-form (length bindings)
+                              (pcase-lambda (`(:values . ,forms))
+                                `(,update . ,forms))))))))))))
 
 (for--defmacro for-do (for-clauses &rest body)
   "The side-effecting iteration macro."
