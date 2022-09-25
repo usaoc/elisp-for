@@ -698,8 +698,8 @@ with a potential @code{&optional} keyword removed:
 
 @example
 @group
-(iter-make (for-do ((@var{value} (@var{name} . @var{args}))
-                    (:do (iter-yield @var{value})))))
+(for-iter ((@var{value} (@var{name} . @var{args}))
+           @var{value}))
 @end group
 @end example
 
@@ -875,6 +875,42 @@ This is achieved by separating each pair of adjacent iteration clauses
 with a vacuous special clause such as @code{(:do)}.
 @end defmac
 
+Below, @var{for-clause*}s are @var{for-clause}s including the
+transformed @var{body}s but excluding the multiple-value form, and
+@var{value*} is the multiple-value form where each tail form
+@code{(:values @var{expression})} is replaced by @var{expression},
+implying that it is an error for the multiple-value form to produce not
+exactly one value.
+
+@defmac for-foldr (@optional{@repeated{binding}} @optional{(@code{:result} @repeated{expression})}) (@optional{@repeated{for-clause}})
+This iteration macro is the reverse of @code{for-fold}.  The sequences
+are still iterated in the same order, but the bindings are updated in
+reverse order.  As such, it uses space proportional to the number of
+iterations.  It is equivalent to the following form where @var{next} is
+a generated identifier, @var{update}s update @var{binding}s to the
+produced values, and @var{expression} is potentially the default
+expression:
+
+@example
+@group
+(let (@optional{@repeated{@var{binding}}})
+  (funcall (for-fold ((@var{next} (lambda ()
+                              nil)))
+               (@optional{@repeated{@var{for-clause*}}}
+                (:let (@var{next} @var{next}))
+                (lambda ()
+                  @optional{@repeated{@var{update}}}
+                  (funcall @var{next})))))
+  @repeated{@var{expression}})
+@end group
+@end example
+@end defmac
+
+@defmac for-foldr* (@optional{@repeated{binding}} @optional{(@code{:result} @repeated{expression})}) (@optional{@repeated{for-clause}})
+This iteration macro is the implicitly nesting version of
+@code{for-foldr}.
+@end defmac
+
 @defmac for-do (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro performs side effects and produces @code{nil} as
 the value.  It is equivalent to the following form:
@@ -892,13 +928,6 @@ the value.  It is equivalent to the following form:
 @defmac for-do* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of @code{for-do}.
 @end defmac
-
-Below, @var{for-clause*}s are @var{for-clause}s including the
-transformed @var{body}s but excluding the multiple-value form, and
-@var{value*} is the multiple-value form where each tail form
-@code{(:values @var{expression})} is replaced by @var{expression},
-implying that it is an error for the multiple-value form to produce not
-exactly one value.
 
 @defmac for-list (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 @cindex terminology @subentry fresh
@@ -922,6 +951,23 @@ generated identifier:
 @defmac for-list* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-list}.
+@end defmac
+
+@defmac for-iter (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
+This iteration macro returns an iterator of the produced values.  It is
+equivalent to the following form:
+
+@example
+@group
+(iter-make (for-do (@optional{@repeated{@var{for-clause*}}}
+                    (:do (iter-yield @var{value*})))))
+@end group
+@end example
+@end defmac
+
+@defmac for-iter* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
+This iteration macro is the implicitly nesting version of
+@code{for-iter}.
 @end defmac
 
 @defmac for-lists (@optional{@repeated{identifier}} @optional{(@code{:result} @repeated{expression})}) (@optional{@repeated{for-clause}}) @optional{@repeated{body}}

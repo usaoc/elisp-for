@@ -115,9 +115,8 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                                         (app (remq '&optional) args))
                                 arglist))
                      (for--with-gensyms (value)
-                       `((iter-make
-                          (for-do ((,value (,name . ,args))
-                                   (:do (iter-yield ,value))))))))
+                       `((for-iter ((,value (,name . ,args))
+                                    ,value)))))
                     (`(,_ . ,_) subforms))))
              `(progn
                 ,@expander

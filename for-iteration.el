@@ -31,6 +31,7 @@
   (require 'for-helper)
   (require 'subr-x))
 (require 'cl-lib)
+(require 'generator)
 
 ;;;; Internal
 (defun for--datum-to-sequence (datum)
@@ -564,6 +565,31 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
                               (pcase-lambda (`(:values . ,forms))
                                 `(,update . ,forms))))))))))))
 
+(for--defmacro for-foldr (bindings for-clauses &rest body)
+  "The reverse-folding iteration macro.
+
+BINDINGS = ([BINDING...] [(:result EXPRESSION...)])
+
+BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
+  (declare (debug for-fold) (indent 2))
+  (pcase-let
+      ((`(,bindings . ,result-forms)
+        (for--parse-bindings bindings #'for--normalize-binding))
+       (`(,for-clauses . ,value-form)
+        (for--parse-body for-clauses body)))
+    (for--with-gensyms (update next)
+      `(for--named-let ,update ,bindings
+         (funcall (for-fold ((,next (lambda () nil)))
+                      (,@for-clauses
+                       (:let (,next ,next))
+                       (lambda ()
+                         ,(for--parse-value-form
+                           value-form (length bindings)
+                           (pcase-lambda (`(:values . ,forms))
+                             `(,update . ,forms)))
+                         (funcall ,next)))))
+         . ,result-forms))))
+
 (for--defmacro for-do (for-clauses &rest body)
   "The side-effecting iteration macro."
   (declare (debug ((&rest for-for-clause) &rest for-body-form))
@@ -589,6 +615,18 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
                     value-form 1
                     (pcase-lambda (`(:values ,form)) form))
                   ,list))))))
+
+(for--defmacro for-iter (for-clauses &rest body)
+  "The iterator-returning macro."
+  (declare (debug for-list) (indent 1))
+  (pcase-let ((`(,for-clauses . ,value-form)
+               (for--parse-body for-clauses body)))
+    `(iter-make
+      (for-do (,@for-clauses
+               (:do (iter-yield
+                     ,(for--parse-value-form
+                       value-form 1
+                       (pcase-lambda (`(:values ,form)) form)))))))))
 
 (for--defmacro for-lists (bindings for-clauses &rest body)
   "The multiple-list-building iteration macro.
