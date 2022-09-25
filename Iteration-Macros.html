@@ -127,6 +127,42 @@ This is achieved by separating each pair of adjacent iteration clauses
 with a vacuous special clause such as <code>(:do)</code>.
 </p></dd></dl>
 
+<p>Below, <var>for-clause*</var>s are <var>for-clause</var>s including the
+transformed <var>body</var>s but excluding the multiple-value form, and
+<var>value*</var> is the multiple-value form where each tail form
+<code>(:values <var>expression</var>)</code> is replaced by <var>expression</var>,
+implying that it is an error for the multiple-value form to produce not
+exactly one value.
+</p>
+<dl class="def">
+<dt id="index-for_002dfoldr"><span class="category">Macro: </span><span><strong>for-foldr</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;])</em><a href='#index-for_002dfoldr' class='copiable-anchor'> &para;</a></span></dt>
+<dd><p>This iteration macro is the reverse of <code>for-fold</code>.  The sequences
+are still iterated in the same order, but the bindings are updated in
+reverse order.  As such, it uses space proportional to the number of
+iterations.  It is equivalent to the following form where <var>next</var> is
+a generated identifier, <var>update</var>s update <var>binding</var>s to the
+produced values, and <var>expression</var> is potentially the default
+expression:
+</p>
+<div class="example">
+<pre class="example">(let ([<var>binding</var>&hellip;])
+  (funcall (for-fold ((<var>next</var> (lambda ()
+                              nil)))
+               ([<var>for-clause*</var>&hellip;]
+                (:let (<var>next</var> <var>next</var>))
+                (lambda ()
+                  [<var>update</var>&hellip;]
+                  (funcall <var>next</var>)))))
+  <var>expression</var>&hellip;)
+</pre></div>
+</dd></dl>
+
+<dl class="def">
+<dt id="index-for_002dfoldr_002a"><span class="category">Macro: </span><span><strong>for-foldr*</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;])</em><a href='#index-for_002dfoldr_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dd><p>This iteration macro is the implicitly nesting version of
+<code>for-foldr</code>.
+</p></dd></dl>
+
 <dl class="def">
 <dt id="index-for_002ddo"><span class="category">Macro: </span><span><strong>for-do</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002ddo' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro performs side effects and produces <code>nil</code> as
@@ -145,13 +181,6 @@ the value.  It is equivalent to the following form:
 <dd><p>This iteration macro is the implicitly nesting version of <code>for-do</code>.
 </p></dd></dl>
 
-<p>Below, <var>for-clause*</var>s are <var>for-clause</var>s including the
-transformed <var>body</var>s but excluding the multiple-value form, and
-<var>value*</var> is the multiple-value form where each tail form
-<code>(:values <var>expression</var>)</code> is replaced by <var>expression</var>,
-implying that it is an error for the multiple-value form to produce not
-exactly one value.
-</p>
 <dl class="def">
 <dt id="index-for_002dlist"><span class="category">Macro: </span><span><strong>for-list</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlist' class='copiable-anchor'> &para;</a></span></dt>
 <dd><span id="index-terminology-11"></span>
@@ -172,6 +201,23 @@ generated identifier:
 <dt id="index-for_002dlist_002a"><span class="category">Macro: </span><span><strong>for-list*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlist_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-list</code>.
+</p></dd></dl>
+
+<dl class="def">
+<dt id="index-for_002diter"><span class="category">Macro: </span><span><strong>for-iter</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002diter' class='copiable-anchor'> &para;</a></span></dt>
+<dd><p>This iteration macro returns an iterator of the produced values.  It is
+equivalent to the following form:
+</p>
+<div class="example">
+<pre class="example">(iter-make (for-do ([<var>for-clause*</var>&hellip;]
+                    (:do (iter-yield <var>value*</var>)))))
+</pre></div>
+</dd></dl>
+
+<dl class="def">
+<dt id="index-for_002diter_002a"><span class="category">Macro: </span><span><strong>for-iter*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002diter_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dd><p>This iteration macro is the implicitly nesting version of
+<code>for-iter</code>.
 </p></dd></dl>
 
 <dl class="def">

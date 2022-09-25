@@ -65,8 +65,8 @@ argument (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/ma
 with a potential <code>&amp;optional</code> keyword removed:
 </p>
 <div class="example">
-<pre class="example">(iter-make (for-do ((<var>value</var> (<var>name</var> . <var>args</var>))
-                    (:do (iter-yield <var>value</var>)))))
+<pre class="example">(for-iter ((<var>value</var> (<var>name</var> . <var>args</var>))
+           <var>value</var>))
 </pre></div>
 
 <p>Additional properties can be associated with the sequence constructor
