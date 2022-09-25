@@ -72,19 +72,26 @@ forms.
 \(fn NAME ARGLIST DOCSTRING DECL BODY...)"
   (declare (debug defmacro) (doc-string 3) (indent 2))
   (let ((docstring
-         (let ((extra "BODY = [[BODY-FORM...] MULTIPLE-VALUE-FORM]
+         (let ((extra (concat (pcase name
+                                ('for-do "BODY = [BODY-FORM...]
 
 BODY-FORM = SPECIAL-CLAUSE | EXPRESSION
 
-FOR-CLAUSES = ([[FOR-CLAUSE...] MULTIPLE-VALUE-FORM])
+FOR-CLAUSES = ([FOR-CLAUSE...])")
+                                (_ "\
+BODY = [[BODY-FORM...] MULTIPLE-VALUE-FORM]
 
+BODY-FORM = SPECIAL-CLAUSE | EXPRESSION
+
+FOR-CLAUSES = ([[FOR-CLAUSE...] MULTIPLE-VALUE-FORM])"))
+                              "\n\n" "\
 FOR-CLAUSE = SPECIAL-CLAUSE | ITERATION-CLAUSE
 
 SPECIAL-CLAUSE = (KEYWORD [SUBFORM...])
 
 ITERATION-CLAUSE = ([IDENTIFIER] SEQUENCE-FORM)
 
-See Info node `(for)Iteration Macros'."))
+See Info node `(for)Iteration Macros'.")))
            (save-match-data
              (if (string-match (rx bol "..." eol) docstring)
                  (replace-match extra 'fixedcase 'literal docstring)
