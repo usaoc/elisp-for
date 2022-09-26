@@ -144,6 +144,12 @@ by (`funcall' MAKE-VALUE FORM)."
                 (app (lambda (form) `(:values ,form)) tail-form)))
        (funcall make-value tail-form)))))
 
+(defun for--parse-single-value (value-form)
+  "Parse VALUE-FORM as a single-value multiple-value form."
+  (declare (side-effect-free t))
+  (for--parse-value-form
+   value-form 1 (pcase-lambda (`(:values ,form)) form)))
+
 (defun for--parse-bindings (bindings make-binding)
   "Parse BINDINGS as the subform of `for-fold'.
 
@@ -612,10 +618,7 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
     (for--with-gensyms (list)
       `(for-fold ((,list '()) (:result (nreverse ,list)))
            (,@for-clauses
-            (cons ,(for--parse-value-form
-                    value-form 1
-                    (pcase-lambda (`(:values ,form)) form))
-                  ,list))))))
+            (cons ,(for--parse-single-value value-form) ,list))))))
 
 (for--defmacro for-iter (for-clauses &rest body)
   "The iterator-returning macro."
@@ -626,9 +629,7 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
     `(iter-make
       (for-do (,@for-clauses
                (:do (iter-yield
-                     ,(for--parse-value-form
-                       value-form 1
-                       (pcase-lambda (`(:values ,form)) form)))))))))
+                     ,(for--parse-single-value value-form))))))))
 
 (for--defmacro for-lists (bindings for-clauses &rest body)
   "The multiple-list-building iteration macro.
@@ -689,10 +690,8 @@ BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
                 (for-fold ((,index 0))
                     (,@for-clauses
                      (:do (setf (aref ,vector ,index)
-                                ,(for--parse-value-form
-                                  value-form 1
-                                  (pcase-lambda (`(:values ,form))
-                                    form))))
+                                ,(for--parse-single-value
+                                  value-form)))
                      (:let (,index (1+ ,index)))
                      (:break (= ,index ,length))
                      ,index))
@@ -732,10 +731,8 @@ BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
                 (for-fold ((,index 0))
                     (,@for-clauses
                      (:do (setf (aref ,string ,index)
-                                ,(for--parse-value-form
-                                  value-form 1
-                                  (pcase-lambda (`(:values ,form))
-                                    form))))
+                                ,(for--parse-single-value
+                                  value-form)))
                      (:let (,index (1+ ,index)))
                      (:break (= ,index ,length))
                      ,index))
@@ -752,9 +749,7 @@ BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
     (for--with-gensyms (value)
       `(for-fold ((,value t))
            (,@for-clauses
-            (:let (,value ,(for--parse-value-form
-                            value-form 1
-                            (pcase-lambda (`(:values ,form)) form))))
+            (:let (,value ,(for--parse-single-value value-form)))
             (:final (not ,value))
             ,value)))))
 
@@ -766,9 +761,7 @@ BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
     (for--with-gensyms (value)
       `(for-fold ((,value nil))
            (,@for-clauses
-            (:let (,value ,(for--parse-value-form
-                            value-form 1
-                            (pcase-lambda (`(:values ,form)) form))))
+            (:let (,value ,(for--parse-single-value value-form)))
             (:final ,value)
             ,value)))))
 
@@ -780,10 +773,7 @@ BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
     (for--with-gensyms (sum)
       `(for-fold ((,sum 0))
            (,@for-clauses
-            (+ ,(for--parse-value-form
-                 value-form 1
-                 (pcase-lambda (`(:values ,form)) form))
-               ,sum))))))
+            (+ ,(for--parse-single-value value-form) ,sum))))))
 
 (for--defmacro for-product (for-clauses &rest body)
   "The product-accumulating iteration macro."
@@ -793,10 +783,7 @@ BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
     (for--with-gensyms (product)
       `(for-fold ((,product 1))
            (,@for-clauses
-            (* ,(for--parse-value-form
-                 value-form 1
-                 (pcase-lambda (`(:values ,form)) form))
-               ,product))))))
+            (* ,(for--parse-single-value value-form) ,product))))))
 
 (for--defmacro for-first (for-clauses &rest body)
   "The first-value-returning iteration macro."
@@ -823,10 +810,7 @@ BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
     (for--with-gensyms (max)
       `(for-fold ((,max -1.0e+INF))
            (,@for-clauses
-            (max ,(for--parse-value-form
-                   value-form 1
-                   (pcase-lambda (`(:values ,form)) form))
-                 ,max))))))
+            (max ,(for--parse-single-value value-form) ,max))))))
 
 (for--defmacro for-min (for-clauses &rest body)
   "The `min'-folding iteration macro."
@@ -836,10 +820,7 @@ BINDINGS = ([IDENTIFIER...] [(:result EXPRESSION...)])"
     (for--with-gensyms (min)
       `(for-fold ((,min 1.0e+INF))
            (,@for-clauses
-            (min ,(for--parse-value-form
-                   value-form 1
-                   (pcase-lambda (`(:values ,form)) form))
-                 ,min))))))
+            (min ,(for--parse-single-value value-form) ,min))))))
 
 ;;;; Provide
 (provide 'for-iteration)
