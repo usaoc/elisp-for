@@ -190,9 +190,20 @@ appended to FOR-CLAUSES.  Finally, the multiple-value form of the
 parsed for clauses is extracted, and a `cons' of the remaining
 for clauses and the multiple-value form is returned."
   (declare (side-effect-free t))
-  (cl-flet ((transform (form)
-              (pcase form
-                (`(,(cl-type keyword) . ,_) form) (_ `(:do ,form)))))
+  (cl-flet
+      ((transform-body (forms)
+         (named-let parse
+             ((do-forms '()) (parsed-forms '()) (forms forms))
+           (cl-symbol-macrolet
+               ((parsed+do (if (null do-forms) parsed-forms
+                             `((:do . ,do-forms) . ,parsed-forms))))
+             (if (null forms) parsed+do
+               (pcase-let ((`(,form . ,forms) forms))
+                 (pcase form
+                   (`(,(cl-type keyword) . ,_)
+                    (parse '() `(,form . ,parsed+do) forms))
+                   (_ (parse `(,form . ,do-forms)
+                             parsed-forms forms)))))))))
     (pcase-exhaustive body
       ((or (and '() (let (or (and `(,value-form) (let clauses '()))
                              (and `(,_ . ,_)
@@ -205,12 +216,11 @@ for clauses and the multiple-value form is returned."
                     (and `(,_ . ,_)
                          (app reverse
                               `(,value-form
-                                . ,(app nreverse
-                                        (app (mapcar #'transform)
-                                             (app (lambda (clauses)
-                                                    `(,@for-clauses
-                                                      ,@clauses))
-                                                  clauses)))))))))
+                                . ,(app transform-body
+                                        (app (lambda (clauses)
+                                               `(,@for-clauses
+                                                 ,@clauses))
+                                             clauses))))))))
        `(,clauses . ,value-form)))))
 
 (defun for--parse-for-clauses (for-clauses)
@@ -560,16 +570,16 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
                                 (funcall expander
                                          special-clause expanded)
                                 clauses))))))))))
-      (macroexp-progn
-       (if (null bindings)
+      (if (null bindings)
+          (macroexp-progn
            (make-body (for--parse-value-form
-                       value-form 0 (lambda (_form) nil)))
-         (for--with-gensyms (update)
-           `((for--named-let ,update ,bindings
-               . ,(make-body (for--parse-value-form
-                              value-form (length bindings)
-                              (pcase-lambda (`(:values . ,forms))
-                                `(,update . ,forms))))))))))))
+                       value-form 0 (lambda (_form) nil))))
+        (for--with-gensyms (update)
+          `(for--named-let ,update ,bindings
+             . ,(make-body (for--parse-value-form
+                            value-form (length bindings)
+                            (pcase-lambda (`(:values . ,forms))
+                              `(,update . ,forms))))))))))
 
 (for--defmacro for-foldr (bindings for-clauses &rest body)
   "The reverse-folding iteration macro.
