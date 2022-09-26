@@ -586,7 +586,7 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
         (for--parse-body for-clauses body)))
     (for--with-gensyms (update next)
       `(for--named-let ,update ,bindings
-         (funcall (for-fold ((,next (lambda () nil)))
+         (funcall (for-fold ((,next #'ignore))
                       (,@for-clauses
                        (:let (,next ,next))
                        (lambda ()

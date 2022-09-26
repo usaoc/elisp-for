@@ -891,16 +891,15 @@ exactly one value.
 This iteration macro is the reverse of @code{for-fold}.  The sequences
 are still iterated in the same order, but the bindings are updated in
 reverse order.  As such, it uses space proportional to the number of
-iterations.  It is equivalent to the following form where @var{next} is
-a generated identifier, @var{update}s update @var{binding}s to the
-produced values, and @var{expression} is potentially the default
-expression:
+iterations.  It is equivalent to the following form (@pxref{Calling
+Functions,,,elisp}) where @var{next} is a generated identifier,
+@var{update}s update @var{binding}s to the produced values, and
+@var{expression} is potentially the default expression:
 
 @example
 @group
 (let (@optional{@repeated{@var{binding}}})
-  (funcall (for-fold ((@var{next} (lambda ()
-                              nil)))
+  (funcall (for-fold ((@var{next} #'ignore))
                (@optional{@repeated{@var{for-clause*}}}
                 (:let (@var{next} @var{next}))
                 (lambda ()
