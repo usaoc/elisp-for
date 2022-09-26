@@ -139,15 +139,14 @@ exactly one value.
 <dd><p>This iteration macro is the reverse of <code>for-fold</code>.  The sequences
 are still iterated in the same order, but the bindings are updated in
 reverse order.  As such, it uses space proportional to the number of
-iterations.  It is equivalent to the following form where <var>next</var> is
-a generated identifier, <var>update</var>s update <var>binding</var>s to the
-produced values, and <var>expression</var> is potentially the default
-expression:
+iterations.  It is equivalent to the following form (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Calling-Functions.html#Calling-Functions">(elisp)Calling
+Functions</a>) where <var>next</var> is a generated identifier,
+<var>update</var>s update <var>binding</var>s to the produced values, and
+<var>expression</var> is potentially the default expression:
 </p>
 <div class="example">
 <pre class="example">(let ([<var>binding</var>&hellip;])
-  (funcall (for-fold ((<var>next</var> (lambda ()
-                              nil)))
+  (funcall (for-fold ((<var>next</var> #'ignore))
                ([<var>for-clause*</var>&hellip;]
                 (:let (<var>next</var> <var>next</var>))
                 (lambda ()
