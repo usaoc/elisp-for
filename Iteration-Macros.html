@@ -272,17 +272,16 @@ identifiers provided that <var>length</var> and <var>init</var> are evaluated
 exactly once in the apparent evaluation order:
 </p>
 <div class="example">
-<pre class="example">(if (zerop <var>length</var>)
-    []
-  (let ((<var>vector</var> (make-vector <var>length</var> <var>init</var>)))
+<pre class="example">(let ((<var>vector</var> (make-vector <var>length</var> <var>init</var>)))
+  (unless (zerop <var>length</var>)
     (for-fold ((<var>index</var> 0))
         ([<var>for-clause*</var>&hellip;]
          (:do (setf (aref <var>vector</var> <var>index</var>)
                     <var>value*</var>))
          (:let (<var>index</var> (1+ <var>index</var>)))
          (:break (= <var>index</var> <var>length</var>))
-         <var>index</var>))
-    <var>vector</var>))
+         <var>index</var>)))
+  <var>vector</var>)
 </pre></div>
 </dd></dl>
 
@@ -316,19 +315,16 @@ such case, it is equivalent to the following form where <var>string</var> and
 apparent evaluation order:
 </p>
 <div class="example">
-<pre class="example">(if (zerop <var>length</var>)
-    (if <var>multibyte</var>
-        (make-string 0 ?\0 'multibyte)
-      &quot;&quot;)
-  (let ((<var>string</var> (make-string <var>length</var> <var>init</var> <var>multibyte</var>)))
+<pre class="example">(let ((<var>string</var> (make-string <var>length</var> <var>init</var> <var>multibyte</var>)))
+  (unless (zerop <var>length</var>)
     (for-fold ((<var>index</var> 0))
         ([<var>for-clause*</var>&hellip;]
          (:do (setf (aref <var>string</var> <var>index</var>)
                     <var>value*</var>))
          (:let (<var>index</var> (1+ <var>index</var>)))
          (:break (= <var>index</var> <var>length</var>))
-         <var>index</var>))
-    <var>string</var>))
+         <var>index</var>)))
+  <var>string</var>)
 </pre></div>
 </dd></dl>
 
