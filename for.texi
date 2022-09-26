@@ -1259,10 +1259,9 @@ specification can be found in later chapters.
 
 Below, @enquote{the iteration} can be an empty iteration when no
 iteration clause follows the special clauses, whose body expanded so far
-are @var{body}s, and the further expanded body is shown as a list of
-forms.  Moreover, the inner iteration does not affect the outer
-iteration when nesting occurs, unless the wording @enquote{the whole
-iteration} is used.
+are @var{body}s.  Moreover, the inner iteration does not affect the
+outer iteration when nesting occurs, unless the wording @enquote{the
+whole iteration} is used.
 
 Special clauses are sequentially processed, such that the body produced
 by the expander of a special clause is fed into the expander of another
@@ -1289,8 +1288,8 @@ This special-clause operator produces the following body:
 
 @example
 @group
-((when (and @optional{@repeated{@var{guard}}})
-   @optional{@repeated{@var{body}}}))
+(when (and @optional{@repeated{@var{guard}}})
+  @optional{@repeated{@var{body}}})
 @end group
 @end example
 @end deffn
@@ -1300,8 +1299,8 @@ This special-clause operator produces the following body:
 
 @example
 @group
-((unless (and @optional{@repeated{@var{guard}}})
-   @optional{@repeated{@var{body}}}))
+(unless (and @optional{@repeated{@var{guard}}})
+  @optional{@repeated{@var{body}}})
 @end group
 @end example
 @end deffn
@@ -1311,8 +1310,8 @@ This special-clause operator produces the following body:
 
 @example
 @group
-((pcase-let (@optional{@repeated{@var{binding}}})
-   @optional{@repeated{@var{body}}}))
+(pcase-let (@optional{@repeated{@var{binding}}})
+  @optional{@repeated{@var{body}}})
 @end group
 @end example
 @end deffn
@@ -1322,8 +1321,8 @@ This special-clause operator produces the following body:
 
 @example
 @group
-((pcase-let* (@optional{@repeated{@var{binding}}})
-   @optional{@repeated{@var{body}}}))
+(pcase-let* (@optional{@repeated{@var{binding}}})
+  @optional{@repeated{@var{body}}})
 @end group
 @end example
 @end deffn
@@ -1333,8 +1332,8 @@ This special-clause operator produces the following body:
 
 @example
 @group
-((when-let (@optional{@repeated{@var{binding}}})
-   @optional{@repeated{@var{body}}}))
+(when-let (@optional{@repeated{@var{binding}}})
+  @optional{@repeated{@var{body}}})
 @end group
 @end example
 @end deffn
@@ -1344,8 +1343,8 @@ This special-clause operator produces the following body:
 
 @example
 @group
-((when-let* (@optional{@repeated{@var{binding}}})
-   @optional{@repeated{@var{body}}}))
+(when-let* (@optional{@repeated{@var{binding}}})
+  @optional{@repeated{@var{body}}})
 @end group
 @end example
 @end deffn
@@ -1358,9 +1357,9 @@ is @code{pcase-exhaustive}:
 
 @example
 @group
-((@var{pcase} @var{expression}
-   ((and @optional{@repeated{@var{pattern}}})
-    @optional{@repeated{@var{body}}})))
+(@var{pcase} @var{expression}
+  ((and @optional{@repeated{@var{pattern}}})
+   @optional{@repeated{@var{body}}}))
 @end group
 @end example
 @end deffn
@@ -1371,22 +1370,17 @@ is an identifier that defaults to @code{_} when omitted:
 
 @example
 @group
-((pcase @var{expression}
-   ((and @optional{@repeated{@var{pattern}}})
-    nil)
-   (@var{as} @optional{@repeated{@var{body}}})))
+(pcase @var{expression}
+  ((and @optional{@repeated{@var{pattern}}})
+   nil)
+  (@var{as}
+   @optional{@repeated{@var{body}}}))
 @end group
 @end example
 @end deffn
 
 @deffn @aux{:do, @optional{@repeated{expression}}}
-This special-clause operator produces the following body:
-
-@example
-@group
-(@optional{@repeated{@var{expression}}} @optional{@repeated{@var{body}}})
-@end group
-@end example
+This special-clause operator prepends @var{expression}s to the body.
 @end deffn
 
 @node Sequence Constructors
