@@ -115,7 +115,7 @@ iteration clause as the sole argument;
 <p>For each <var>identifier</var> and each <var>value</var> produced by the
 multiple-value form, <var>identifier</var> is first bound to the value of
 <var>expression</var> or <code>nil</code> when there is no <var>expression</var> and
-later updated to <var>value</var> after each iteration.
+later updated to <var>value</var> after each iteration<a id="DOCF12" href="#FOOT12"><sup>12</sup></a>.
 </p></dd></dl>
 
 <dl class="def">
@@ -155,7 +155,10 @@ expression:
                   (funcall <var>next</var>)))))
   <var>expression</var>&hellip;)
 </pre></div>
-</dd></dl>
+
+<p>It is an error for the expanded form to execute under dynamic binding
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Variable-Scoping.html#Variable-Scoping">(elisp)Variable Scoping</a>).
+</p></dd></dl>
 
 <dl class="def">
 <dt id="index-for_002dfoldr_002a"><span class="category">Macro: </span><span><strong>for-foldr*</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;])</em><a href='#index-for_002dfoldr_002a' class='copiable-anchor'> &para;</a></span></dt>
@@ -185,7 +188,7 @@ the value.  It is equivalent to the following form:
 <dt id="index-for_002dlist"><span class="category">Macro: </span><span><strong>for-list</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlist' class='copiable-anchor'> &para;</a></span></dt>
 <dd><span id="index-terminology-11"></span>
 <p>This iteration macro accumulates the values into a
-fresh<a id="DOCF12" href="#FOOT12"><sup>12</sup></a> list and returns
+fresh<a id="DOCF13" href="#FOOT13"><sup>13</sup></a> list and returns
 the list.  It is equivalent to the following form where <var>list</var> is a
 generated identifier:
 </p>
@@ -212,7 +215,9 @@ equivalent to the following form:
 <pre class="example">(iter-make (for-do ([<var>for-clause*</var>&hellip;]
                     (:do (iter-yield <var>value*</var>)))))
 </pre></div>
-</dd></dl>
+
+<p>It is an error for the expanded form to execute under dynamic binding.
+</p></dd></dl>
 
 <dl class="def">
 <dt id="index-for_002diter_002a"><span class="category">Macro: </span><span><strong>for-iter*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002diter_002a' class='copiable-anchor'> &para;</a></span></dt>
@@ -252,7 +257,7 @@ multiple-value form to produce not as many values as there are
 <dd><span id="index-terminology-12"></span>
 <p>When neither <var>length</var> nor <var>init</var> is present, this iteration
 macro is equivalent to the following form (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Vector-Functions.html#Vector-Functions">(elisp)Vector
-Functions</a>), such that it coerces<a id="DOCF13" href="#FOOT13"><sup>13</sup></a> the list returned by <code>for-list</code> to vector:
+Functions</a>), such that it coerces<a id="DOCF14" href="#FOOT14"><sup>14</sup></a> the list returned by <code>for-list</code> to vector:
 </p>
 <div class="example">
 <pre class="example">(vconcat (for-list ([<var>for-clause</var>&hellip;])
@@ -489,9 +494,16 @@ identifier:
 <h4 class="footnotes-heading">Footnotes</h4>
 
 <h5><a id="FOOT12" href="#DOCF12">(12)</a></h5>
+<p>Note that the
+behavior of bindings is subtlety different from that of
+<code>named-let</code>.  In <code>named-let</code>, each application of the
+self-recursive function creates new bindings, just as normal function
+application does.  In contrast, <code>for-fold</code> always retains the same
+bindings.</p>
+<h5><a id="FOOT13" href="#DOCF13">(13)</a></h5>
 <p>Following
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_f.htm">Common Lisp</a>, a <em>fresh</em> object is newly allocated.</p>
-<h5><a id="FOOT13" href="#DOCF13">(13)</a></h5>
+<h5><a id="FOOT14" href="#DOCF14">(14)</a></h5>
 <p>Following
 <a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_c.htm">Common Lisp</a>, <em>coerce</em> means to non-destructively convert an object
 to another type.</p>
