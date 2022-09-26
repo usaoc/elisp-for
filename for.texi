@@ -904,6 +904,9 @@ expression:
   @repeated{@var{expression}})
 @end group
 @end example
+
+It is an error for the expanded form to execute under dynamic binding
+(@pxref{Variable Scoping,,,elisp}).
 @end defmac
 
 @defmac for-foldr* (@optional{@repeated{binding}} @optional{(@code{:result} @repeated{expression})}) (@optional{@repeated{for-clause}})
@@ -963,6 +966,8 @@ equivalent to the following form:
                     (:do (iter-yield @var{value*})))))
 @end group
 @end example
+
+It is an error for the expanded form to execute under dynamic binding.
 @end defmac
 
 @defmac for-iter* (@optional{@repeated{for-clause}}) @optional{@repeated{body}}

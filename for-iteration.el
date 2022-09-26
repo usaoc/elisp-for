@@ -572,6 +572,7 @@ BINDINGS = ([BINDING...] [(:result EXPRESSION...)])
 
 BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
   (declare (debug for-fold) (indent 2))
+  (cl-assert lexical-binding)
   (pcase-let
       ((`(,bindings . ,result-forms)
         (for--parse-bindings bindings #'for--normalize-binding))
@@ -619,6 +620,7 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
 (for--defmacro for-iter (for-clauses &rest body)
   "The iterator-returning macro."
   (declare (debug for-list) (indent 1))
+  (cl-assert lexical-binding)
   (pcase-let ((`(,for-clauses . ,value-form)
                (for--parse-body for-clauses body)))
     `(iter-make
