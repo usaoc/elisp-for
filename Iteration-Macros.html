@@ -135,7 +135,7 @@ implying that it is an error for the multiple-value form to produce not
 exactly one value.
 </p>
 <dl class="def">
-<dt id="index-for_002dfoldr"><span class="category">Macro: </span><span><strong>for-foldr</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;])</em><a href='#index-for_002dfoldr' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-for_002dfoldr"><span class="category">Macro: </span><span><strong>for-foldr</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfoldr' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the reverse of <code>for-fold</code>.  The sequences
 are still iterated in the same order, but the bindings are updated in
 reverse order.  As such, it uses space proportional to the number of
@@ -160,7 +160,7 @@ Functions</a>) where <var>next</var> is a generated identifier,
 </p></dd></dl>
 
 <dl class="def">
-<dt id="index-for_002dfoldr_002a"><span class="category">Macro: </span><span><strong>for-foldr*</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;])</em><a href='#index-for_002dfoldr_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-for_002dfoldr_002a"><span class="category">Macro: </span><span><strong>for-foldr*</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfoldr_002a' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
 <code>for-foldr</code>.
 </p></dd></dl>
