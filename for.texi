@@ -864,7 +864,12 @@ Else, expand to @code{(@var{pattern} (for-in-iterator (for-generator
 For each @var{identifier} and each @var{value} produced by the
 multiple-value form, @var{identifier} is first bound to the value of
 @var{expression} or @code{nil} when there is no @var{expression} and
-later updated to @var{value} after each iteration.
+later updated to @var{value} after each iteration@footnote{Note that the
+behavior of bindings is subtlety different from that of
+@code{named-let}.  In @code{named-let}, each application of the
+self-recursive function creates new bindings, just as normal function
+application does.  In contrast, @code{for-fold} always retains the same
+bindings.}.
 @end defmac
 
 @defmac for-fold* (@optional{@repeated{binding}} @optional{(@code{:result} @repeated{expression})}) (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
