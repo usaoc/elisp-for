@@ -1032,17 +1032,16 @@ exactly once in the apparent evaluation order:
 
 @example
 @group
-(if (zerop @var{length})
-    []
-  (let ((@var{vector} (make-vector @var{length} @var{init})))
+(let ((@var{vector} (make-vector @var{length} @var{init})))
+  (unless (zerop @var{length})
     (for-fold ((@var{index} 0))
         (@optional{@repeated{@var{for-clause*}}}
          (:do (setf (aref @var{vector} @var{index})
                     @var{value*}))
          (:let (@var{index} (1+ @var{index})))
          (:break (= @var{index} @var{length}))
-         @var{index}))
-    @var{vector}))
+         @var{index})))
+  @var{vector})
 @end group
 @end example
 @end defmac
@@ -1078,19 +1077,16 @@ apparent evaluation order:
 
 @example
 @group
-(if (zerop @var{length})
-    (if @var{multibyte}
-        (make-string 0 ?\0 'multibyte)
-      "")
-  (let ((@var{string} (make-string @var{length} @var{init} @var{multibyte})))
+(let ((@var{string} (make-string @var{length} @var{init} @var{multibyte})))
+  (unless (zerop @var{length})
     (for-fold ((@var{index} 0))
         (@optional{@repeated{@var{for-clause*}}}
          (:do (setf (aref @var{string} @var{index})
                     @var{value*}))
          (:let (@var{index} (1+ @var{index})))
          (:break (= @var{index} @var{length}))
-         @var{index}))
-    @var{string}))
+         @var{index})))
+  @var{string})
 @end group
 @end example
 @end defmac
