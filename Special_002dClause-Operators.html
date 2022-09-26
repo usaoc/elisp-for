@@ -59,10 +59,9 @@ specification can be found in later chapters.
 </p>
 <p>Below, &ldquo;the iteration&rdquo; can be an empty iteration when no
 iteration clause follows the special clauses, whose body expanded so far
-are <var>body</var>s, and the further expanded body is shown as a list of
-forms.  Moreover, the inner iteration does not affect the outer
-iteration when nesting occurs, unless the wording &ldquo;the whole
-iteration&rdquo; is used.
+are <var>body</var>s.  Moreover, the inner iteration does not affect the
+outer iteration when nesting occurs, unless the wording &ldquo;the
+whole iteration&rdquo; is used.
 </p>
 <p>Special clauses are sequentially processed, such that the body produced
 by the expander of a special clause is fed into the expander of another
@@ -91,8 +90,8 @@ true before the iteration.
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">((when (and [<var>guard</var>&hellip;])
-   [<var>body</var>&hellip;]))
+<pre class="example">(when (and [<var>guard</var>&hellip;])
+  [<var>body</var>&hellip;])
 </pre></div>
 </dd></dl>
 
@@ -101,8 +100,8 @@ true before the iteration.
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">((unless (and [<var>guard</var>&hellip;])
-   [<var>body</var>&hellip;]))
+<pre class="example">(unless (and [<var>guard</var>&hellip;])
+  [<var>body</var>&hellip;])
 </pre></div>
 </dd></dl>
 
@@ -111,8 +110,8 @@ true before the iteration.
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">((pcase-let ([<var>binding</var>&hellip;])
-   [<var>body</var>&hellip;]))
+<pre class="example">(pcase-let ([<var>binding</var>&hellip;])
+  [<var>body</var>&hellip;])
 </pre></div>
 </dd></dl>
 
@@ -121,8 +120,8 @@ true before the iteration.
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">((pcase-let* ([<var>binding</var>&hellip;])
-   [<var>body</var>&hellip;]))
+<pre class="example">(pcase-let* ([<var>binding</var>&hellip;])
+  [<var>body</var>&hellip;])
 </pre></div>
 </dd></dl>
 
@@ -131,8 +130,8 @@ true before the iteration.
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">((when-let ([<var>binding</var>&hellip;])
-   [<var>body</var>&hellip;]))
+<pre class="example">(when-let ([<var>binding</var>&hellip;])
+  [<var>body</var>&hellip;])
 </pre></div>
 </dd></dl>
 
@@ -141,8 +140,8 @@ true before the iteration.
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">((when-let* ([<var>binding</var>&hellip;])
-   [<var>body</var>&hellip;]))
+<pre class="example">(when-let* ([<var>binding</var>&hellip;])
+  [<var>body</var>&hellip;])
 </pre></div>
 </dd></dl>
 
@@ -154,9 +153,9 @@ Conditional</a>) when <code>:exhaustive</code> is omitted, otherwise it
 is <code>pcase-exhaustive</code>:
 </p>
 <div class="example">
-<pre class="example">((<var>pcase</var> <var>expression</var>
-   ((and [<var>pattern</var>&hellip;])
-    [<var>body</var>&hellip;])))
+<pre class="example">(<var>pcase</var> <var>expression</var>
+  ((and [<var>pattern</var>&hellip;])
+   [<var>body</var>&hellip;]))
 </pre></div>
 </dd></dl>
 
@@ -166,21 +165,18 @@ is <code>pcase-exhaustive</code>:
 is an identifier that defaults to <code>_</code> when omitted:
 </p>
 <div class="example">
-<pre class="example">((pcase <var>expression</var>
-   ((and [<var>pattern</var>&hellip;])
-    nil)
-   (<var>as</var> [<var>body</var>&hellip;])))
+<pre class="example">(pcase <var>expression</var>
+  ((and [<var>pattern</var>&hellip;])
+   nil)
+  (<var>as</var>
+   [<var>body</var>&hellip;]))
 </pre></div>
 </dd></dl>
 
 <dl class="def">
 <dt id="index-_003ado"><span class="category">Auxiliary Operator: </span><span><strong>:do</strong> <em>[expression&hellip;]</em><a href='#index-_003ado' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This special-clause operator produces the following body:
-</p>
-<div class="example">
-<pre class="example">([<var>expression</var>&hellip;] [<var>body</var>&hellip;])
-</pre></div>
-</dd></dl>
+<dd><p>This special-clause operator prepends <var>expression</var>s to the body.
+</p></dd></dl>
 
 </div>
 <hr>
