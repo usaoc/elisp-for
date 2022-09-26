@@ -887,7 +887,7 @@ transformed @var{body}s but excluding the multiple-value form, and
 implying that it is an error for the multiple-value form to produce not
 exactly one value.
 
-@defmac for-foldr (@optional{@repeated{binding}} @optional{(@code{:result} @repeated{expression})}) (@optional{@repeated{for-clause}})
+@defmac for-foldr (@optional{@repeated{binding}} @optional{(@code{:result} @repeated{expression})}) (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the reverse of @code{for-fold}.  The sequences
 are still iterated in the same order, but the bindings are updated in
 reverse order.  As such, it uses space proportional to the number of
@@ -913,7 +913,7 @@ It is an error for the expanded form to execute under dynamic binding
 (@pxref{Variable Scoping,,,elisp}).
 @end defmac
 
-@defmac for-foldr* (@optional{@repeated{binding}} @optional{(@code{:result} @repeated{expression})}) (@optional{@repeated{for-clause}})
+@defmac for-foldr* (@optional{@repeated{binding}} @optional{(@code{:result} @repeated{expression})}) (@optional{@repeated{for-clause}}) @optional{@repeated{body}}
 This iteration macro is the implicitly nesting version of
 @code{for-foldr}.
 @end defmac
