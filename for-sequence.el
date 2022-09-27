@@ -197,11 +197,11 @@ the range is closed."
 
 START defaults to 0 when it is nil or omitted."
   (:expander-case
-   (`(,id ,(or (and `(,_) (let start-form 0))
+   (`(,id ,(or (and `(,_) (let start-form nil))
                `(,_ ,start-form)))
     (for--with-gensyms (start number)
       `(,id (:do-in ((,start ,start-form)) ()
-                    ((,number (cl-the (integer 0) ,start))) ()
+                    ((,number (cl-the (integer 0) (or ,start 0)))) ()
                     ((,id ,number)) ((1+ ,number))))))))
 
 (for--defseq for-in-producer (producer &rest args)
