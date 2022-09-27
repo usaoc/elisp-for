@@ -34,19 +34,6 @@
 (require 'generator)
 
 ;;;; Internal
-(defun for--datum-to-sequence (datum)
-  "Transform DATUM to a sequence form.
-
-Currently, literal lists, arrays, and integers are transformed to
-`for-in-list', `for-in-array', and `for-in-range' sequences."
-  (declare (side-effect-free t))
-  (pcase datum
-    ((or '() `',(cl-type list)) `(for-in-list ,datum))
-    ((or (cl-type array) `',(cl-type array)) `(for-in-array ,datum))
-    ((or (cl-type integer) `',(cl-type integer))
-     `(for-in-range ,datum))
-    (_ nil)))
-
 (defun for--expand-iteration-clause (clause)
   "Expand the iteration clause CLAUSE as much as possible.
 
@@ -65,8 +52,15 @@ when SEQUENCE-FORM is a `:do-in' form."
                          ,(and (cl-type list) loop-forms)))
             (guard (= (length loop-bindings) (length loop-forms))))
        clause)
-      (`(,id ,(app for--datum-to-sequence
-                   (and (pred identity) sequence)))
+      (`(,id ,(or (and (or '() `',(cl-type list))
+                       (app (lambda (datum) `(for-in-list ,datum))
+                            sequence))
+                  (and (or (cl-type array) `',(cl-type array))
+                       (app (lambda (datum) `(for-in-array ,datum))
+                            sequence))
+                  (and (or (cl-type integer) `',(cl-type integer))
+                       (app (lambda (datum) `(for-in-range ,datum))
+                            sequence))))
        (expand `(,id ,sequence)))
       (`(,id (,(and (cl-type symbol)
                     (app (lambda (head) (get head 'for--alias))
