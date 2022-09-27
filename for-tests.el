@@ -532,13 +532,17 @@
         ((`(,(and (app (+ 5 (random 5)) end) start) . ,_) list)
          (step (+ (/ (random 15) 10.0) 0.5)) (step* (- step)))
       (should (equal (seq (i (in-inclusive-range start end))
-                          (1+ i))
+                          (j (in-infinite-range start))
+                          (+ i j))
                      (cl-loop for i from start to end
-                              collect (1+ i))))
+                              for j from start
+                              collect (+ i j))))
       (should (equal (seq (i (in-inclusive-range end start step*))
-                          (1+ i))
+                          (j (in-infinite-range start step))
+                          (+ i j))
                      (cl-loop for i from end downto start by step
-                              collect (1+ i))))
+                              for j from start by step
+                              collect (+ i j))))
       (should (equal (seq (i (in-range end)) (1+ i))
                      (cl-loop for i below end collect (1+ i))))
       (should (equal (seq (i (in-range start end)) (1+ i))

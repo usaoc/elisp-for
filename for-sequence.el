@@ -183,6 +183,19 @@ the range is closed."
                     ((funcall ,continuep ,number ,end))
                     ((,id ,number)) ((+ ,number ,step))))))))
 
+(for--defseq for-in-infinite-range (start &optional step)
+  "Return an iterator that returns each number in infinite range.
+
+START is the start of range.  STEP defaults to 1 when it is nil
+or omitted."
+  (:expander-case
+   (`(,id ,(or (and `(,_ ,start-form) (let step-form nil))
+               (and `(,_ ,start-form ,step-form))))
+    (for--with-gensyms (start step number)
+      `(,id (:do-in ((,start ,start-form) (,step (or ,step-form 1)))
+                    () ((,number ,start)) () ((,id ,number))
+                    ((+ ,number ,step))))))))
+
 (for--defseq for-in-list (list)
   "Return an iterator that returns each element in LIST."
   (:type list)
@@ -195,14 +208,13 @@ the range is closed."
 (for--defseq for-in-naturals (&optional start)
   "Return an iterator that returns each natural number from START.
 
-START defaults to 0 when it is nil or omitted."
+Equivalent to (`for-in-infinite-range' START 1) where START
+defaults to 0 when it is nil or omitted."
   (:expander-case
    (`(,id ,(or (and `(,_) (let start-form nil))
                `(,_ ,start-form)))
-    (for--with-gensyms (start number)
-      `(,id (:do-in ((,start ,start-form)) ()
-                    ((,number (cl-the (integer 0) (or ,start 0)))) ()
-                    ((,id ,number)) ((1+ ,number))))))))
+    `(,id (for-in-infinite-range
+           (cl-the (integer 0) (or ,start-form 0)) 1)))))
 
 (for--defseq for-in-producer (producer &rest args)
   "Return an iterator that returns each call to PRODUCER.

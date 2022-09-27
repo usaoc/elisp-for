@@ -1476,6 +1476,12 @@ The iteration terminates when the number is no longer in the closed
 range of @var{start} and @var{end}.
 @end deffn
 
+@deffn @seq{for-in-infinite-range, in-infinite-range, start @optional{step}}
+This sequence iterates over the numbers from @var{start}.  The step size
+@var{step} defaults to @code{1} when it is @code{nil} or omitted and is
+added to the number after each iteration.
+@end deffn
+
 @deffn @seq{for-in-list, in-list, list}
 This sequence iterates over the elements of the non-dotted list
 @var{list}.  As such, @code{list}s are dispatched to it.  Moreover, a
@@ -1485,12 +1491,13 @@ treated as if this sequence constructor is used.
 
 @deffn @seq{for-in-naturals, in-naturals, @optional{start}}
 This sequence iterates over the natural numbers (non-negative integers)
-from @var{start} where @var{start} defaults to @code{0} when it is
-@code{nil} or omitted and is checked to be of type @code{(integer 0)} by
-@code{cl-the} (@pxref{Declarations,,,cl}).  The type checking can be
-disabled by an @code{optimize} declaration, but this is not recommended
-since the type checking is done at compile time when @var{start} is a
-literal object anyway.
+from @var{start}.  It is equivalent to the sequence
+@code{(for-in-infinite-range @var{start} 1)} where @var{start} defaults
+to @code{0} when it is @code{nil} or omitted and is checked to be of
+type @code{(integer 0)} by @code{cl-the} (@pxref{Declarations,,,cl}).
+The type checking can be disabled by an @code{optimize} declaration, but
+this is not recommended since the type checking is done at compile time
+when @var{start} is a constant anyway.
 @end deffn
 
 @deffn @seq{for-in-producer, in-producer, producer @optional{continuep @optional{@repeated{arg}}}}
