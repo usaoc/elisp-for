@@ -220,7 +220,6 @@ An equivalent @code{for-list} form with a @code{:pcase} special clause:
                        (and (cl-type string)
                             (app string-to-number number))))
            number))
-
 @res{(2 3)}
 @end group
 @end example
@@ -262,9 +261,8 @@ The destructuring capability of @code{cl-loop} forms:
 
 @example
 @group
-(cl-loop for (number . string) in '((1 . "1")
-                                    (2 . "b")
-                                    (3 . "3"))
+(cl-loop for (number . string)
+           in '((1 . "1") (2 . "b") (3 . "3"))
          if (eql number (string-to-number string))
            collect number)
 @res{(1 3)}
@@ -275,9 +273,8 @@ The destructuring capability of @code{cl-loop} forms:
 
 @example
 @group
-(for-list ((`(,number . ,string) '((1 . "1")
-                                   (2 . "b")
-                                   (3 . "3")))
+(for-list ((`(,number . ,string)
+            '((1 . "1") (2 . "b") (3 . "3")))
            (:if (eql number (string-to-number string)))
            number))
 @res{(1 3)}
@@ -361,7 +358,6 @@ An equivalent @code{named-let} form:
                   (+ item sum)
                 sum)
               (cdr tail))))))
-
 @res{2}
 @end group
 @end example
