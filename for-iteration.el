@@ -43,7 +43,7 @@ expander, or is treated as a function form.  The expansion stops
 when SEQUENCE-FORM is a `:do-in' form."
   (named-let expand
       ((clause (pcase-exhaustive clause
-                 (`(,sequence) `(,(gensym "_id") ,sequence))
+                 (`(,sequence) `(,(gensym "_unused") ,sequence))
                  (`(,_ ,_) clause))))
     (pcase-exhaustive clause
       ((and `(,_ (:do-in ,(cl-type list) ,(cl-type list)
@@ -313,7 +313,9 @@ NAME is bound to a local macro that updates BINDINGS in BODY.
   (pcase-let
       (((and (app (mapcar (pcase-lambda (`(,id ,_)) id))
                   (and ids (app (mapcar (lambda (id)
-                                          (gensym (symbol-name id))))
+                                          (make-symbol
+                                           (concat (symbol-name id)
+                                                   "-value"))))
                                 renamed-ids)))
              (app (mapcar (pcase-lambda (`(,_ ,value)) value))
                   values))
