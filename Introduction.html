@@ -109,7 +109,6 @@ clause:
                        (and (cl-type string)
                             (app string-to-number number))))
            number))
-
      &rArr; (2 3)
 </pre></div>
 
@@ -145,9 +144,8 @@ sense.  This is useful for, but not only for destructuring.
 <p>The destructuring capability of <code>cl-loop</code> forms:
 </p>
 <div class="example">
-<pre class="example">(cl-loop for (number . string) in '((1 . &quot;1&quot;)
-                                    (2 . &quot;b&quot;)
-                                    (3 . &quot;3&quot;))
+<pre class="example">(cl-loop for (number . string)
+           in '((1 . &quot;1&quot;) (2 . &quot;b&quot;) (3 . &quot;3&quot;))
          if (eql number (string-to-number string))
            collect number)
      &rArr; (1 3)
@@ -156,9 +154,8 @@ sense.  This is useful for, but not only for destructuring.
 <p><code>for-list</code> forms use <code>pcase-let</code> forms:
 </p>
 <div class="example">
-<pre class="example">(for-list ((`(,number . ,string) '((1 . &quot;1&quot;)
-                                   (2 . &quot;b&quot;)
-                                   (3 . &quot;3&quot;)))
+<pre class="example">(for-list ((`(,number . ,string)
+            '((1 . &quot;1&quot;) (2 . &quot;b&quot;) (3 . &quot;3&quot;)))
            (:if (eql number (string-to-number string)))
            number))
      &rArr; (1 3)
