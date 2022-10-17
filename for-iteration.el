@@ -422,11 +422,11 @@ node `(for)Definers'.
 
 (for--defspecial :if (body)
   "Evaluate BODY when all subforms are non-nil."
-  (`(,_ . ,guards) `((when (and . ,guards) . ,body))) )
+  (`(,_ . ,guards) `((when (and . ,guards) . ,body))))
 
 (for--defspecial :if-not (body)
   "Evaluate BODY unless all subforms are non-nil."
-  (`(,_ . ,guards) `((unless (and . ,guards) . ,body))) )
+  (`(,_ . ,guards) `((unless (and . ,guards) . ,body))))
 
 (for--defspecial-let :let pcase-let
   "Evaluate BODY with subforms bound by `%S'.")
