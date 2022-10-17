@@ -312,23 +312,27 @@ NAME is bound to a local macro that updates BINDINGS in BODY.
            (indent 2))
   (pcase-let
       (((and (app (mapcar (pcase-lambda (`(,id ,_)) id))
-                  (and ids (app (mapcar (lambda (id)
-                                          (make-symbol
-                                           (concat (symbol-name id)
-                                                   "-value"))))
-                                renamed-ids)))
+                  (and ids
+                       (app (mapcar (lambda (id)
+                                      (make-symbol
+                                       (concat (symbol-name id)
+                                               "-value"))))
+                            renamed-ids)
+                       (app (mapcar (lambda (_id) (gensym "value")))
+                            value-ids)))
              (app (mapcar (pcase-lambda (`(,_ ,value)) value))
                   values))
         bindings))
-    (cl-flet ((make-binding (id value) `(,id ,value)))
+    (cl-flet ((make-binding (id value) `(,id ,value))
+              (make-update (id value) `(,id ,(list '\, value))))
       `(let ,(cl-mapcar #'make-binding renamed-ids values)
          (cl-symbol-macrolet
              ,(cl-mapcar #'make-binding ids renamed-ids)
            (cl-macrolet
-               ((,name (&rest values)
-                  `(for--setq . ,(cl-mapcar (lambda (id value)
-                                              `(,id ,value))
-                                            ',renamed-ids values))))
+               ((,name ,value-ids
+                  ,(list '\` `(for--setq . ,(cl-mapcar #'make-update
+                                                       renamed-ids
+                                                       value-ids)))))
              . ,body))))))
 
 ;;;; Interface
