@@ -531,8 +531,8 @@
             (should (equal (seq (i (on-array vector 1 end)) (1+ i))
                            (cl-loop for i from 1 below end
                                     collect (1+ i))))
-            (should (equal (seq (i (on-array vector 1 end 2)) (1+ i))
-                           (cl-loop for i from 1 below end by 2
+            (should (equal (seq (i (on-array vector end 1 -2)) (1+ i))
+                           (cl-loop for i from end above 1 by 2
                                     collect (1+ i))))))
         (let ((string (concat list)))
           (should (equal (seq (i (in-array string)) (1+ i)) result))
@@ -550,8 +550,8 @@
             (should (equal (seq (i (on-array string 1 end)) (1+ i))
                            (cl-loop for i from 1 below end
                                     collect (1+ i))))
-            (should (equal (seq (i (on-array string 1 end 2)) (1+ i))
-                           (cl-loop for i from 1 below end by 2
+            (should (equal (seq (i (on-array string end 1 -2)) (1+ i))
+                           (cl-loop for i from end above 1 by 2
                                     collect (1+ i)))))))
       (should (equal (seq (i (in-list list)) (1+ i)) result)))
     (should (equal (seq (i (on-list list)) i)
