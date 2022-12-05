@@ -1394,10 +1394,10 @@ so far:
 @example
 @group
 (let @var{memoize-bindings}
-  (let @var{outer-bindings}
+  (pcase-let* @var{outer-bindings}
     (let @var{loop-bindings}
       (while (and . @var{loop-guards})
-        (pcase-let @var{inner-bindings}
+        (pcase-let* @var{inner-bindings}
           @optional{@repeated{@var{body}}}
           @var{loop-update}))))
 @end group

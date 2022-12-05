@@ -517,7 +517,7 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
                                               ,@final-ids
                                               . ,loop-guards)
                                     . ,(if (null inner-bindings) body
-                                         `((pcase-let ,inner-bindings
+                                         `((pcase-let* ,inner-bindings
                                              . ,body)))))))
                       (let* ((body
                               (pcase-exhaustive loop-bindings
@@ -536,7 +536,8 @@ BINDING = IDENTIFIER | (IDENTIFIER [EXPRESSION])"
                                                 ,@loop-forms))))))))))
                              (body
                               (if (null outer-bindings) body
-                                `((let ,outer-bindings . ,body))))
+                                `((pcase-let* ,outer-bindings
+                                    . ,body))))
                              (body
                               (if (null memoize-bindings) body
                                 `((let ,memoize-bindings . ,body)))))
