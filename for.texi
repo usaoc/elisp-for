@@ -369,17 +369,18 @@ rise to the usefulness of infinite sequences.
 @cindex convention @subentry metavariable
 @cindex convention @subentry optional form
 @cindex convention @subentry repeated form
-@code{(for-in-naturals @optional{@var{start}})}@footnote{In this manual,
-a metavariable is typeset as @samp{@var{metavariable}}, an optional form
-as @samp{@optional{@var{optional-form}}}, and a form repeated @emph{once
-or more} as @samp{@repeated{@var{repeated-form}}}.  This is the same as
-the Emacs Lisp Manual (@pxref{A Sample Function Description,,,elisp})
-modulo the @samp{@repeated{@var{repeated-form}}} convention.} is an
-infinite sequence:
+@code{(for-in-infinite-range @optional{@var{start}
+@optional{@var{step}}})}@footnote{In this manual, a metavariable is
+typeset as @samp{@var{metavariable}}, an optional form as
+@samp{@optional{@var{optional-form}}}, and a form repeated @emph{once or
+more} as @samp{@repeated{@var{repeated-form}}}.  This is the same as the
+Emacs Lisp Manual (@pxref{A Sample Function Description,,,elisp}) modulo
+the @samp{@repeated{@var{repeated-form}}} convention.} is an infinite
+sequence:
 
 @example
 @group
-(for-list ((natural (for-in-naturals))
+(for-list ((natural (for-in-infinite-range 0))
            (item '(a b c))
            (cons natural item)))
 @res{((0 . a) (1 . b) (2 . c))}
@@ -1485,17 +1486,6 @@ This sequence iterates over the elements of the non-dotted list
 @var{list}.  As such, @code{list}s are dispatched to it.  Moreover, a
 literal list as a sequence form when used in iteration clauses is
 treated as if this sequence constructor is used.
-@end deffn
-
-@deffn @seq{for-in-naturals, in-naturals, @optional{start}}
-This sequence iterates over the natural numbers (non-negative integers)
-from @var{start}.  It is equivalent to the sequence
-@code{(for-in-infinite-range @var{start} 1)} where @var{start} defaults
-to @code{0} when it is @code{nil} or omitted and is checked to be of
-type @code{(integer 0)} by @code{cl-the} (@pxref{Declarations,,,cl}).
-The type checking can be disabled by an @code{optimize} declaration, but
-this is not recommended since the type checking is done at compile time
-when @var{start} is a constant anyway.
 @end deffn
 
 @deffn @seq{for-in-producer, in-producer, producer @optional{continuep @optional{@repeated{arg}}}}

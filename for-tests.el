@@ -313,7 +313,7 @@
                                 (+ i j)))
                  (cl-reduce #'* result :initial-value (*))))
     (let ((n (+ 2 (random 2))))
-      (should (equal (for-first* ((i (in-naturals n))
+      (should (equal (for-first* ((i (in-infinite-range n))
                                   (j (in-value i))
                                   (k (in-value j))
                                   (list i j k)))
@@ -444,7 +444,8 @@
                        (delq nil)))))
     (let ((length (- (length list) (+ 2 (random 2)))))
       (should (string= (with-output-to-string
-                         (for-do ((i (in-list list)) (j (in-naturals))
+                         (for-do ((i (in-list list))
+                                  (j (in-infinite-range 0))
                                   (:break (= j length))
                                   (:do (prin1 i) (terpri)))))
                        (with-output-to-string
@@ -556,13 +557,6 @@
       (should (equal (seq (i (in-list list)) (1+ i)) result)))
     (should (equal (seq (i (on-list list)) i)
                    (cl-maplist #'identity list)))
-    (let ((int (random 10)))
-      (should (equal (seq (i (in-naturals int)) ((in-range 10))
-                          (1+ i))
-                     (cl-loop for i from int repeat 10
-                              collect (1+ i))))
-      (should-error (seq (i (in-naturals (float int))) i)
-                    :type 'wrong-type-argument))
     (pcase-let*
         ((`(,(and (app (+ 5 (random 5)) end) start) . ,_) list)
          (step (+ (/ (random 15) 10.0) 0.5)) (step* (- step)))

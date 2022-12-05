@@ -228,17 +228,6 @@ or omitted."
       `(,id (:do-in ((,list ,list-form)) () ((,tail ,list))
                     (,tail) ((,id (car ,tail))) ((cdr ,tail))))))))
 
-(for--defseq for-in-naturals (&optional start)
-  "Return an iterator that returns each natural number from START.
-
-Equivalent to (`for-in-infinite-range' START 1) where START
-defaults to 0 when it is nil or omitted."
-  (:expander-case
-   (`(,id ,(or (and `(,_) (let start-form nil))
-               `(,_ ,start-form)))
-    `(,id (for-in-infinite-range
-           (cl-the (integer 0) (or ,start-form 0)) 1)))))
-
 (for--defseq for-in-producer (producer &rest args)
   "Return an iterator that returns each call to PRODUCER.
 
