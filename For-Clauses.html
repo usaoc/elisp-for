@@ -101,11 +101,12 @@ rise to the usefulness of infinite sequences.
 <span id="index-convention"></span>
 <span id="index-convention-1"></span>
 <span id="index-convention-2"></span>
-<p><code>(for-in-naturals [<var>start</var>])</code><a id="DOCF7" href="#FOOT7"><sup>7</sup></a> is an
-infinite sequence:
+<p><code>(for-in-infinite-range [<var>start</var>
+[<var>step</var>]])</code><a id="DOCF7" href="#FOOT7"><sup>7</sup></a> is an infinite
+sequence:
 </p>
 <div class="example">
-<pre class="example">(for-list ((natural (for-in-naturals))
+<pre class="example">(for-list ((natural (for-in-infinite-range 0))
            (item '(a b c))
            (cons natural item)))
      &rArr; ((0 . a) (1 . b) (2 . c))
@@ -172,12 +173,12 @@ It is an error<a id="DOCF5" href="#FOOT5"><sup>5</sup></a> for it to be any othe
 <code>cons</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Building-Lists.html#Building-Lists">(elisp)Building Lists</a>), that is, a <em>circular
 list</em> or a <em>dotted list</em>.</p>
 <h5><a id="FOOT7" href="#DOCF7">(7)</a></h5>
-<p>In this manual,
-a metavariable is typeset as &lsquo;<samp><var>metavariable</var></samp>&rsquo;, an optional form
-as &lsquo;<samp>[<var>optional-form</var>]</samp>&rsquo;, and a form repeated <em>once
-or more</em> as &lsquo;<samp><var>repeated-form</var>&hellip;</samp>&rsquo;.  This is the same as
-the Emacs Lisp Manual (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/A-Sample-Function-Description.html#A-Sample-Function-Description">(elisp)A Sample Function Description</a>)
-modulo the &lsquo;<samp><var>repeated-form</var>&hellip;</samp>&rsquo; convention.</p>
+<p>In this manual, a metavariable is
+typeset as &lsquo;<samp><var>metavariable</var></samp>&rsquo;, an optional form as
+&lsquo;<samp>[<var>optional-form</var>]</samp>&rsquo;, and a form repeated <em>once or
+more</em> as &lsquo;<samp><var>repeated-form</var>&hellip;</samp>&rsquo;.  This is the same as the
+Emacs Lisp Manual (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/A-Sample-Function-Description.html#A-Sample-Function-Description">(elisp)A Sample Function Description</a>) modulo
+the &lsquo;<samp><var>repeated-form</var>&hellip;</samp>&rsquo; convention.</p>
 <h5><a id="FOOT8" href="#DOCF8">(8)</a></h5>
 <p>In
 <a href="http://www.r6rs.org/final/html/r6rs-lib/r6rs-lib-Z-H-13.html"><acronym title="Revised6 Report on the Algorithmic

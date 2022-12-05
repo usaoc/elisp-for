@@ -157,19 +157,6 @@ treated as if this sequence constructor is used.
 </p></dd></dl>
 
 <dl class="def">
-<dt id="index-for_002din_002dnaturals"><span class="category">Function: </span><span><strong>for-in-naturals</strong> <em>[start]</em><a href='#index-for_002din_002dnaturals' class='copiable-anchor'> &para;</a></span></dt>
-<dt id="index-in_002dnaturals"><span class="category">Auxiliary Operator: </span><span><strong>in-naturals</strong> <em>[start]</em><a href='#index-in_002dnaturals' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This sequence iterates over the natural numbers (non-negative integers)
-from <var>start</var>.  It is equivalent to the sequence
-<code>(for-in-infinite-range <var>start</var> 1)</code> where <var>start</var> defaults
-to <code>0</code> when it is <code>nil</code> or omitted and is checked to be of
-type <code>(integer 0)</code> by <code>cl-the</code> (see <a data-manual="cl" href="https://www.gnu.org/software/emacs/manual/html_node/cl/Declarations.html#Declarations">(cl)Declarations</a>).
-The type checking can be disabled by an <code>optimize</code> declaration, but
-this is not recommended since the type checking is done at compile time
-when <var>start</var> is a constant anyway.
-</p></dd></dl>
-
-<dl class="def">
 <dt id="index-for_002din_002dproducer"><span class="category">Function: </span><span><strong>for-in-producer</strong> <em>producer [continuep [arg&hellip;]]</em><a href='#index-for_002din_002dproducer' class='copiable-anchor'> &para;</a></span></dt>
 <dt id="index-in_002dproducer"><span class="category">Auxiliary Operator: </span><span><strong>in-producer</strong> <em>producer [continuep [arg&hellip;]]</em><a href='#index-in_002dproducer' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the values produced by repeated evaluations
