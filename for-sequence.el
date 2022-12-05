@@ -155,15 +155,31 @@ Otherwise, invoke `cl-call-next-method'."
   "Signal `for-unhandled-type' with DATUM."
   (signal 'for-unhandled-type (list datum)))
 
-(for--defseq for-in-array (array)
-  "Return an iterator that returns each item in ARRAY."
+(for--defseq for-in-array (array &optional start end step)
+  "Return an iterator that returns each item in ARRAY.
+
+Indexes are iterated as in (`for-in-range' START END STEP),
+except that END defaults to (`length' ARRAY) when it is nil or
+omitted."
   (:type array)
   (:expander-case
-   (`(,id (,_ ,array-form))
-    (for--with-gensyms (array length index)
-      `(,id (:do-in ((,array ,array-form)) ((,length (length ,array)))
-                    ((,index 0)) ((< ,index ,length))
-                    ((,id (aref ,array ,index))) ((1+ ,index))))))))
+   (`(,id ,(or (and (or (and (or (and `(,_ ,array-form)
+                                      (let start-form nil))
+                                 `(,_ ,array-form ,start-form))
+                             (let end-form nil))
+                        `(,_ ,array-form ,start-form ,end-form))
+                    (let step-form nil))
+               `(,_ ,array-form ,start-form ,end-form ,step-form)))
+    (for--with-gensyms (array start end step length index)
+      `(,id (:do-in ((,array ,array-form)
+                     (,start (or ,start-form 0))
+                     (,end ,end-form)
+                     (,step (or ,step-form 1)))
+                    ((,length (or ,end (length ,array))))
+                    ((,index ,start))
+                    ((< ,index ,length))
+                    ((,id (aref ,array ,index)))
+                    ((+ ,index ,step))))))))
 
 (for--defseq for-in-inclusive-range (start end &optional step)
   "Return an iterator that returns each number in inclusive range.
@@ -341,14 +357,30 @@ half-open when STEP is negative."
                     (,continue) ((,id ,value)) (nil))))))
   (iter-make (iter-yield value)))
 
-(for--defseq for-on-array (array)
-  "Return an iterator that returns each index on ARRAY."
+(for--defseq for-on-array (array &optional start end step)
+  "Return an iterator that returns each index on ARRAY.
+
+Indexes are iterated as in (`for-in-range' START END STEP),
+except that END defaults to (`length' ARRAY) when it is nil or
+omitted."
   (:expander-case
-   (`(,id (,_ ,array-form))
-    (for--with-gensyms (array length index)
-      `(,id (:do-in ((,array ,array-form)) ((,length (length ,array)))
-                    ((,index 0)) ((< ,index ,length))
-                    ((,id ,index)) ((1+ ,index))))))))
+   (`(,id ,(or (and (or (and (or (and `(,_ ,array-form)
+                                      (let start-form nil))
+                                 `(,_ ,array-form ,start-form))
+                             (let end-form nil))
+                        `(,_ ,array-form ,start-form ,end-form))
+                    (let step-form nil))
+               `(,_ ,array-form ,start-form ,end-form ,step-form)))
+    (for--with-gensyms (array start end step length index)
+      `(,id (:do-in ((,array ,array-form)
+                     (,start (or ,start-form 0))
+                     (,end ,end-form)
+                     (,step (or ,step-form 1)))
+                    ((,length (or ,end (length ,array))))
+                    ((,index ,start))
+                    ((< ,index ,length))
+                    ((,id ,index))
+                    ((+ ,index ,step))))))))
 
 (for--defseq for-on-list (list)
   "Return an iterator that returns each cons on LIST."

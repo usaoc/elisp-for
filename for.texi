@@ -1457,11 +1457,13 @@ constructor.  All sequence constructors when used as generators are
 guaranteed to delay the computation as much as possible, including that
 of the initial states.
 
-@deffn @seq{for-in-array, in-array, array}
-This sequence iterates over the elements of the array @var{array}.  As
-such, @code{array}s are dispatched to it.  Moreover, a literal array as
-a sequence form when used in iteration clauses is treated as if this
-sequence constructor is used.
+@deffn @seq{for-in-array, in-array, array @optional{start @optional{end @optional{step}}}}
+This sequence iterates over the elements of the array @var{array}.
+Indexes are iterated as in @code{(for-in-range @var{start} @var{end}
+@var{step})}, except that @var{end} defaults to @code{(length
+@var{array})} when it is nil or omitted.  @code{array}s are dispatched
+to it.  Moreover, a literal array as a sequence form when used in
+iteration clauses is treated as if this sequence constructor is used.
 @end deffn
 
 @deffn @seq{for-in-inclusive-range, in-inclusive-range, start end @optional{step}}
@@ -1537,8 +1539,11 @@ makes a circular list of the arguments.
 This sequence returns @var{value} once.
 @end deffn
 
-@deffn @seq{for-on-array, on-array, array}
+@deffn @seq{for-on-array, on-array, array @optional{start @optional{end @optional{step}}}}
 This sequence iterates over the indexes of the array @var{array}.
+Indexes are iterated as in @code{(for-in-range @var{start} @var{end}
+@var{step})}, except that @var{end} defaults to @code{(length
+@var{array})} when it is nil or omitted.
 @end deffn
 
 @deffn @seq{for-on-list, on-list, list}
