@@ -62,10 +62,10 @@ so far:
 </p>
 <div class="example">
 <pre class="example">(let <var>memoize-bindings</var>
-  (let <var>outer-bindings</var>
+  (pcase-let* <var>outer-bindings</var>
     (let <var>loop-bindings</var>
       (while (and . <var>loop-guards</var>)
-        (pcase-let <var>inner-bindings</var>
+        (pcase-let* <var>inner-bindings</var>
           [<var>body</var>&hellip;]
           <var>loop-update</var>))))
 </pre></div>
@@ -119,12 +119,14 @@ guaranteed to delay the computation as much as possible, including that
 of the initial states.
 </p>
 <dl class="def">
-<dt id="index-for_002din_002darray"><span class="category">Function: </span><span><strong>for-in-array</strong> <em>array</em><a href='#index-for_002din_002darray' class='copiable-anchor'> &para;</a></span></dt>
-<dt id="index-in_002darray"><span class="category">Auxiliary Operator: </span><span><strong>in-array</strong> <em>array</em><a href='#index-in_002darray' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This sequence iterates over the elements of the array <var>array</var>.  As
-such, <code>array</code>s are dispatched to it.  Moreover, a literal array as
-a sequence form when used in iteration clauses is treated as if this
-sequence constructor is used.
+<dt id="index-for_002din_002darray"><span class="category">Function: </span><span><strong>for-in-array</strong> <em>array [start [end [step]]]</em><a href='#index-for_002din_002darray' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-in_002darray"><span class="category">Auxiliary Operator: </span><span><strong>in-array</strong> <em>array [start [end [step]]]</em><a href='#index-in_002darray' class='copiable-anchor'> &para;</a></span></dt>
+<dd><p>This sequence iterates over the elements of the array <var>array</var>.
+Indexes are iterated as in <code>(for-in-range <var>start</var> <var>end</var>
+<var>step</var>)</code>, except that <var>end</var> defaults to <code>(length
+<var>array</var>)</code> when it is nil or omitted.  <code>array</code>s are dispatched
+to it.  Moreover, a literal array as a sequence form when used in
+iteration clauses is treated as if this sequence constructor is used.
 </p></dd></dl>
 
 <dl class="def">
@@ -220,9 +222,12 @@ makes a circular list of the arguments.
 </p></dd></dl>
 
 <dl class="def">
-<dt id="index-for_002don_002darray"><span class="category">Function: </span><span><strong>for-on-array</strong> <em>array</em><a href='#index-for_002don_002darray' class='copiable-anchor'> &para;</a></span></dt>
-<dt id="index-on_002darray"><span class="category">Auxiliary Operator: </span><span><strong>on-array</strong> <em>array</em><a href='#index-on_002darray' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-for_002don_002darray"><span class="category">Function: </span><span><strong>for-on-array</strong> <em>array [start [end [step]]]</em><a href='#index-for_002don_002darray' class='copiable-anchor'> &para;</a></span></dt>
+<dt id="index-on_002darray"><span class="category">Auxiliary Operator: </span><span><strong>on-array</strong> <em>array [start [end [step]]]</em><a href='#index-on_002darray' class='copiable-anchor'> &para;</a></span></dt>
 <dd><p>This sequence iterates over the indexes of the array <var>array</var>.
+Indexes are iterated as in <code>(for-in-range <var>start</var> <var>end</var>
+<var>step</var>)</code>, except that <var>end</var> defaults to <code>(length
+<var>array</var>)</code> when it is nil or omitted.
 </p></dd></dl>
 
 <dl class="def">
