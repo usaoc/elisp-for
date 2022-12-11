@@ -43,6 +43,15 @@
       (while tail (cl-shiftf last tail (cdr tail))))
     (setf (cdr last) values)))
 
+(defsubst for--overlay-list (buffer)
+  "Return (`overlays-in' (`point-min') (`point-max')).
+
+BUFFER is used as the current buffer."
+  (declare (side-effect-free t))
+  (if (not buffer) (overlays-in (point-min) (point-max))
+    (with-current-buffer buffer
+      (overlays-in (point-min) (point-max)))))
+
 ;;;; Interface
 (defmacro define-for-sequence (name arglist &rest subforms)
   "Define a sequence constructor NAME with ARGLIST and DOCSTRING.
@@ -163,13 +172,8 @@ except that END defaults to (`length' ARRAY) when it is nil or
 omitted."
   (:type array)
   (:expander-case
-   (`(,id ,(or (and (or (and (or (and `(,_ ,array-form)
-                                      (let start-form nil))
-                                 `(,_ ,array-form ,start-form))
-                             (let end-form nil))
-                        `(,_ ,array-form ,start-form ,end-form))
-                    (let step-form nil))
-               `(,_ ,array-form ,start-form ,end-form ,step-form)))
+   (`(,id ,(for--funcall array-form
+                         &optional start-form end-form step-form))
     (for--with-gensyms (array start end step continuep index)
       `(,id (:do-in ((,array ,array-form)
                      (,start ,start-form)
@@ -191,9 +195,7 @@ START is the start of range, and END is the end of range.  STEP
 defaults to 1 when it is nil or omitted.  Unlike `for-in-range',
 the range is closed."
   (:expander-case
-   (`(,id ,(or (and `(,_ ,start-form ,end-form)
-                    (let step-form nil))
-               `(,_ ,start-form ,end-form ,step-form)))
+   (`(,id ,(for--funcall start-form end-form &optional step-form))
     (for--with-gensyms (start end step continuep number)
       `(,id (:do-in ((,start ,start-form)
                      (,end ,end-form)
@@ -210,8 +212,7 @@ the range is closed."
 START is the start of range.  STEP defaults to 1 when it is nil
 or omitted."
   (:expander-case
-   (`(,id ,(or (and `(,_ ,start-form) (let step-form nil))
-               (and `(,_ ,start-form ,step-form))))
+   (`(,id ,(for--funcall start-form &optional step-form))
     (for--with-gensyms (start step number)
       `(,id (:do-in ((,start ,start-form)
                      (,step ,step-form))
@@ -222,11 +223,7 @@ or omitted."
 (for--defseq for-in-list (list)
   "Return an iterator that returns each element in LIST."
   (:type list)
-  (:expander-case
-   (`(,id (,_ ,list-form))
-    (for--with-gensyms (list tail)
-      `(,id (:do-in ((,list ,list-form)) () ((,tail ,list))
-                    (,tail) ((,id (car ,tail))) ((cdr ,tail))))))))
+  (:expander-case (`(,id (,_ ,list)) (for--in-list id list))))
 
 (for--defseq for-in-producer (producer &rest args)
   "Return an iterator that returns each call to PRODUCER.
@@ -287,11 +284,8 @@ range is right half-open when STEP is non-negative, or left
 half-open when STEP is negative."
   (:type integer)
   (:expander-case
-   (`(,id ,(or (and (or (and `(,_ ,start-or-end-form)
-                             (let end-form nil))
-                        `(,_ ,start-or-end-form ,end-form))
-                    (let step-form nil))
-               `(,_ ,start-or-end-form ,end-form ,step-form)))
+   (`(,id ,(for--funcall start-or-end-form
+                         &optional end-form step-form))
     (for--with-gensyms (start-or-end end step start continuep number)
       `(,id (:do-in ((,start-or-end ,start-or-end-form)
                      (,end ,end-form)
@@ -378,20 +372,12 @@ MATCH NOSORT COUNT)), where FULL, NOSORT, and COUNT defaults to
 nil when omitted, and MATCH defaults to
 `directory-files-no-dot-files-regexp' when it is nil or omitted."
   (:expander-case
-   (`(,id ,(or (and (or (and (or (and (or (and `(,_ ,directory)
-                                               (let full nil))
-                                          `(,_ ,directory ,full))
-                                      (let match nil))
-                                 `(,_ ,directory ,full ,match))
-                             (let nosort nil))
-                        `(,_ ,directory ,full ,match ,nosort))
-                    (let count nil))
-               `(,_ ,directory ,full ,match ,nosort ,count)))
-    `(,id (for-in-list
-           (directory-files
-            ,directory ,full
-            (or ,match directory-files-no-dot-files-regexp)
-            ,nosort ,count))))))
+   (`(,id ,(for--funcall directory &optional full match nosort count))
+    (for--in-list id
+                  (directory-files
+                   directory full
+                   (match directory-files-no-dot-files-regexp)
+                   nosort count)))))
 
 (for--defseq for-in-directory-recursively
     (dir regexp
@@ -403,21 +389,13 @@ REGEXP INCLUDE-DIRECTORIES PREDICATE FOLLOW-SYMLINKS)) where
 INCLUDE-DIRECTORIES, PREDICATE, and FOLLOW-SYMLINKS defaults to
 nil when omitted."
   (:expander-case
-   (`(,id ,(or (and (or (and (or (and `(,_ ,dir ,regexp)
-                                      (let include-directories nil))
-                                 `(,_ ,dir ,regexp
-                                      ,include-directories))
-                             (let predicate nil))
-                        `(,_ ,dir ,regexp
-                             ,include-directories ,predicate))
-                    (let follow-symlinks nil))
-               `(,_ ,dir ,regexp
-                    ,include-directories ,predicate
-                    ,follow-symlinks)))
-    `(,id (for-in-list
-           (directory-files-recursively
-            ,dir ,regexp
-            ,include-directories ,predicate ,follow-symlinks))))))
+   (`(,id ,(for--funcall
+            dir regexp
+            &optional include-directories predicate follow-symlinks))
+    (for--in-list id
+                  (directory-files-recursively
+                   dir regexp
+                   include-directories predicate follow-symlinks)))))
 
 (for--defseq for-the-buffers (&optional frame)
   "Return an iterator that returns each buffer in FRAME.
@@ -426,7 +404,7 @@ Equivalent to (`for-in-list' (`buffer-list' FRAME)) where FRAME
 defaults to nil when omitted."
   (:expander-case
    (`(,id ,(or (and `(,_) (let frame nil)) `(,_ ,frame)))
-    `(,id (for-in-list (buffer-list ,frame))))))
+    (for--in-list id (buffer-list frame)))))
 
 (for--defseq for-the-frames ()
   "Return an iterator that returns each frame.
@@ -459,13 +437,8 @@ to (`for-in-list' (`overlays-in' (`point-min') (`point-max')))
 with BUFFER as the current buffer.  BUFFER defaults to the
 current buffer when it is nil or omitted."
   (:expander-case
-   (`(,id ,(or (and `(,_) (let buffer-form nil)) `(,_ ,buffer-form)))
-    (for--with-gensyms (buffer)
-      `(,id (for-in-list
-             (if-let ((,buffer ,buffer-form))
-                 (with-current-buffer ,buffer
-                   (overlays-in (point-min) (point-max)))
-               (overlays-in (point-min) (point-max)))))))))
+   (`(,id ,(or (and `(,_) (let buffer nil)) `(,_ ,buffer)))
+    (for--in-list id (for--overlay-list buffer)))))
 
 (for--defseq for-the-windows (&optional frame minibuf)
   "Return an iterator that returns each window in FRAME.
@@ -477,10 +450,7 @@ it is not a frame or omitted.  MINIBUF and FRAME are passed to
 `next-window' as the MINIBUF and ALL-FRAMES arguments where
 MINIBUF defaults to nil when it is omitted."
   (:expander-case
-   (`(,id ,(or (and (or (and `(,_) (let frame-form nil))
-                        `(,_ ,frame-form))
-                    (let minibuf-form nil))
-               `(,_ ,frame-form ,minibuf-form)))
+   (`(,id ,(for--funcall &optional frame-form minibuf-form))
     (for--with-gensyms (frame minibuf current original visited)
       `(,id (:do-in ((,frame ,frame-form) (,minibuf ,minibuf-form))
                     ((,original (frame-selected-window

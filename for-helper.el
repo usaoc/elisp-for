@@ -27,8 +27,8 @@
 
 ;;; Code:
 ;;;; Require
+(require 'cl-lib)
 (eval-when-compile
-  (require 'cl-lib)
   (require 'subr-x))
 
 ;;;; Interface
@@ -168,6 +168,37 @@ A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
                                   "for-" (symbol-name name))))
                 . ,subforms))))))
 
+(defmacro for--in-list (id form)
+  "Return an iteration clause suitable for (ID (in-list FORM))."
+  (cl-flet ((\, (form) (list '\, form)))
+    (cl-flet ((make-id (form)
+                (pcase form
+                  ((or `(,id ,_) id) (make-symbol (symbol-name id)))))
+              (make-binding (id form)
+                (pcase form ((or `(,form ,_) form) `(,,id ,,form))))
+              (make-default (id form)
+                (pcase form
+                  (`(,_ ,default) `((,,id (or ,,id ,default))))
+                  (_ '()))))
+      (pcase form
+        ((or (and `(,head . ,(and (app (mapcar #'make-id) ids)
+                                  (app (cl-mapcar #'make-binding ids)
+                                       bindings)
+                                  (app (cl-mapcan #'make-default ids)
+                                       defaults)))
+                  (let tail-form `(,head . ,(mapcar #'\, ids))))
+             (and (let list (make-symbol "list"))
+                  (let ids `(,list))
+                  (let bindings `((,,list ,,form)))
+                  (let defaults '())
+                  (let tail-form ,list)))
+         (let ((tail (make-symbol "tail")))
+           `(for--with-gensyms (,@ids ,tail)
+              ,(list '\` `(,,id (:do-in ,bindings ,defaults
+                                        ((,,tail ,tail-form)) (,,tail)
+                                        ((,,id (car ,,tail)))
+                                        ((cdr ,,tail))))))))))))
+
 (defmacro for--with-gensyms (names &rest body)
   "Bind NAMEs in NAMES to generated identifiers and evaluate BODY.
 
@@ -176,6 +207,26 @@ A SUBFORM in SUBFORMS can be either a `:type', `:expander', or
   `(let ,(mapcar (lambda (name) `(,name (gensym ,(symbol-name name))))
                  names)
      . ,body))
+
+(pcase-defmacro for--funcall (&rest args)
+  "Matches EXPVAL as an arglist according to ARGS."
+  (named-let parse ((mand-args '()) (args args))
+    (pcase args
+      (`(&optional . ,opt-args)
+       (cl-flet
+           ((\, (form) (list '\, form))
+            (args-pat (args) (list '\` (cons (list '\, '_) args))))
+         (let ((args (mapcar #'\, (nreverse mand-args))))
+           (named-let build
+               ((args args) (opt-args opt-args) (pat (args-pat args)))
+             (pcase opt-args
+               ('() pat)
+               (`(,arg . ,opt-args)
+                (let ((args `(,@args ,,arg)))
+                  (build args opt-args
+                         `(or (and ,pat (let ,arg nil))
+                              ,(args-pat args))))))))))
+      (`(,arg . ,args) (parse `(,arg . ,mand-args) args)))))
 
 ;;;; Provide
 (provide 'for-helper)
