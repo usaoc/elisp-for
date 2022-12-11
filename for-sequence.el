@@ -27,12 +27,12 @@
 
 ;;; Code:
 ;;;; Require
+(require 'cl-lib)
+(require 'generator)
 (eval-when-compile
   (require 'for-helper)
   (require 'for-iteration)
   (require 'subr-x))
-(require 'cl-lib)
-(require 'generator)
 
 ;;;; Internal
 (defsubst for--make-circular (&rest values)

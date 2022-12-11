@@ -27,13 +27,13 @@
 
 ;;; Code:
 ;;;; Require
-(eval-when-compile
-  (require 'for-helper)
-  (require 'subr-x))
 (require 'cl-lib)
 (require 'ert)
 (require 'for)
 (require 'generator)
+(eval-when-compile
+  (require 'for-helper)
+  (require 'subr-x))
 
 ;;;; Internal
 (eval-when-compile

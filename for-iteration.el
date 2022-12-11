@@ -27,11 +27,11 @@
 
 ;;; Code:
 ;;;; Require
+(require 'cl-lib)
+(require 'generator)
 (eval-when-compile
   (require 'for-helper)
   (require 'subr-x))
-(require 'cl-lib)
-(require 'generator)
 
 ;;;; Internal
 (defun for--expand-iteration-clause (clause)
