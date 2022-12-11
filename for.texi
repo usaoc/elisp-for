@@ -1529,13 +1529,6 @@ makes a circular list of the arguments.
 This sequence returns @var{value} once.
 @end deffn
 
-@deffn @seq{for-on-array, on-array, array @optional{start @optional{end @optional{step}}}}
-This sequence iterates over the indexes of the array @var{array}.
-Indexes are iterated as in @code{(for-in-range @var{start} @var{end}
-@var{step})}, except that @var{end} defaults to @code{(length
-@var{array})} when it is nil or omitted.
-@end deffn
-
 @deffn @seq{for-on-list, on-list, list}
 This sequence iterates over the @code{cons}es of the non-dotted list
 @var{list}.

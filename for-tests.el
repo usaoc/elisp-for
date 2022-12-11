@@ -510,8 +510,7 @@
 (for--deftest-seq
   (let ((list (for--make-test-list)))
     (let ((result (mapcar #'1+ list)))
-      (pcase-let* ((length (length result))
-                   (`(,_ . ,(and rest (app butlast rest-butlast)))
+      (pcase-let* ((`(,_ . ,(and rest (app butlast rest-butlast)))
                     result)
                    (rest-butlast-even
                     (cl-loop for i in rest-butlast by #'cddr
@@ -519,41 +518,19 @@
         (let ((vector (vconcat list)))
           (should (equal (seq (i (in-array vector)) (1+ i)) result))
           (should (equal (seq (i (in-array vector 1)) (1+ i)) rest))
-          (should (equal (seq (i (on-array vector)) (1+ i))
-                         (cl-loop for i below length collect (1+ i))))
-          (should (equal (seq (i (on-array vector 1)) (1+ i))
-                         (cl-loop for i from 1 below length
-                                  collect (1+ i))))
           (let ((end (1- (length vector))))
             (should (equal (seq (i (in-array vector 1 end)) (1+ i))
                            rest-butlast))
             (should (equal (seq (i (in-array vector 1 end 2)) (1+ i))
-                           rest-butlast-even))
-            (should (equal (seq (i (on-array vector 1 end)) (1+ i))
-                           (cl-loop for i from 1 below end
-                                    collect (1+ i))))
-            (should (equal (seq (i (on-array vector end 1 -2)) (1+ i))
-                           (cl-loop for i from end above 1 by 2
-                                    collect (1+ i))))))
+                           rest-butlast-even))))
         (let ((string (concat list)))
           (should (equal (seq (i (in-array string)) (1+ i)) result))
           (should (equal (seq (i (in-array string 1)) (1+ i)) rest))
-          (should (equal (seq (i (on-array string)) (1+ i))
-                         (cl-loop for i below length collect (1+ i))))
-          (should (equal (seq (i (on-array string 1)) (1+ i))
-                         (cl-loop for i from 1 below length
-                                  collect (1+ i))))
           (let ((end (1- (length string))))
             (should (equal (seq (i (in-array string 1 end)) (1+ i))
                            rest-butlast))
             (should (equal (seq (i (in-array string 1 end 2)) (1+ i))
-                           rest-butlast-even))
-            (should (equal (seq (i (on-array string 1 end)) (1+ i))
-                           (cl-loop for i from 1 below end
-                                    collect (1+ i))))
-            (should (equal (seq (i (on-array string end 1 -2)) (1+ i))
-                           (cl-loop for i from end above 1 by 2
-                                    collect (1+ i)))))))
+                           rest-butlast-even)))))
       (should (equal (seq (i (in-list list)) (1+ i)) result)))
     (should (equal (seq (i (on-list list)) i)
                    (cl-maplist #'identity list)))

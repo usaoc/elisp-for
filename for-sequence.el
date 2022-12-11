@@ -361,34 +361,6 @@ half-open when STEP is negative."
                     (,continue) ((,id ,value)) (nil))))))
   (iter-make (iter-yield value)))
 
-(for--defseq for-on-array (array &optional start end step)
-  "Return an iterator that returns each index on ARRAY.
-
-Indexes are iterated as in (`for-in-range' START END STEP),
-except that END defaults to (`length' ARRAY) when it is nil or
-omitted."
-  (:expander-case
-   (`(,id ,(or (and (or (and (or (and `(,_ ,array-form)
-                                      (let start-form nil))
-                                 `(,_ ,array-form ,start-form))
-                             (let end-form nil))
-                        `(,_ ,array-form ,start-form ,end-form))
-                    (let step-form nil))
-               `(,_ ,array-form ,start-form ,end-form ,step-form)))
-    (for--with-gensyms (array start end step continuep index)
-      `(,id (:do-in ((,array ,array-form)
-                     (,start ,start-form)
-                     (,end ,end-form)
-                     (,step ,step-form))
-                    ((,start (or ,start 0))
-                     (,end (or ,end (length ,array)))
-                     (,step (or ,step 1))
-                     (,continuep (if (< ,step 0) #'> #'<)))
-                    ((,index ,start))
-                    ((funcall ,continuep ,index ,end))
-                    ((,id ,index))
-                    ((+ ,index ,step))))))))
-
 (for--defseq for-on-list (list)
   "Return an iterator that returns each cons on LIST."
   (:expander-case
