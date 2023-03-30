@@ -105,10 +105,8 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                  (or `(:expander . ,(and `((,_) ,_ . ,_) body))
                      `(:expander-case
                        . ,(app (lambda (cases)
-                                 (for--with-gensyms (for-clause)
-                                   `((,for-clause)
-                                     (pcase-exhaustive ,for-clause
-                                       . ,cases))))
+                                 `((#1=#:for-clause)
+                                   (pcase-exhaustive #1# . ,cases)))
                                body))))
            . ,subforms)
          (let ((id (intern (concat name-string
@@ -129,19 +127,17 @@ BODY are the body of generator.  See Info node `(for)Definers'.
                     (`(,_ . ,_) subforms))))
              `(progn
                 ,@expander
-                ,@(if (null aliases) '()
-                    (mapcar (lambda (alias)
-                              `(define-symbol-prop
-                                ',alias 'for--alias ',name))
-                            aliases))
-                ,@(if (null types) '()
-                    (mapcar (lambda (type)
-                              `(cl-defmethod for-generator
-                                 ((#1=#:datum ,type))
-                                 ,(concat "Call `" name-string
-                                          "' with DATUM.")
-                                 (,name #1#)))
-                            types))
+                ,@(mapcar (lambda (alias)
+                            `(define-symbol-prop
+                              ',alias 'for--alias ',name))
+                          aliases)
+                ,@(mapcar (lambda (type)
+                            `(cl-defmethod for-generator
+                               ((#1=#:datum ,type))
+                               ,(concat "Call `" name-string
+                                        "' with DATUM.")
+                               (,name #1#)))
+                          types)
                 (defun ,name ,arglist
                   ,@docstring ,@declaration . ,body))))))))
 
