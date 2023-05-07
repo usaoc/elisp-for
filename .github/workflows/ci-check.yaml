@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'for*.el'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

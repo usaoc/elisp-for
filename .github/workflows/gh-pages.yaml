@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - for.texi
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
