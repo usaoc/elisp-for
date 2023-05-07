@@ -1494,7 +1494,7 @@ of the function form @code{(funcall @var{producer}
 @optional{@repeated{@var{arg}}})}.  The iteration is infinite when
 @var{continuep} is omitted.  Otherwise, the iteration terminates when
 @code{(funcall @var{continuep} @var{value})} is false where @var{value}
-is the value of the function form,
+is the value of the function form.
 @end deffn
 
 @deffn @seq{for-in-range, in-range, end}
