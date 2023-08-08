@@ -407,9 +407,7 @@ defaults to nil when omitted."
 
 Not equivalent to (`for-in-list' (`frame-list')), since the
 frames are visited from the selected frame in `next-frame'
-order.
-
-See Info node `(for)Sequence Constructors'."
+order."
   (:expander-case
    (`(,id (,_))
     (for--with-gensyms (current original visited)
