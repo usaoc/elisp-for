@@ -297,7 +297,8 @@ from the expanded form.
                  (pcase-exhaustive pair
                    (`(,id ,value)
                     (if (identifier= id value) form
-                      `(setq ,id (prog1 ,value ,form)))))))
+                      `(setq ,id ,(if (not form) value
+                                    `(prog1 ,value ,form))))))))
              pairs :from-end t :initial-value nil))
 
 (defmacro for--named-let (name bindings &rest body)
