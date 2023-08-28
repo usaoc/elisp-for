@@ -1049,7 +1049,6 @@ This iteration macro is the implicitly nesting version of
 @end defmac
 
 @defmac for-string (@optional{@repeated{for-clause}}) @optional{@code{:length} length @optional{@code{:init} init @optional{@code{:multibyte} multibyte}}} @optional{@repeated{body}}
-@cindex terminology @subentry coerce
 When neither @var{length}, @var{init}, nor @var{multibyte} is present,
 this iteration macro is equivalent to the following form
 (@pxref{Creating Strings,,,elisp}), such that it coerces the list
