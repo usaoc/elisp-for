@@ -15,7 +15,7 @@ sequence forms inspired by Racket.  For detailed documentation, refer
 to [[https://usaoc.github.io/elisp-for/][the manual]].
 
 * Introduction
-  [[https://racket-lang.org/][Racket]], extending on the idea of [[https://srfi.schemers.org/srfi-42/srfi-42.html][SRFI 42]], provides [[https://docs.racket-lang.org/reference/sequences.html][iteration]] and
+  [[https://racket-lang.org/][Racket]], extending on the idea of [[https://srfi.schemers.org/srfi-42/srfi-42.html][SRFI 42]], provides [[https://docs.racket-lang.org/reference/for.html][iteration]] and
   [[https://docs.racket-lang.org/reference/sequences.html][sequence]] forms that are both efficient and generic.  The iteration
   forms essentially expand to calls to self-tail-recursive procedures,
   similar to [[https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-10.html][~do~ and named ~let~ forms]].  The sequence constructors
