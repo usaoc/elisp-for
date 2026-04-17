@@ -1,11 +1,11 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
-<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 7.1, https://www.gnu.org/software/texinfo/ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!-- This manual documents For (version 1.4).
+<!-- This manual documents For (version 1.4.1).
 
-Copyright (C) 2022 Wing Hei Chan
+Copyright © 2022 Wing Hei Chan
 
 This document is free documentation: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published
@@ -34,476 +34,482 @@ with this document.  If not, see https://www.gnu.org/licenses/. -->
 <link href="Iteration-Forms.html" rel="up" title="Iteration Forms">
 <link href="Special_002dClause-Operators.html" rel="next" title="Special-Clause Operators">
 <style type="text/css">
-@import url("https://www.gnu.org/software/emacs/manual.css");
-cite { font-style: italic; }
+<!--
+a.copiable-link {visibility: hidden; text-decoration: none; line-height: 0em}
+div.example {margin-left: 3.2em}
+span:hover a.copiable-link {visibility: visible}
+strong.def-name {font-family: monospace; font-weight: bold; font-size: larger}
+ul.mark-bullet {list-style-type: disc}
+-->
 </style>
+
 
 </head>
 
 <body lang="en">
-<div class="section" id="Iteration-Macros">
-<div class="header">
+<div class="section-level-extent" id="Iteration-Macros">
+<div class="nav-panel">
 <p>
 Next: <a href="Special_002dClause-Operators.html" accesskey="n" rel="next">Special-Clause Operators</a>, Up: <a href="Iteration-Forms.html" accesskey="u" rel="up">Iteration Forms</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<span id="Iteration-Macros-1"></span><h3 class="section">4.1 Iteration Macros</h3>
+<h3 class="section" id="Iteration-Macros-1"><span>4.1 Iteration Macros<a class="copiable-link" href="#Iteration-Macros-1"> &para;</a></span></h3>
 <p>Iteration macros are global macros acting as the entry points of this
 package.
 </p>
-<dl class="def">
-<dt id="index-for_002dfold"><span class="category">Macro: </span><span><strong>for-fold</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfold' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dfold"><span class="category-def">Macro: </span><span><strong class="def-name">for-fold</strong> <var class="def-var-arguments">([binding&hellip;] [(<code class="code">:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dfold"> &para;</a></span></dt>
 <dd><p>This iteration macro is the fundamental building block of other
-iteration macros.  <var>body</var>s are first transformed according to the
-following rules and appended to <var>for-clause</var>s preserving their
+iteration macros.  <var class="var">body</var>s are first transformed according to the
+following rules and appended to <var class="var">for-clause</var>s preserving their
 order:
 </p>
-<ul>
-<li> Each form except the last one is transformed to a <code>:do</code> clause
+<ul class="itemize mark-bullet">
+<li>Each form except the last one is transformed to a <code class="code">:do</code> clause
 unless it is already a special clause;
 
-</li><li> The last form is treated as a multiple-value form as is.
+</li><li>The last form is treated as a multiple-value form as is.
 </li></ul>
 
-<p><var>for-clause</var>s are then processed in order.  Multiple adjacent
+<p><var class="var">for-clause</var>s are then processed in order.  Multiple adjacent
 iteration clauses are treated as a group, and special clauses serve to
 separate the groups of iteration clauses.  A group of iteration clauses
-expands to a <code>while</code> loop wrapping the body expanded so far, and a
+expands to a <code class="code">while</code> loop wrapping the body expanded so far, and a
 special clause expands according to its idiosyncratic rules, presumably
 wrapping the body expanded so far.  A group of iteration clauses or a
 special clause to the left of another group of iteration clauses or
 special clause nests the latter.  The last form is a multiple-value form
-that produces as many values as there are <var>binding</var>s.  It is an
+that produces as many values as there are <var class="var">binding</var>s.  It is an
 error for the multiple-value form to produce not as many values as there
-are <var>binding</var>s.
+are <var class="var">binding</var>s.
 </p>
-<p>After <var>for-clause</var>s are processed, <var>expression</var>s are appended to
-the body, and <var>binding</var>s are bound by a <code>let</code> form wrapping the
-body.  Given that <var>binding</var> has either the form
-<code>(<var>identifier</var> [<var>expression</var>])</code> or
-<var>identifier</var>, <var>expression</var> defaults to <code>nil</code> when there is
-no <var>identifier</var>, <var>identifier</var> when there is one, <code>(cons
-<var>identifier</var>&hellip;)</code> when there are two, and <code>(list
-<var>identifier</var>&hellip;)</code> when there are three or more.
+<p>After <var class="var">for-clause</var>s are processed, <var class="var">expression</var>s are appended to
+the body, and <var class="var">binding</var>s are bound by a <code class="code">let</code> form wrapping the
+body.  Given that <var class="var">binding</var> has either the form
+<code class="code">(<var class="var">identifier</var> [<var class="var">expression</var>])</code> or
+<var class="var">identifier</var>, <var class="var">expression</var> defaults to <code class="code">nil</code> when there is
+no <var class="var">identifier</var>, <var class="var">identifier</var> when there is one, <code class="code">(cons
+<var class="var">identifier</var>&hellip;)</code> when there are two, and <code class="code">(list
+<var class="var">identifier</var>&hellip;)</code> when there are three or more.
 </p>
-<p>An iteration clause has the form <code>(<var>pattern</var>
-<var>sequence-form</var>)</code> where <var>pattern</var> is a <code>pcase</code> pattern and
-<var>sequence-form</var> is either <code>(<var>head</var>
-[<var>subform</var>&hellip;])</code> or <var>datum</var>.  Alternatively, it
-has the form <code>(<var>sequence-form</var>)</code>, which is first transformed to
-the former with a generated identifier as <var>pattern</var>.  It is then
+<p>An iteration clause has the form <code class="code">(<var class="var">pattern</var>
+<var class="var">sequence-form</var>)</code> where <var class="var">pattern</var> is a <code class="code">pcase</code> pattern and
+<var class="var">sequence-form</var> is either <code class="code">(<var class="var">head</var>
+[<var class="var">subform</var>&hellip;])</code> or <var class="var">datum</var>.  Alternatively, it
+has the form <code class="code">(<var class="var">sequence-form</var>)</code>, which is first transformed to
+the former with a generated identifier as <var class="var">pattern</var>.  It is then
 iteratively expanded as follows:
 </p>
-<ul>
-<li> If the sole <var>subform</var> is a <code>:do-in</code> form, terminate the
+<ul class="itemize mark-bullet">
+<li>If the sole <var class="var">subform</var> is a <code class="code">:do-in</code> form, terminate the
 expansion;
 
-</li><li> Else, if <var>datum</var> is a recognized literal object, expand to
-<code>(<var>pattern</var> (<var>head</var> <var>datum</var>))</code> where <var>head</var> is the
+</li><li>Else, if <var class="var">datum</var> is a recognized literal object, expand to
+<code class="code">(<var class="var">pattern</var> (<var class="var">head</var> <var class="var">datum</var>))</code> where <var class="var">head</var> is the
 corresponding sequence constructor;
 
-</li><li> Else, if <var>head</var> is an alias of <var>base</var>, expand to
-<code>(<var>pattern</var> (<var>base</var> [<var>subform</var>&hellip;]))</code>;
+</li><li>Else, if <var class="var">head</var> is an alias of <var class="var">base</var>, expand to
+<code class="code">(<var class="var">pattern</var> (<var class="var">base</var> [<var class="var">subform</var>&hellip;]))</code>;
 
-</li><li> Else, if <var>head</var> has an associated expander, call it with the
+</li><li>Else, if <var class="var">head</var> has an associated expander, call it with the
 iteration clause as the sole argument;
 
-</li><li> Else, expand to <code>(<var>pattern</var> (for-in-iterator (for-generator
-<var>datum</var>)))</code>.
+</li><li>Else, expand to <code class="code">(<var class="var">pattern</var> (for-in-iterator (for-generator
+<var class="var">datum</var>)))</code>.
 </li></ul>
 
-<p>For each <var>identifier</var> and each <var>value</var> produced by the
-multiple-value form, <var>identifier</var> is first bound to the value of
-<var>expression</var> or <code>nil</code> when there is no <var>expression</var> and
-later updated to <var>value</var> after each iteration<a id="DOCF12" href="#FOOT12"><sup>12</sup></a>.
+<p>For each <var class="var">identifier</var> and each <var class="var">value</var> produced by the
+multiple-value form, <var class="var">identifier</var> is first bound to the value of
+<var class="var">expression</var> or <code class="code">nil</code> when there is no <var class="var">expression</var> and
+later updated to <var class="var">value</var> after each iteration<a class="footnote" id="DOCF12" href="#FOOT12"><sup>12</sup></a>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dfold_002a"><span class="category">Macro: </span><span><strong>for-fold*</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfold_002a' class='copiable-anchor'> &para;</a></span></dt>
-<dd><span id="index-iteration-form"></span>
-<p>This iteration macro is the <em>implicitly nesting</em> version of
-<code>for-fold</code>, such that every iteration clause is a group in its own.
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dfold_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-fold*</strong> <var class="def-var-arguments">([binding&hellip;] [(<code class="code">:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dfold_002a"> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-iteration-form-implicitly-nesting"></a>
+<p>This iteration macro is the <em class="dfn">implicitly nesting</em> version of
+<code class="code">for-fold</code>, such that every iteration clause is a group in its own.
 This is achieved by separating each pair of adjacent iteration clauses
-with a vacuous special clause such as <code>(:do)</code>.
+with a vacuous special clause such as <code class="code">(:do)</code>.
 </p></dd></dl>
 
-<p>Below, <var>for-clause*</var>s are <var>for-clause</var>s including the
-transformed <var>body</var>s but excluding the multiple-value form, and
-<var>value*</var> is the multiple-value form where each tail form
-<code>(:values <var>expression</var>)</code> is replaced by <var>expression</var>,
+<p>Below, <var class="var">for-clause*</var>s are <var class="var">for-clause</var>s including the
+transformed <var class="var">body</var>s but excluding the multiple-value form, and
+<var class="var">value*</var> is the multiple-value form where each tail form
+<code class="code">(:values <var class="var">expression</var>)</code> is replaced by <var class="var">expression</var>,
 implying that it is an error for the multiple-value form to produce not
 exactly one value.
 </p>
-<dl class="def">
-<dt id="index-for_002dfoldr"><span class="category">Macro: </span><span><strong>for-foldr</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfoldr' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro is the reverse of <code>for-fold</code>.  The sequences
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dfoldr"><span class="category-def">Macro: </span><span><strong class="def-name">for-foldr</strong> <var class="def-var-arguments">([binding&hellip;] [(<code class="code">:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dfoldr"> &para;</a></span></dt>
+<dd><p>This iteration macro is the reverse of <code class="code">for-fold</code>.  The sequences
 are still iterated in the same order, but the bindings are updated in
 reverse order.  As such, it uses space proportional to the number of
 iterations.  It is equivalent to the following form (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Calling-Functions.html#Calling-Functions">(elisp)Calling
-Functions</a>) where <var>next</var> is a generated identifier,
-<var>update</var>s update <var>binding</var>s to the produced values, and
-<var>expression</var> is potentially the default expression:
+Functions</a>) where <var class="var">next</var> is a generated identifier,
+<var class="var">update</var>s update <var class="var">binding</var>s to the produced values, and
+<var class="var">expression</var> is potentially the default expression:
 </p>
 <div class="example">
-<pre class="example">(let ([<var>binding</var>&hellip;])
-  (funcall (for-fold ((<var>next</var> #'ignore))
-               ([<var>for-clause*</var>&hellip;]
-                (:let (<var>next</var> <var>next</var>))
+<div class="group"><pre class="example-preformatted">(let ([<var class="var">binding</var>...])
+  (funcall (for-fold ((<var class="var">next</var> #'ignore))
+               ([<var class="var">for-clause*</var>...]
+                (:let (<var class="var">next</var> <var class="var">next</var>))
                 (lambda ()
-                  [<var>update</var>&hellip;]
-                  (funcall <var>next</var>)))))
-  <var>expression</var>&hellip;)
-</pre></div>
+                  [<var class="var">update</var>...]
+                  (funcall <var class="var">next</var>)))))
+  <var class="var">expression</var>...)
+</pre></div></div>
 
 <p>It is an error for the expanded form to execute under dynamic binding
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Variable-Scoping.html#Variable-Scoping">(elisp)Variable Scoping</a>).
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dfoldr_002a"><span class="category">Macro: </span><span><strong>for-foldr*</strong> <em>([binding&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfoldr_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dfoldr_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-foldr*</strong> <var class="def-var-arguments">([binding&hellip;] [(<code class="code">:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dfoldr_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-foldr</code>.
+<code class="code">for-foldr</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002ddo"><span class="category">Macro: </span><span><strong>for-do</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002ddo' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro performs side effects and produces <code>nil</code> as
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002ddo"><span class="category-def">Macro: </span><span><strong class="def-name">for-do</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002ddo"> &para;</a></span></dt>
+<dd><p>This iteration macro performs side effects and produces <code class="code">nil</code> as
 the value.  It is equivalent to the following form:
 </p>
 <div class="example">
-<pre class="example">(for-fold ()
-    ([<var>for-clause</var>&hellip;])
-  [<var>body</var>&hellip;]
+<div class="group"><pre class="example-preformatted">(for-fold ()
+    ([<var class="var">for-clause</var>...])
+  [<var class="var">body</var>...]
   (:values))
-</pre></div>
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-for_002ddo_002a"><span class="category">Macro: </span><span><strong>for-do*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002ddo_002a' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro is the implicitly nesting version of <code>for-do</code>.
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002ddo_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-do*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002ddo_002a"> &para;</a></span></dt>
+<dd><p>This iteration macro is the implicitly nesting version of <code class="code">for-do</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dlist"><span class="category">Macro: </span><span><strong>for-list</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlist' class='copiable-anchor'> &para;</a></span></dt>
-<dd><span id="index-terminology-11"></span>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dlist"><span class="category-def">Macro: </span><span><strong class="def-name">for-list</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dlist"> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-terminology-fresh"></a>
 <p>This iteration macro accumulates the values into a
-fresh<a id="DOCF13" href="#FOOT13"><sup>13</sup></a> list and returns
-the list.  It is equivalent to the following form where <var>list</var> is a
+fresh<a class="footnote" id="DOCF13" href="#FOOT13"><sup>13</sup></a> list and returns
+the list.  It is equivalent to the following form where <var class="var">list</var> is a
 generated identifier:
 </p>
 <div class="example">
-<pre class="example">(for-fold ((<var>list</var> '())
-           (:result (nreverse <var>list</var>)))
-    ([<var>for-clause*</var>&hellip;]
-     (cons <var>value*</var> <var>list</var>)))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(for-fold ((<var class="var">list</var> '())
+           (:result (nreverse <var class="var">list</var>)))
+    ([<var class="var">for-clause*</var>...]
+     (cons <var class="var">value*</var> <var class="var">list</var>)))
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dlist_002a"><span class="category">Macro: </span><span><strong>for-list*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlist_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dlist_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-list*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dlist_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-list</code>.
+<code class="code">for-list</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002diter"><span class="category">Macro: </span><span><strong>for-iter</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002diter' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002diter"><span class="category-def">Macro: </span><span><strong class="def-name">for-iter</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002diter"> &para;</a></span></dt>
 <dd><p>This iteration macro returns an iterator of the produced values.  It is
 equivalent to the following form:
 </p>
 <div class="example">
-<pre class="example">(iter-make (for-do ([<var>for-clause*</var>&hellip;]
-                    (:do (iter-yield <var>value*</var>)))))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(iter-make (for-do ([<var class="var">for-clause*</var>...]
+                    (:do (iter-yield <var class="var">value*</var>)))))
+</pre></div></div>
 
 <p>It is an error for the expanded form to execute under dynamic binding.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002diter_002a"><span class="category">Macro: </span><span><strong>for-iter*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002diter_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002diter_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-iter*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002diter_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-iter</code>.
+<code class="code">for-iter</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dlists"><span class="category">Macro: </span><span><strong>for-lists</strong> <em>([identifier&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlists' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dlists"><span class="category-def">Macro: </span><span><strong class="def-name">for-lists</strong> <var class="def-var-arguments">([identifier&hellip;] [(<code class="code">:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dlists"> &para;</a></span></dt>
 <dd><p>This iteration macro accumulates the values into fresh lists and
-sequentially evaluates <var>expression</var>s with <var>identifier</var>s bound to
-the lists.  It is like <code>for-fold</code>, except:
+sequentially evaluates <var class="var">expression</var>s with <var class="var">identifier</var>s bound to
+the lists.  It is like <code class="code">for-fold</code>, except:
 </p>
-<ul>
-<li> Each <var>identifier</var> is transformed to <code>(<var>identifier</var> '())</code> as
-<var>binding</var>, and <var>expression</var>s are wrapped in a <code>let</code> form
-with each <var>identifier</var> bound to <code>(nreverse <var>identifier</var>)</code>;
+<ul class="itemize mark-bullet">
+<li>Each <var class="var">identifier</var> is transformed to <code class="code">(<var class="var">identifier</var> '())</code> as
+<var class="var">binding</var>, and <var class="var">expression</var>s are wrapped in a <code class="code">let</code> form
+with each <var class="var">identifier</var> bound to <code class="code">(nreverse <var class="var">identifier</var>)</code>;
 
-</li><li> For each <var>expression</var> in the tail forms of the multiple-value form
-and each <var>identifier</var>, <var>expression</var> is transformed to
-<code>(cons <var>expression</var> <var>identifier</var>)</code>.  It is an error for the
+</li><li>For each <var class="var">expression</var> in the tail forms of the multiple-value form
+and each <var class="var">identifier</var>, <var class="var">expression</var> is transformed to
+<code class="code">(cons <var class="var">expression</var> <var class="var">identifier</var>)</code>.  It is an error for the
 multiple-value form to produce not as many values as there are
-<var>identifier</var>s.
+<var class="var">identifier</var>s.
 </li></ul>
 
-<p>The values of <var>identifier</var>s during the iteration are unspecified.
+<p>The values of <var class="var">identifier</var>s during the iteration are unspecified.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dlists_002a"><span class="category">Macro: </span><span><strong>for-lists*</strong> <em>([identifier&hellip;] [(<code>:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlists_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dlists_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-lists*</strong> <var class="def-var-arguments">([identifier&hellip;] [(<code class="code">:result</code> expression&hellip;)]) ([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dlists_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-lists</code>.
+<code class="code">for-lists</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dvector"><span class="category">Macro: </span><span><strong>for-vector</strong> <em>([for-clause&hellip;]) [<code>:length</code> length [<code>:init</code> init]] [body&hellip;]</em><a href='#index-for_002dvector' class='copiable-anchor'> &para;</a></span></dt>
-<dd><span id="index-terminology-12"></span>
-<p>When neither <var>length</var> nor <var>init</var> is present, this iteration
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dvector"><span class="category-def">Macro: </span><span><strong class="def-name">for-vector</strong> <var class="def-var-arguments">([for-clause&hellip;]) [<code class="code">:length</code> length [<code class="code">:init</code> init]] [body&hellip;]</var><a class="copiable-link" href="#index-for_002dvector"> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-terminology-coerce"></a>
+<p>When neither <var class="var">length</var> nor <var class="var">init</var> is present, this iteration
 macro is equivalent to the following form (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Vector-Functions.html#Vector-Functions">(elisp)Vector
-Functions</a>), such that it coerces<a id="DOCF14" href="#FOOT14"><sup>14</sup></a> the list returned by <code>for-list</code> to vector:
+Functions</a>), such that it coerces<a class="footnote" id="DOCF14" href="#FOOT14"><sup>14</sup></a> the list returned by <code class="code">for-list</code> to vector:
 </p>
 <div class="example">
-<pre class="example">(vconcat (for-list ([<var>for-clause</var>&hellip;])
-           [<var>body</var>&hellip;]))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(vconcat (for-list ([<var class="var">for-clause</var>...])
+           [<var class="var">body</var>...]))
+</pre></div></div>
 
 <p>Otherwise, this iteration macro accumulates the values into a fresh
-vector of length <var>length</var> with each element being <var>init</var> where
-<var>init</var> defaults to <code>0</code> when omitted.  In such case, it is
+vector of length <var class="var">length</var> with each element being <var class="var">init</var> where
+<var class="var">init</var> defaults to <code class="code">0</code> when omitted.  In such case, it is
 equivalent to the following form (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Setting-Generalized-Variables.html#Setting-Generalized-Variables">(elisp)Setting Generalized
-Variables</a>) where <var>vector</var> and <var>index</var> are generated
-identifiers provided that <var>length</var> and <var>init</var> are evaluated
+Variables</a>) where <var class="var">vector</var> and <var class="var">index</var> are generated
+identifiers provided that <var class="var">length</var> and <var class="var">init</var> are evaluated
 exactly once in the apparent evaluation order:
 </p>
 <div class="example">
-<pre class="example">(let ((<var>vector</var> (make-vector <var>length</var> <var>init</var>)))
-  (unless (zerop <var>length</var>)
-    (for-fold ((<var>index</var> 0))
-        ([<var>for-clause*</var>&hellip;]
-         (:do (setf (aref <var>vector</var> <var>index</var>)
-                    <var>value*</var>))
-         (:let (<var>index</var> (1+ <var>index</var>)))
-         (:break (= <var>index</var> <var>length</var>))
-         <var>index</var>)))
-  <var>vector</var>)
-</pre></div>
+<div class="group"><pre class="example-preformatted">(let ((<var class="var">vector</var> (make-vector <var class="var">length</var> <var class="var">init</var>)))
+  (unless (zerop <var class="var">length</var>)
+    (for-fold ((<var class="var">index</var> 0))
+        ([<var class="var">for-clause*</var>...]
+         (:do (setf (aref <var class="var">vector</var> <var class="var">index</var>)
+                    <var class="var">value*</var>))
+         (:let (<var class="var">index</var> (1+ <var class="var">index</var>)))
+         (:break (= <var class="var">index</var> <var class="var">length</var>))
+         <var class="var">index</var>)))
+  <var class="var">vector</var>)
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dvector_002a"><span class="category">Macro: </span><span><strong>for-vector*</strong> <em>([for-clause&hellip;]) [<code>:length</code> length [<code>:init</code> init]] [body&hellip;]</em><a href='#index-for_002dvector_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dvector_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-vector*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [<code class="code">:length</code> length [<code class="code">:init</code> init]] [body&hellip;]</var><a class="copiable-link" href="#index-for_002dvector_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-vector</code>.
+<code class="code">for-vector</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dstring"><span class="category">Macro: </span><span><strong>for-string</strong> <em>([for-clause&hellip;]) [<code>:length</code> length [<code>:init</code> init [<code>:multibyte</code> multibyte]]] [body&hellip;]</em><a href='#index-for_002dstring' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>When neither <var>length</var>, <var>init</var>, nor <var>multibyte</var> is present,
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dstring"><span class="category-def">Macro: </span><span><strong class="def-name">for-string</strong> <var class="def-var-arguments">([for-clause&hellip;]) [<code class="code">:length</code> length [<code class="code">:init</code> init [<code class="code">:multibyte</code> multibyte]]] [body&hellip;]</var><a class="copiable-link" href="#index-for_002dstring"> &para;</a></span></dt>
+<dd><p>When neither <var class="var">length</var>, <var class="var">init</var>, nor <var class="var">multibyte</var> is present,
 this iteration macro is equivalent to the following form
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Strings.html#Creating-Strings">(elisp)Creating Strings</a>), such that it coerces the list
-returned by <code>for-list</code> to string:
+returned by <code class="code">for-list</code> to string:
 </p>
 <div class="example">
-<pre class="example">(concat (for-list ([<var>for-clause</var>&hellip;])
-          [<var>body</var>&hellip;]))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(concat (for-list ([<var class="var">for-clause</var>...])
+          [<var class="var">body</var>...]))
+</pre></div></div>
 
 <p>Otherwise, this iteration macro accumulates the values into a fresh
-string of length <var>length</var> with each element being <var>init</var> where
-<var>init</var> defaults to <code>?\0</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/General-Escape-Syntax.html#General-Escape-Syntax">(elisp)General Escape
+string of length <var class="var">length</var> with each element being <var class="var">init</var> where
+<var class="var">init</var> defaults to <code class="code">?\0</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/General-Escape-Syntax.html#General-Escape-Syntax">(elisp)General Escape
 Syntax</a>) when omitted.  The string is always a multibyte string
-(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Non_002dASCII-Characters.html#Non_002dASCII-Characters">(elisp)Non-ASCII Characters</a>) when <var>multibyte</var> is true.  In
-such case, it is equivalent to the following form where <var>string</var> and
-<var>index</var> are generated identifiers provided that <var>length</var>,
-<var>init</var>, and <var>multibyte</var> are evaluated exactly once in the
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Non_002dASCII-Characters.html#Non_002dASCII-Characters">(elisp)Non-ASCII Characters</a>) when <var class="var">multibyte</var> is true.  In
+such case, it is equivalent to the following form where <var class="var">string</var> and
+<var class="var">index</var> are generated identifiers provided that <var class="var">length</var>,
+<var class="var">init</var>, and <var class="var">multibyte</var> are evaluated exactly once in the
 apparent evaluation order:
 </p>
 <div class="example">
-<pre class="example">(let ((<var>string</var> (make-string <var>length</var> <var>init</var> <var>multibyte</var>)))
-  (unless (zerop <var>length</var>)
-    (for-fold ((<var>index</var> 0))
-        ([<var>for-clause*</var>&hellip;]
-         (:do (setf (aref <var>string</var> <var>index</var>)
-                    <var>value*</var>))
-         (:let (<var>index</var> (1+ <var>index</var>)))
-         (:break (= <var>index</var> <var>length</var>))
-         <var>index</var>)))
-  <var>string</var>)
-</pre></div>
+<div class="group"><pre class="example-preformatted">(let ((<var class="var">string</var> (make-string <var class="var">length</var> <var class="var">init</var> <var class="var">multibyte</var>)))
+  (unless (zerop <var class="var">length</var>)
+    (for-fold ((<var class="var">index</var> 0))
+        ([<var class="var">for-clause*</var>...]
+         (:do (setf (aref <var class="var">string</var> <var class="var">index</var>)
+                    <var class="var">value*</var>))
+         (:let (<var class="var">index</var> (1+ <var class="var">index</var>)))
+         (:break (= <var class="var">index</var> <var class="var">length</var>))
+         <var class="var">index</var>)))
+  <var class="var">string</var>)
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dstring_002a"><span class="category">Macro: </span><span><strong>for-string*</strong> <em>([for-clause&hellip;]) [<code>:length</code> length [<code>:init</code> init [<code>:multibyte</code> multibyte]]] [body&hellip;]</em><a href='#index-for_002dstring_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dstring_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-string*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [<code class="code">:length</code> length [<code class="code">:init</code> init [<code class="code">:multibyte</code> multibyte]]] [body&hellip;]</var><a class="copiable-link" href="#index-for_002dstring_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-string</code>.
+<code class="code">for-string</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dand"><span class="category">Macro: </span><span><strong>for-and</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dand' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro performs <code>and</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Combining-Conditions.html#Combining-Conditions">(elisp)Combining
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dand"><span class="category-def">Macro: </span><span><strong class="def-name">for-and</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dand"> &para;</a></span></dt>
+<dd><p>This iteration macro performs <code class="code">and</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Combining-Conditions.html#Combining-Conditions">(elisp)Combining
 Conditions</a>) on the values.  It is equivalent to the following
-form where <var>value</var> is a generated identifier:
+form where <var class="var">value</var> is a generated identifier:
 </p>
 <div class="example">
-<pre class="example">(for-fold ((<var>value</var> t))
-    ([<var>for-clause*</var>&hellip;]
-     (:let (<var>value</var> <var>value*</var>))
-     (:final (not <var>value</var>))
-     <var>value</var>))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(for-fold ((<var class="var">value</var> t))
+    ([<var class="var">for-clause*</var>...]
+     (:let (<var class="var">value</var> <var class="var">value*</var>))
+     (:final (not <var class="var">value</var>))
+     <var class="var">value</var>))
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dand_002a"><span class="category">Macro: </span><span><strong>for-and*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dand_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dand_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-and*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dand_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-and</code>.
+<code class="code">for-and</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dor"><span class="category">Macro: </span><span><strong>for-or</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dor' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro performs <code>or</code> on the values.  It is equivalent
-to the following form where <var>value</var> is a generated identifier:
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dor"><span class="category-def">Macro: </span><span><strong class="def-name">for-or</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dor"> &para;</a></span></dt>
+<dd><p>This iteration macro performs <code class="code">or</code> on the values.  It is equivalent
+to the following form where <var class="var">value</var> is a generated identifier:
 </p>
 <div class="example">
-<pre class="example">(for-fold ((<var>value</var> nil))
-    ([<var>for-clause*</var>&hellip;]
-     (:let (<var>value</var> <var>value*</var>))
-     (:final <var>value</var>)
-     <var>value</var>))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(for-fold ((<var class="var">value</var> nil))
+    ([<var class="var">for-clause*</var>...]
+     (:let (<var class="var">value</var> <var class="var">value*</var>))
+     (:final <var class="var">value</var>)
+     <var class="var">value</var>))
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dor_002a"><span class="category">Macro: </span><span><strong>for-or*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dor_002a' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro is the implicitly nesting version of <code>for-or</code>.
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dor_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-or*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dor_002a"> &para;</a></span></dt>
+<dd><p>This iteration macro is the implicitly nesting version of <code class="code">for-or</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dsum"><span class="category">Macro: </span><span><strong>for-sum</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dsum' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dsum"><span class="category-def">Macro: </span><span><strong class="def-name">for-sum</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dsum"> &para;</a></span></dt>
 <dd><p>This iteration macro accumulates the values into a sum.  It is
-equivalent to the following form where <var>sum</var> is a generated
+equivalent to the following form where <var class="var">sum</var> is a generated
 identifier:
 </p>
 <div class="example">
-<pre class="example">(for-fold ((<var>sum</var> 0))
-    ([<var>for-clause*</var>&hellip;]
-     (+ <var>value*</var> <var>sum</var>)))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(for-fold ((<var class="var">sum</var> 0))
+    ([<var class="var">for-clause*</var>...]
+     (+ <var class="var">value*</var> <var class="var">sum</var>)))
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dsum_002a"><span class="category">Macro: </span><span><strong>for-sum*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dsum_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dsum_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-sum*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dsum_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-sum</code>.
+<code class="code">for-sum</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dproduct"><span class="category">Macro: </span><span><strong>for-product</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dproduct' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dproduct"><span class="category-def">Macro: </span><span><strong class="def-name">for-product</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dproduct"> &para;</a></span></dt>
 <dd><p>This iteration macro accumulates the values into a product.  It is
-equivalent to the following form where <var>product</var> is a generated
+equivalent to the following form where <var class="var">product</var> is a generated
 identifier:
 </p>
 <div class="example">
-<pre class="example">(for-fold ((<var>product</var> 0))
-    ([<var>for-clause*</var>&hellip;]
-     (* <var>value*</var> <var>product</var>)))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(for-fold ((<var class="var">product</var> 0))
+    ([<var class="var">for-clause*</var>...]
+     (* <var class="var">value*</var> <var class="var">product</var>)))
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dproduct_002a"><span class="category">Macro: </span><span><strong>for-product*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dproduct_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dproduct_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-product*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dproduct_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-product</code>.
+<code class="code">for-product</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dfirst"><span class="category">Macro: </span><span><strong>for-first</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfirst' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro returns the first value or <code>nil</code> if the
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dfirst"><span class="category-def">Macro: </span><span><strong class="def-name">for-first</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dfirst"> &para;</a></span></dt>
+<dd><p>This iteration macro returns the first value or <code class="code">nil</code> if the
 iteration never begins.  It is equivalent to the following form where
-<var>value</var> is a generated identifier:
+<var class="var">value</var> is a generated identifier:
 </p>
 <div class="example">
-<pre class="example">(for-fold ((<var>value</var> nil))
+<div class="group"><pre class="example-preformatted">(for-fold ((<var class="var">value</var> nil))
     ((:final)
-     [<var>for-clause</var>&hellip;])
-  [<var>body</var>&hellip;])
-</pre></div>
+     [<var class="var">for-clause</var>...])
+  [<var class="var">body</var>...])
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dfirst_002a"><span class="category">Macro: </span><span><strong>for-first*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dfirst_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dfirst_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-first*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dfirst_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-first</code>.
+<code class="code">for-first</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dlast"><span class="category">Macro: </span><span><strong>for-last</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlast' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro returns the last value or <code>nil</code> if the
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dlast"><span class="category-def">Macro: </span><span><strong class="def-name">for-last</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dlast"> &para;</a></span></dt>
+<dd><p>This iteration macro returns the last value or <code class="code">nil</code> if the
 iteration never begins.  It is equivalent to the following form where
-<var>value</var> is a generated identifier:
+<var class="var">value</var> is a generated identifier:
 </p>
 <div class="example">
-<pre class="example">(for-fold ((<var>value</var> nil))
-    ([<var>for-clause</var>&hellip;])
-  [<var>body</var>&hellip;])
-</pre></div>
+<div class="group"><pre class="example-preformatted">(for-fold ((<var class="var">value</var> nil))
+    ([<var class="var">for-clause</var>...])
+  [<var class="var">body</var>...])
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dlast_002a"><span class="category">Macro: </span><span><strong>for-last*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dlast_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dlast_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-last*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dlast_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-last</code>.
+<code class="code">for-last</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dmax"><span class="category">Macro: </span><span><strong>for-max</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dmax' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro performs <code>max</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Comparison-of-Numbers.html#Comparison-of-Numbers">(elisp)Comparison of
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dmax"><span class="category-def">Macro: </span><span><strong class="def-name">for-max</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dmax"> &para;</a></span></dt>
+<dd><p>This iteration macro performs <code class="code">max</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Comparison-of-Numbers.html#Comparison-of-Numbers">(elisp)Comparison of
 Numbers</a>) on the values.  It is equivalent to the following form
-where <var>max</var> is a generated identifier:
+where <var class="var">max</var> is a generated identifier:
 </p>
 <div class="example">
-<pre class="example">(for-fold ((<var>max</var> -1.0e+INF))
-    ([<var>for-clause*</var>&hellip;]
-     (max <var>value*</var> <var>max</var>)))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(for-fold ((<var class="var">max</var> -1.0e+INF))
+    ([<var class="var">for-clause*</var>...]
+     (max <var class="var">value*</var> <var class="var">max</var>)))
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dmax_002a"><span class="category">Macro: </span><span><strong>for-max*</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dmax_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dmax_002a"><span class="category-def">Macro: </span><span><strong class="def-name">for-max*</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dmax_002a"> &para;</a></span></dt>
 <dd><p>This iteration macro is the implicitly nesting version of
-<code>for-max</code>.
+<code class="code">for-max</code>.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-for_002dmin"><span class="category">Macro: </span><span><strong>for-min</strong> <em>([for-clause&hellip;]) [body&hellip;]</em><a href='#index-for_002dmin' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This iteration macro performs <code>min</code> on the values.  It is
-equivalent to the following form where <var>min</var> is a generated
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-for_002dmin"><span class="category-def">Macro: </span><span><strong class="def-name">for-min</strong> <var class="def-var-arguments">([for-clause&hellip;]) [body&hellip;]</var><a class="copiable-link" href="#index-for_002dmin"> &para;</a></span></dt>
+<dd><p>This iteration macro performs <code class="code">min</code> on the values.  It is
+equivalent to the following form where <var class="var">min</var> is a generated
 identifier:
 </p>
 <div class="example">
-<pre class="example">(for-fold ((<var>min</var> 1.0e+INF))
-    ([<var>for-clause*</var>&hellip;]
-     (min <var>value*</var> <var>min</var>)))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(for-fold ((<var class="var">min</var> 1.0e+INF))
+    ([<var class="var">for-clause*</var>...]
+     (min <var class="var">value*</var> <var class="var">min</var>)))
+</pre></div></div>
 </dd></dl>
 
 </div>
-<div class="footnote">
+<div class="footnotes-segment">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT12" href="#DOCF12">(12)</a></h5>
+<h5 class="footnote-body-heading"><a id="FOOT12" href="#DOCF12">(12)</a></h5>
 <p>Note that the
 behavior of bindings is subtlety different from that of
-<code>named-let</code>.  In <code>named-let</code>, each application of the
+<code class="code">named-let</code>.  In <code class="code">named-let</code>, each application of the
 self-recursive function creates new bindings, just as normal function
-application does.  In contrast, <code>for-fold</code> always retains the same
+application does.  In contrast, <code class="code">for-fold</code> always retains the same
 bindings.</p>
-<h5><a id="FOOT13" href="#DOCF13">(13)</a></h5>
+<h5 class="footnote-body-heading"><a id="FOOT13" href="#DOCF13">(13)</a></h5>
 <p>Following
-<a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_f.htm">Common Lisp</a>, a <em>fresh</em> object is newly allocated.</p>
-<h5><a id="FOOT14" href="#DOCF14">(14)</a></h5>
+<a class="url" href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_f.htm">Common Lisp</a>, a <em class="dfn">fresh</em> object is newly allocated.</p>
+<h5 class="footnote-body-heading"><a id="FOOT14" href="#DOCF14">(14)</a></h5>
 <p>Following
-<a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_c.htm">Common Lisp</a>, <em>coerce</em> means to non-destructively convert an object
+<a class="url" href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_c.htm">Common Lisp</a>, <em class="dfn">coerce</em> means to non-destructively convert an object
 to another type.</p>
 </div>
 <hr>
-<div class="header">
+<div class="nav-panel">
 <p>
 Next: <a href="Special_002dClause-Operators.html">Special-Clause Operators</a>, Up: <a href="Iteration-Forms.html">Iteration Forms</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>

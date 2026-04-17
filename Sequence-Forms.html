@@ -1,11 +1,11 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
-<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 7.1, https://www.gnu.org/software/texinfo/ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!-- This manual documents For (version 1.4).
+<!-- This manual documents For (version 1.4.1).
 
-Copyright (C) 2022 Wing Hei Chan
+Copyright © 2022 Wing Hei Chan
 
 This document is free documentation: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published
@@ -35,103 +35,107 @@ with this document.  If not, see https://www.gnu.org/licenses/. -->
 <link href="Multiple-Values.html" rel="next" title="Multiple Values">
 <link href="For-Clauses.html" rel="prev" title="For Clauses">
 <style type="text/css">
-@import url("https://www.gnu.org/software/emacs/manual.css");
-cite { font-style: italic; }
+<!--
+a.copiable-link {visibility: hidden; text-decoration: none; line-height: 0em}
+div.example {margin-left: 3.2em}
+span:hover a.copiable-link {visibility: visible}
+-->
 </style>
+
 
 </head>
 
 <body lang="en">
-<div class="section" id="Sequence-Forms">
-<div class="header">
+<div class="section-level-extent" id="Sequence-Forms">
+<div class="nav-panel">
 <p>
 Next: <a href="Multiple-Values.html" accesskey="n" rel="next">Multiple Values</a>, Previous: <a href="For-Clauses.html" accesskey="p" rel="prev">For Clauses</a>, Up: <a href="Basic-Concepts.html" accesskey="u" rel="up">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<span id="Sequence-Forms-1"></span><h3 class="section">2.2 Sequence Forms</h3>
-<span id="index-sequence-form"></span>
-<span id="index-sequence-form-1"></span>
-<p>A <em>sequence form</em> represents an ordered collection of values, much
-like an <em>iterator</em> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Generators.html#Generators">(elisp)Generators</a>).  In fact, a
+<h3 class="section" id="Sequence-Forms-1"><span>2.2 Sequence Forms<a class="copiable-link" href="#Sequence-Forms-1"> &para;</a></span></h3>
+<a class="index-entry-id" id="index-sequence-form-expander"></a>
+<a class="index-entry-id" id="index-sequence-form-iterator"></a>
+<p>A <em class="dfn">sequence form</em> represents an ordered collection of values, much
+like an <em class="dfn">iterator</em> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Generators.html#Generators">(elisp)Generators</a>).  In fact, a
 sequence form produces an iterator when evaluated as a function form
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Forms.html#Function-Forms">(elisp)Function Forms</a>).  Nonetheless, iterators are relatively
 expensive since they capture the states.  Rather than keeping the states
 in another object, a sequence form can be directly expanded in an
-iteration form when an <em>expander</em> is available.
+iteration form when an <em class="dfn">expander</em> is available.
 </p>
 <p>Produce an iterator that iterates over the list and iterate over
 the values of it:
 </p>
 <div class="example">
-<pre class="example">(let ((iterator (for-in-list '(1 2 3))))
+<div class="group"><pre class="example-preformatted">(let ((iterator (for-in-list '(1 2 3))))
   (for-vector ((item (for-in-iterator iterator))
                item)))
      &rArr; [1 2 3]
-</pre></div>
+</pre></div></div>
 
 <p>Directly iterate over the list:
 </p>
 <div class="example">
-<pre class="example">(for-vector ((item (for-in-list '(1 2 3)))
+<div class="group"><pre class="example-preformatted">(for-vector ((item (for-in-list '(1 2 3)))
              item))
      &rArr; [1 2 3]
-</pre></div>
+</pre></div></div>
 
-<span id="index-sequence-form-2"></span>
-<p>For convenience, a sequence constructor can have <em>aliases</em> when used
+<a class="index-entry-id" id="index-sequence-form-alias"></a>
+<p>For convenience, a sequence constructor can have <em class="dfn">aliases</em> when used
 in iteration clauses to avoid the need of shorthands
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Shorthands.html#Shorthands">(elisp)Shorthands</a>).
 </p>
-<p><code>for-in-list</code> and <code>for-in-range</code> have aliases:
+<p><code class="code">for-in-list</code> and <code class="code">for-in-range</code> have aliases:
 </p>
 <div class="example">
-<pre class="example">(for-list ((item (in-list '(a b c)))
+<div class="group"><pre class="example-preformatted">(for-list ((item (in-list '(a b c)))
            (number (in-range 1 5 2))
            (cons item number)))
      &rArr; ((a . 1) (b . 3))
-</pre></div>
+</pre></div></div>
 
-<span id="index-error"></span>
-<span id="index-sequence-form-3"></span>
-<p><em>Dynamic dispatch</em> is available when an arbitrary expression is used
+<a class="index-entry-id" id="index-error-unhandled-type"></a>
+<a class="index-entry-id" id="index-sequence-form-dynamic-dispatch"></a>
+<p><em class="dfn">Dynamic dispatch</em> is available when an arbitrary expression is used
 as a sequence form in iteration clauses.  The expression
-<var>expression</var> is transformed to <code>(for-in-iterator (for-generator
-<var>expression</var>))</code>, where <code>for-generator</code> is a generic function
+<var class="var">expression</var> is transformed to <code class="code">(for-in-iterator (for-generator
+<var class="var">expression</var>))</code>, where <code class="code">for-generator</code> is a generic function
 (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Generic-Functions.html#Generic-Functions">(elisp)Generic Functions</a>) that acts as a generator.  Moreover,
-<code>for-unhandled-type</code> is <code>signal</code>ed (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Signaling-Errors.html#Signaling-Errors">(elisp)Signaling
-Errors</a>) when the value of <var>expression</var> is unhandled.
+<code class="code">for-unhandled-type</code> is <code class="code">signal</code>ed (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Signaling-Errors.html#Signaling-Errors">(elisp)Signaling
+Errors</a>) when the value of <var class="var">expression</var> is unhandled.
 </p>
-<p>A <code>list</code> dispatched to the application of <code>for-in-list</code> to it:
+<p>A <code class="code">list</code> dispatched to the application of <code class="code">for-in-list</code> to it:
 </p>
 <div class="example">
-<pre class="example">(let ((list '(1 2 3)))
+<div class="group"><pre class="example-preformatted">(let ((list '(1 2 3)))
   (for-list ((item list)
              item)))
      &rArr; (1 2 3)
-</pre></div>
+</pre></div></div>
 
-<p>A <code>function</code> dispatched to itself:
+<p>A <code class="code">function</code> dispatched to itself:
 </p>
 <div class="example">
-<pre class="example">(let ((iterator (for-in-list '(1 2 3))))
+<div class="group"><pre class="example-preformatted">(let ((iterator (for-in-list '(1 2 3))))
   (for-list ((item iterator)
              item)))
      &rArr; (1 2 3)
-</pre></div>
+</pre></div></div>
 
-<p><code>(record '#:some-type)</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Read-Syntax.html#Special-Read-Syntax">(elisp)Special Read Syntax</a> and
-<a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Records.html#Records">(elisp)Records</a>) triggers <code>for-unhandled-type</code>:
+<p><code class="code">(record '#:some-type)</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Special-Read-Syntax.html#Special-Read-Syntax">(elisp)Special Read Syntax</a> and
+<a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Records.html#Records">(elisp)Records</a>) triggers <code class="code">for-unhandled-type</code>:
 </p>
 <div class="example">
-<pre class="example">(let ((some-object (record '#:some-type)))
+<div class="group"><pre class="example-preformatted">(let ((some-object (record '#:some-type)))
   (for-list ((item some-object)
              item)))
      error&rarr; Unhandled type: #s(some-type)
-</pre></div>
+</pre></div></div>
 
-<span id="index-sequence-form-4"></span>
-<p>Analogous to dynamic dispatch, certain <em>literal
-objects</em><a id="DOCF9" href="#FOOT9"><sup>9</sup></a> are implicitly wrapped
+<a class="index-entry-id" id="index-sequence-form-literal-object"></a>
+<p>Analogous to dynamic dispatch, certain <em class="dfn">literal
+objects</em><a class="footnote" id="DOCF9" href="#FOOT9"><sup>9</sup></a> are implicitly wrapped
 in sequence forms when used in iteration clauses.  Currently, literal
 lists, arrays (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Arrays.html#Arrays">(elisp)Arrays</a>), and integers (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Integer-Basics.html#Integer-Basics">(elisp)Integer
 Basics</a>) are recognized.
@@ -139,25 +143,31 @@ Basics</a>) are recognized.
 <p>Recognized literal objects are implicitly wrapped in sequence forms:
 </p>
 <div class="example">
-<pre class="example">(for-sum ((number1 '(3 4 5))
+<div class="group"><pre class="example-preformatted">(for-sum ((number1 '(3 4 5))
           (number2 [6 7 8])
           (number3 3)
           (* number1 number2 number3)))
      &rArr; 108
-</pre></div>
+</pre></div></div>
 
 </div>
-<div class="footnote">
+<div class="footnotes-segment">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h5><a id="FOOT9" href="#DOCF9">(9)</a></h5>
+<h5 class="footnote-body-heading"><a id="FOOT5" href="For-Clauses.html#DOCF5">(8)</a></h5>
 <p>Following
-<a href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_l.htm">Common Lisp</a>, a self-evaluating (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Self_002dEvaluating-Forms.html#Self_002dEvaluating-Forms">(elisp)Self-Evaluating Forms</a>)
+<a class="url" href="https://schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-4.html"><abbr class="acronym" title="Revised5 Report on the Algorithmic
+Language Scheme">R<sup class="sup">5</sup>RS</abbr> (<cite class="cite">Revised<sup class="sup">5</sup> Report on the Algorithmic
+Language Scheme</cite>)</a>, <em class="dfn">an error</em> does not specify whether or when the error is
+detected or reported.</p>
+<h5 class="footnote-body-heading"><a id="FOOT9" href="#DOCF9">(9)</a></h5>
+<p>Following
+<a class="url" href="http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_l.htm">Common Lisp</a>, a self-evaluating (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Self_002dEvaluating-Forms.html#Self_002dEvaluating-Forms">(elisp)Self-Evaluating Forms</a>)
 literal object can be either quoted or unquoted.</p>
 </div>
 <hr>
-<div class="header">
+<div class="nav-panel">
 <p>
 Next: <a href="Multiple-Values.html">Multiple Values</a>, Previous: <a href="For-Clauses.html">For Clauses</a>, Up: <a href="Basic-Concepts.html">Basic Concepts</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>

@@ -1,11 +1,11 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
-<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 7.1, https://www.gnu.org/software/texinfo/ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!-- This manual documents For (version 1.4).
+<!-- This manual documents For (version 1.4.1).
 
-Copyright (C) 2022 Wing Hei Chan
+Copyright © 2022 Wing Hei Chan
 
 This document is free documentation: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published
@@ -34,153 +34,158 @@ with this document.  If not, see https://www.gnu.org/licenses/. -->
 <link href="Iteration-Forms.html" rel="up" title="Iteration Forms">
 <link href="Iteration-Macros.html" rel="prev" title="Iteration Macros">
 <style type="text/css">
-@import url("https://www.gnu.org/software/emacs/manual.css");
-cite { font-style: italic; }
+<!--
+a.copiable-link {visibility: hidden; text-decoration: none; line-height: 0em}
+div.example {margin-left: 3.2em}
+span:hover a.copiable-link {visibility: visible}
+strong.def-name {font-family: monospace; font-weight: bold; font-size: larger}
+-->
 </style>
+
 
 </head>
 
 <body lang="en">
-<div class="section" id="Special_002dClause-Operators">
-<div class="header">
+<div class="section-level-extent" id="Special_002dClause-Operators">
+<div class="nav-panel">
 <p>
 Previous: <a href="Iteration-Macros.html" accesskey="p" rel="prev">Iteration Macros</a>, Up: <a href="Iteration-Forms.html" accesskey="u" rel="up">Iteration Forms</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<span id="Special_002dClause-Operators-1"></span><h3 class="section">4.2 Special-Clause Operators</h3>
-<span id="index-terminology-13"></span>
-<p>Special-clause operators are <em>auxiliary operators</em> in the sense that
+<h3 class="section" id="Special_002dClause-Operators-1"><span>4.2 Special-Clause Operators<a class="copiable-link" href="#Special_002dClause-Operators-1"> &para;</a></span></h3>
+<a class="index-entry-id" id="index-terminology-auxiliary-operator"></a>
+<p>Special-clause operators are <em class="dfn">auxiliary operators</em> in the sense that
 they are heads of auxiliary forms that are only syntactically valid in
 certain forms.  In the case of special-clause operators, the auxiliary
-forms they head are valid in the <var>for-clause</var> and <var>body</var>
+forms they head are valid in the <var class="var">for-clause</var> and <var class="var">body</var>
 positions of the iteration forms.  Beside special-clause operators,
-<code>:do-in</code> is an auxiliary operator heading a sequence form, whose
+<code class="code">:do-in</code> is an auxiliary operator heading a sequence form, whose
 specification can be found in later chapters.
 </p>
 <p>Below, &ldquo;the iteration&rdquo; can be an empty iteration when no
 iteration clause follows the special clauses, whose body expanded so far
-are <var>body</var>s.  Moreover, the inner iteration does not affect the
+are <var class="var">body</var>s.  Moreover, the inner iteration does not affect the
 outer iteration when nesting occurs, unless the wording &ldquo;the
 whole iteration&rdquo; is used.
 </p>
 <p>Special clauses are sequentially processed, such that the body produced
 by the expander of a special clause is fed into the expander of another
-special clause to its left.  Nonetheless, <code>:break</code> and
-<code>:final</code> clauses are specially expanded since they involve
+special clause to its left.  Nonetheless, <code class="code">:break</code> and
+<code class="code">:final</code> clauses are specially expanded since they involve
 non-local transformation in order to terminate the whole iteration.  As
 a result, they cannot be implemented by
-<code>define-for-special-clause</code>.
+<code class="code">define-for-special-clause</code>.
 </p>
-<dl class="def">
-<dt id="index-_003abreak"><span class="category">Auxiliary Operator: </span><span><strong>:break</strong> <em>[guard&hellip;]</em><a href='#index-_003abreak' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn">
+<dt class="deffn" id="index-_003abreak"><span class="category-def">Auxiliary Operator: </span><span><strong class="def-name">:break</strong> <var class="def-var-arguments">[guard&hellip;]</var><a class="copiable-link" href="#index-_003abreak"> &para;</a></span></dt>
 <dd><p>This special-clause operator immediately terminates the whole iteration
-when <code>(and [<var>guard</var>&hellip;])</code> is true before the
+when <code class="code">(and [<var class="var">guard</var>&hellip;])</code> is true before the
 iteration.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-_003afinal"><span class="category">Auxiliary Operator: </span><span><strong>:final</strong> <em>[guard&hellip;]</em><a href='#index-_003afinal' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn">
+<dt class="deffn" id="index-_003afinal"><span class="category-def">Auxiliary Operator: </span><span><strong class="def-name">:final</strong> <var class="def-var-arguments">[guard&hellip;]</var><a class="copiable-link" href="#index-_003afinal"> &para;</a></span></dt>
 <dd><p>This special-clause operator terminates the whole iteration after one
-more iteration when <code>(and [<var>guard</var>&hellip;])</code> is
+more iteration when <code class="code">(and [<var class="var">guard</var>&hellip;])</code> is
 true before the iteration.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-_003aif"><span class="category">Auxiliary Operator: </span><span><strong>:if</strong> <em>[guard&hellip;]</em><a href='#index-_003aif' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn">
+<dt class="deffn" id="index-_003aif"><span class="category-def">Auxiliary Operator: </span><span><strong class="def-name">:if</strong> <var class="def-var-arguments">[guard&hellip;]</var><a class="copiable-link" href="#index-_003aif"> &para;</a></span></dt>
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">(when (and [<var>guard</var>&hellip;])
-  [<var>body</var>&hellip;])
-</pre></div>
+<div class="group"><pre class="example-preformatted">(when (and [<var class="var">guard</var>...])
+  [<var class="var">body</var>...])
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-_003aif_002dnot"><span class="category">Auxiliary Operator: </span><span><strong>:if-not</strong> <em>[guard&hellip;]</em><a href='#index-_003aif_002dnot' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn">
+<dt class="deffn" id="index-_003aif_002dnot"><span class="category-def">Auxiliary Operator: </span><span><strong class="def-name">:if-not</strong> <var class="def-var-arguments">[guard&hellip;]</var><a class="copiable-link" href="#index-_003aif_002dnot"> &para;</a></span></dt>
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">(unless (and [<var>guard</var>&hellip;])
-  [<var>body</var>&hellip;])
-</pre></div>
+<div class="group"><pre class="example-preformatted">(unless (and [<var class="var">guard</var>...])
+  [<var class="var">body</var>...])
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-_003alet"><span class="category">Auxiliary Operator: </span><span><strong>:let</strong> <em>[binding&hellip;]</em><a href='#index-_003alet' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn">
+<dt class="deffn" id="index-_003alet"><span class="category-def">Auxiliary Operator: </span><span><strong class="def-name">:let</strong> <var class="def-var-arguments">[binding&hellip;]</var><a class="copiable-link" href="#index-_003alet"> &para;</a></span></dt>
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">(pcase-let ([<var>binding</var>&hellip;])
-  [<var>body</var>&hellip;])
-</pre></div>
+<div class="group"><pre class="example-preformatted">(pcase-let ([<var class="var">binding</var>...])
+  [<var class="var">body</var>...])
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-_003alet_002a"><span class="category">Auxiliary Operator: </span><span><strong>:let*</strong> <em>[binding&hellip;]</em><a href='#index-_003alet_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn">
+<dt class="deffn" id="index-_003alet_002a"><span class="category-def">Auxiliary Operator: </span><span><strong class="def-name">:let*</strong> <var class="def-var-arguments">[binding&hellip;]</var><a class="copiable-link" href="#index-_003alet_002a"> &para;</a></span></dt>
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">(pcase-let* ([<var>binding</var>&hellip;])
-  [<var>body</var>&hellip;])
-</pre></div>
+<div class="group"><pre class="example-preformatted">(pcase-let* ([<var class="var">binding</var>...])
+  [<var class="var">body</var>...])
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-_003aif_002dlet"><span class="category">Auxiliary Operator: </span><span><strong>:if-let</strong> <em>[binding&hellip;]</em><a href='#index-_003aif_002dlet' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn">
+<dt class="deffn" id="index-_003aif_002dlet"><span class="category-def">Auxiliary Operator: </span><span><strong class="def-name">:if-let</strong> <var class="def-var-arguments">[binding&hellip;]</var><a class="copiable-link" href="#index-_003aif_002dlet"> &para;</a></span></dt>
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">(when-let ([<var>binding</var>&hellip;])
-  [<var>body</var>&hellip;])
-</pre></div>
+<div class="group"><pre class="example-preformatted">(when-let ([<var class="var">binding</var>...])
+  [<var class="var">body</var>...])
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-_003aif_002dlet_002a"><span class="category">Auxiliary Operator: </span><span><strong>:if-let*</strong> <em>[binding&hellip;]</em><a href='#index-_003aif_002dlet_002a' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn">
+<dt class="deffn" id="index-_003aif_002dlet_002a"><span class="category-def">Auxiliary Operator: </span><span><strong class="def-name">:if-let*</strong> <var class="def-var-arguments">[binding&hellip;]</var><a class="copiable-link" href="#index-_003aif_002dlet_002a"> &para;</a></span></dt>
 <dd><p>This special-clause operator produces the following body:
 </p>
 <div class="example">
-<pre class="example">(when-let* ([<var>binding</var>&hellip;])
-  [<var>body</var>&hellip;])
-</pre></div>
+<div class="group"><pre class="example-preformatted">(when-let* ([<var class="var">binding</var>...])
+  [<var class="var">body</var>...])
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-_003apcase"><span class="category">Auxiliary Operator: </span><span><strong>:pcase</strong> <em>expression [<code>:exhaustive</code>] [pattern&hellip;]</em><a href='#index-_003apcase' class='copiable-anchor'> &para;</a></span></dt>
+<dl class="first-deffn">
+<dt class="deffn" id="index-_003apcase"><span class="category-def">Auxiliary Operator: </span><span><strong class="def-name">:pcase</strong> <var class="def-var-arguments">expression [<code class="code">:exhaustive</code>] [pattern&hellip;]</var><a class="copiable-link" href="#index-_003apcase"> &para;</a></span></dt>
 <dd><p>This special-clause operator produces the following body where
-<var>pcase</var> is <code>pcase</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Pattern_002dMatching-Conditional.html#Pattern_002dMatching-Conditional">(elisp)Pattern-Matching
-Conditional</a>) when <code>:exhaustive</code> is omitted, otherwise it
-is <code>pcase-exhaustive</code>:
+<var class="var">pcase</var> is <code class="code">pcase</code> (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Pattern_002dMatching-Conditional.html#Pattern_002dMatching-Conditional">(elisp)Pattern-Matching
+Conditional</a>) when <code class="code">:exhaustive</code> is omitted, otherwise it
+is <code class="code">pcase-exhaustive</code>:
 </p>
 <div class="example">
-<pre class="example">(<var>pcase</var> <var>expression</var>
-  ((and [<var>pattern</var>&hellip;])
-   [<var>body</var>&hellip;]))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(<var class="var">pcase</var> <var class="var">expression</var>
+  ((and [<var class="var">pattern</var>...])
+   [<var class="var">body</var>...]))
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-_003apcase_002dnot"><span class="category">Auxiliary Operator: </span><span><strong>:pcase-not</strong> <em>expression [<code>:as</code> as] [pattern&hellip;]</em><a href='#index-_003apcase_002dnot' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This special-clause operator produces the following body where <var>as</var>
-is an identifier that defaults to <code>_</code> when omitted:
+<dl class="first-deffn">
+<dt class="deffn" id="index-_003apcase_002dnot"><span class="category-def">Auxiliary Operator: </span><span><strong class="def-name">:pcase-not</strong> <var class="def-var-arguments">expression [<code class="code">:as</code> as] [pattern&hellip;]</var><a class="copiable-link" href="#index-_003apcase_002dnot"> &para;</a></span></dt>
+<dd><p>This special-clause operator produces the following body where <var class="var">as</var>
+is an identifier that defaults to <code class="code">_</code> when omitted:
 </p>
 <div class="example">
-<pre class="example">(pcase <var>expression</var>
-  ((and [<var>pattern</var>&hellip;])
+<div class="group"><pre class="example-preformatted">(pcase <var class="var">expression</var>
+  ((and [<var class="var">pattern</var>...])
    nil)
-  (<var>as</var>
-   [<var>body</var>&hellip;]))
-</pre></div>
+  (<var class="var">as</var>
+   [<var class="var">body</var>...]))
+</pre></div></div>
 </dd></dl>
 
-<dl class="def">
-<dt id="index-_003ado"><span class="category">Auxiliary Operator: </span><span><strong>:do</strong> <em>[expression&hellip;]</em><a href='#index-_003ado' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This special-clause operator prepends <var>expression</var>s to the body.
+<dl class="first-deffn">
+<dt class="deffn" id="index-_003ado"><span class="category-def">Auxiliary Operator: </span><span><strong class="def-name">:do</strong> <var class="def-var-arguments">[expression&hellip;]</var><a class="copiable-link" href="#index-_003ado"> &para;</a></span></dt>
+<dd><p>This special-clause operator prepends <var class="var">expression</var>s to the body.
 </p></dd></dl>
 
 </div>
 <hr>
-<div class="header">
+<div class="nav-panel">
 <p>
 Previous: <a href="Iteration-Macros.html">Iteration Macros</a>, Up: <a href="Iteration-Forms.html">Iteration Forms</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>

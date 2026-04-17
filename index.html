@@ -1,11 +1,11 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
-<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 7.1, https://www.gnu.org/software/texinfo/ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!-- This manual documents For (version 1.4).
+<!-- This manual documents For (version 1.4.1).
 
-Copyright (C) 2022 Wing Hei Chan
+Copyright © 2022 Wing Hei Chan
 
 This document is free documentation: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published
@@ -33,14 +33,17 @@ with this document.  If not, see https://www.gnu.org/licenses/. -->
 <link href="#SEC_Contents" rel="contents" title="Table of Contents">
 <link href="Introduction.html" rel="next" title="Introduction">
 <style type="text/css">
-@import url("https://www.gnu.org/software/emacs/manual.css");
-cite { font-style: italic; }
+<!--
+a.copiable-link {visibility: hidden; text-decoration: none; line-height: 0em}
+span:hover a.copiable-link {visibility: visible}
+ul.toc-numbered-mark {list-style: none}
+-->
 </style>
+
 
 </head>
 
 <body lang="en">
-<h1 class="settitle" align="center">For</h1>
 
 
 
@@ -55,27 +58,27 @@ cite { font-style: italic; }
 
 
 
-<div class="top" id="Top">
-<div class="header">
+<div class="top-level-extent" id="Top">
+<div class="nav-panel">
 <p>
 Next: <a href="Introduction.html" accesskey="n" rel="next">Introduction</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<span id="For"></span><h1 class="top">For</h1>
+<h1 class="top" id="For"><span>For<a class="copiable-link" href="#For"> &para;</a></span></h1>
 <p>This package provides iteration and sequence forms inspired by Racket.
 Two major facilities are provided:
 </p>
-<ol>
-<li> Generic iteration forms equivalent to <code>named-let</code> forms;
+<ol class="enumerate">
+<li> Generic iteration forms equivalent to <code class="code">named-let</code> forms;
 
 </li><li> Generic sequence constructors that are both expanders and generators.
 </li></ol>
 
-<p>This manual documents For (version 1.4).
+<p>This manual documents For (version 1.4.1).
 </p>
 <p>Copyright &copy; 2022 Wing Hei Chan
 </p>
-<blockquote>
+<blockquote class="quotation">
 <p>This document is free documentation: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published
 by the Free Software Foundation, either version 3 of the License, or (at
@@ -87,26 +90,26 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 General Public License for more details.
 </p>
 <p>You should have received a copy of the GNU General Public License along
-with this document.  If not, see <a href="https://www.gnu.org/licenses/">https://www.gnu.org/licenses/</a>.
+with this document.  If not, see <a class="url" href="https://www.gnu.org/licenses/">https://www.gnu.org/licenses/</a>.
 </p></blockquote>
 
 
-<div class="Contents_element" id="SEC_Contents">
+<div class="element-contents" id="SEC_Contents">
 <h2 class="contents-heading">Table of Contents</h2>
 
 <div class="contents">
 
-<ul class="no-bullet">
+<ul class="toc-numbered-mark">
   <li><a id="toc-Introduction-1" href="Introduction.html">1 Introduction</a></li>
   <li><a id="toc-Basic-Concepts-1" href="Basic-Concepts.html">2 Basic Concepts</a>
-  <ul class="no-bullet">
+  <ul class="toc-numbered-mark">
     <li><a id="toc-For-Clauses-1" href="For-Clauses.html">2.1 For Clauses</a></li>
     <li><a id="toc-Sequence-Forms-1" href="Sequence-Forms.html">2.2 Sequence Forms</a></li>
     <li><a id="toc-Multiple-Values-1" href="Multiple-Values.html">2.3 Multiple Values</a></li>
   </ul></li>
   <li><a id="toc-Definers-1" href="Definers.html">3 Definers</a></li>
   <li><a id="toc-Iteration-Forms-1" href="Iteration-Forms.html">4 Iteration Forms</a>
-  <ul class="no-bullet">
+  <ul class="toc-numbered-mark">
     <li><a id="toc-Iteration-Macros-1" href="Iteration-Macros.html">4.1 Iteration Macros</a></li>
     <li><a id="toc-Special_002dClause-Operators-1" href="Special_002dClause-Operators.html">4.2 Special-Clause Operators</a></li>
   </ul></li>
@@ -118,7 +121,7 @@ with this document.  If not, see <a href="https://www.gnu.org/licenses/">https:/
 </div>
 </div>
 <hr>
-<div class="header">
+<div class="nav-panel">
 <p>
 Next: <a href="Introduction.html" accesskey="n" rel="next">Introduction</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>

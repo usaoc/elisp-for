@@ -1,11 +1,11 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
-<!-- Created by GNU Texinfo 6.8, https://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 7.1, https://www.gnu.org/software/texinfo/ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!-- This manual documents For (version 1.4).
+<!-- This manual documents For (version 1.4.1).
 
-Copyright (C) 2022 Wing Hei Chan
+Copyright © 2022 Wing Hei Chan
 
 This document is free documentation: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published
@@ -35,109 +35,115 @@ with this document.  If not, see https://www.gnu.org/licenses/. -->
 <link href="Iteration-Forms.html" rel="next" title="Iteration Forms">
 <link href="Basic-Concepts.html" rel="prev" title="Basic Concepts">
 <style type="text/css">
-@import url("https://www.gnu.org/software/emacs/manual.css");
-cite { font-style: italic; }
+<!--
+a.copiable-link {visibility: hidden; text-decoration: none; line-height: 0em}
+div.example {margin-left: 3.2em}
+span:hover a.copiable-link {visibility: visible}
+strong.def-name {font-family: monospace; font-weight: bold; font-size: larger}
+ul.mark-bullet {list-style-type: disc}
+-->
 </style>
+
 
 </head>
 
 <body lang="en">
-<div class="chapter" id="Definers">
-<div class="header">
+<div class="chapter-level-extent" id="Definers">
+<div class="nav-panel">
 <p>
 Next: <a href="Iteration-Forms.html" accesskey="n" rel="next">Iteration Forms</a>, Previous: <a href="Basic-Concepts.html" accesskey="p" rel="prev">Basic Concepts</a>, Up: <a href="index.html" accesskey="u" rel="up">For</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<span id="Definers-1"></span><h2 class="chapter">3 Definers</h2>
+<h2 class="chapter" id="Definers-1"><span>3 Definers<a class="copiable-link" href="#Definers-1"> &para;</a></span></h2>
 <p>Two definers are available for defining sequence constructors and
 special-clause operators.  This chapter specifies them.
 </p>
-<dl class="def">
-<dt id="index-define_002dfor_002dsequence"><span class="category">Macro: </span><span><strong>define-for-sequence</strong> <em>name arglist [docstring] [subform&hellip;] [body&hellip;]</em><a href='#index-define_002dfor_002dsequence' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This definer defines the sequence constructor <var>name</var> as a generator
-with <var>arglist</var> as the argument list, an optional <var>docstring</var> as
-the documentation string, and optional <var>body</var>s as the body.  When no
-<var>body</var> is present and <var>arglist</var> does not contain a <code>&amp;rest</code>
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-define_002dfor_002dsequence"><span class="category-def">Macro: </span><span><strong class="def-name">define-for-sequence</strong> <var class="def-var-arguments">name arglist [docstring] [subform&hellip;] [body&hellip;]</var><a class="copiable-link" href="#index-define_002dfor_002dsequence"> &para;</a></span></dt>
+<dd><p>This definer defines the sequence constructor <var class="var">name</var> as a generator
+with <var class="var">arglist</var> as the argument list, an optional <var class="var">docstring</var> as
+the documentation string, and optional <var class="var">body</var>s as the body.  When no
+<var class="var">body</var> is present and <var class="var">arglist</var> does not contain a <code class="code">&amp;rest</code>
 argument (see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Argument-List.html#Argument-List">(elisp)Argument List</a>), the default body is used.
 </p>
 <p>The default body consists of a sole expression as follows where
-<var>value</var> is a generated identifier and <var>args</var> is <var>arglist</var>
-with a potential <code>&amp;optional</code> keyword removed:
+<var class="var">value</var> is a generated identifier and <var class="var">args</var> is <var class="var">arglist</var>
+with a potential <code class="code">&amp;optional</code> keyword removed:
 </p>
 <div class="example">
-<pre class="example">(for-iter ((<var>value</var> (<var>name</var> . <var>args</var>))
-           <var>value</var>))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(for-iter ((<var class="var">value</var> (<var class="var">name</var> . <var class="var">args</var>))
+           <var class="var">value</var>))
+</pre></div></div>
 
 <p>Additional properties can be associated with the sequence constructor
-with optional <var>subform</var>s where a <var>subform</var> is one of the
+with optional <var class="var">subform</var>s where a <var class="var">subform</var> is one of the
 following types:
 </p>
-<ul>
-<li> <code>(declare [<var>declaration</var>&hellip;])</code>
+<ul class="itemize mark-bullet">
+<li><code class="code">(declare [<var class="var">declaration</var>&hellip;])</code>
 
-</li><li> <code>(:alias [<var>alias</var>&hellip;])</code>
+</li><li><code class="code">(:alias [<var class="var">alias</var>&hellip;])</code>
 
-</li><li> <code>(:type [<var>type</var>&hellip;])</code>
+</li><li><code class="code">(:type [<var class="var">type</var>&hellip;])</code>
 
-</li><li> <code>(:expander (<var>arg</var>) <var>body</var>&hellip;)</code> <em>or</em>
-<code>(:expander-case [<var>case</var>&hellip;])</code>
+</li><li><code class="code">(:expander (<var class="var">arg</var>) <var class="var">body</var>&hellip;)</code> <em class="emph">or</em>
+<code class="code">(:expander-case [<var class="var">case</var>&hellip;])</code>
 </li></ul>
 
 <p>It is an error for a type to appear more than once.  The form of
-<code>declare</code> subforms is the same as normal <code>declare</code> forms
-(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Declare-Form.html#Declare-Form">(elisp)Declare Form</a>).  An <var>alias</var> is an identifier as an
-alias of <var>name</var> available when used in iteration clauses.  For each
-<var>type</var>, a primary method for <code>for-generator</code> is defined as
-follows where <var>datum</var> is a generated identifier:
+<code class="code">declare</code> subforms is the same as normal <code class="code">declare</code> forms
+(see <a data-manual="elisp" href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Declare-Form.html#Declare-Form">(elisp)Declare Form</a>).  An <var class="var">alias</var> is an identifier as an
+alias of <var class="var">name</var> available when used in iteration clauses.  For each
+<var class="var">type</var>, a primary method for <code class="code">for-generator</code> is defined as
+follows where <var class="var">datum</var> is a generated identifier:
 </p>
 <div class="example">
-<pre class="example">(cl-defmethod for-generator ((<var>datum</var> <var>type</var>))
-  (<var>name</var> <var>datum</var>))
-</pre></div>
+<div class="group"><pre class="example-preformatted">(cl-defmethod for-generator ((<var class="var">datum</var> <var class="var">type</var>))
+  (<var class="var">name</var> <var class="var">datum</var>))
+</pre></div></div>
 
-<p>When an <code>:expander</code> subform is present, an expander with
-<var>arg</var> as the sole argument and <var>body</var>s as the body is defined
+<p>When an <code class="code">:expander</code> subform is present, an expander with
+<var class="var">arg</var> as the sole argument and <var class="var">body</var>s as the body is defined
 and available when used in iteration clauses.  The expander receives the
 iteration clause as the argument and produces an expanded iteration
-clause.  An <code>:expander-case</code> subform is equivalent to an
-<code>:expander</code> subform with <code>(pcase-exhaustive <var>arg</var>
-[<var>case</var>&hellip;])</code> as the sole expression in <var>body</var>.
+clause.  An <code class="code">:expander-case</code> subform is equivalent to an
+<code class="code">:expander</code> subform with <code class="code">(pcase-exhaustive <var class="var">arg</var>
+[<var class="var">case</var>&hellip;])</code> as the sole expression in <var class="var">body</var>.
 </p>
-<p>Note that the subforms are processed <em>before</em> the generator is
+<p>Note that the subforms are processed <em class="emph">before</em> the generator is
 defined.  Therefore, the aliases and expander are available in the body
 of generator.
 </p></dd></dl>
 
-<dl class="def">
-<dt id="index-define_002dfor_002dspecial_002dclause"><span class="category">Macro: </span><span><strong>define-for-special-clause</strong> <em>name arglist [docstring] [subform&hellip;]</em><a href='#index-define_002dfor_002dspecial_002dclause' class='copiable-anchor'> &para;</a></span></dt>
-<dd><p>This definer defines the special-clause operator <var>name</var> as an
-expander with an optional <var>docstring</var> as the documentation string.
-It is an error for <var>name</var> to be a non-keyword.  When a special
-clause <code>(<var>name</var> . <var>subforms</var>)</code> is encountered, the expander
+<dl class="first-deffn first-defmac-alias-first-deffn">
+<dt class="deffn defmac-alias-deffn" id="index-define_002dfor_002dspecial_002dclause"><span class="category-def">Macro: </span><span><strong class="def-name">define-for-special-clause</strong> <var class="def-var-arguments">name arglist [docstring] [subform&hellip;]</var><a class="copiable-link" href="#index-define_002dfor_002dspecial_002dclause"> &para;</a></span></dt>
+<dd><p>This definer defines the special-clause operator <var class="var">name</var> as an
+expander with an optional <var class="var">docstring</var> as the documentation string.
+It is an error for <var class="var">name</var> to be a non-keyword.  When a special
+clause <code class="code">(<var class="var">name</var> . <var class="var">subforms</var>)</code> is encountered, the expander
 is invoked.  The expander receives two arguments where the first is the
 special clause and the second is the body expanded so far as a list of
 forms, and produces the further expanded body as a list of forms.
-<var>arglist</var> and <var>subform</var>s are expanded as follows:
+<var class="var">arglist</var> and <var class="var">subform</var>s are expanded as follows:
 </p>
-<ul>
-<li> When <var>arglist</var> has <em>two</em> identifiers, <var>arglist</var> is the
-argument list of expander, and <var>subform</var>s are the body of expander;
+<ul class="itemize mark-bullet">
+<li>When <var class="var">arglist</var> has <em class="emph">two</em> identifiers, <var class="var">arglist</var> is the
+argument list of expander, and <var class="var">subform</var>s are the body of expander;
 
-</li><li> When <var>arglist</var> has <em>one</em> identifier <var>body</var>,
-<code>(<var>special-clause</var> <var>body</var>)</code> is the argument list of
-expander where <var>special-clause</var> is a generated identifier, and
-<code>(pcase-exhaustive <var>special-clause</var>
-[<var>subform</var>&hellip;])</code> is the sole expression in the body
+</li><li>When <var class="var">arglist</var> has <em class="emph">one</em> identifier <var class="var">body</var>,
+<code class="code">(<var class="var">special-clause</var> <var class="var">body</var>)</code> is the argument list of
+expander where <var class="var">special-clause</var> is a generated identifier, and
+<code class="code">(pcase-exhaustive <var class="var">special-clause</var>
+[<var class="var">subform</var>&hellip;])</code> is the sole expression in the body
 of expander.
 </li></ul>
 
-<p>It is an error for <var>arglist</var> to be in any other form.
+<p>It is an error for <var class="var">arglist</var> to be in any other form.
 </p></dd></dl>
 
 </div>
 <hr>
-<div class="header">
+<div class="nav-panel">
 <p>
 Next: <a href="Iteration-Forms.html">Iteration Forms</a>, Previous: <a href="Basic-Concepts.html">Basic Concepts</a>, Up: <a href="index.html">For</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
